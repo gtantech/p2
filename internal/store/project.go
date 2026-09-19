@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"uuid"
 
@@ -45,6 +46,10 @@ type projectDbStore struct {
 func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectDbParams) (Project, error) {
 	data, err := p.queries.UpdateProject(ctx, db.UpdateProjectParams{ID: params.Id.String(), DispName: params.DisplayName})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Project doesn't exist
+			return Project{}, ErrProjectNotFound
+		}
 		return Project{}, err
 	}
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
@@ -54,6 +59,10 @@ func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectDbParam
 func (p *projectDbStore) GetProjects(ctx context.Context) ([]Project, error) {
 	data, err := p.queries.FindAllProjects(ctx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Project doesn't exist
+			return []Project{}, ErrProjectNotFound
+		}
 		return []Project{}, err
 	}
 	projects := make([]Project, len(data))
@@ -67,6 +76,10 @@ func (p *projectDbStore) GetProjects(ctx context.Context) ([]Project, error) {
 func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]Project, error) {
 	data, err := p.queries.FindProjectByName(ctx, search)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Project doesn't exist
+			return []Project{}, ErrProjectNotFound
+		}
 		return []Project{}, err
 	}
 	projects := make([]Project, len(data))
@@ -94,6 +107,10 @@ func (p *projectDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 func (p *projectDbStore) GetByID(ctx context.Context, id uuid.UUID) (Project, error) {
 	data, err := p.queries.FindProjectById(ctx, id.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Project doesn't exist
+			return Project{}, ErrProjectNotFound
+		}
 		return Project{}, err
 	}
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
