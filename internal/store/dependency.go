@@ -49,6 +49,10 @@ type UpdateDepdencencyDbParams struct {
 }
 
 type DependencyStore interface {
+	GetByID(ctx context.Context, id uuid.UUID) (Dependency, error)
+	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error)
+	GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error)
+	GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error)
 	Create(ctx context.Context, params CreateDepdencencyDbParams) (Dependency, error)
 	Update(ctx context.Context, params UpdateDepdencencyDbParams) (Dependency, error)
 	Delete(ctx context.Context, id uuid.UUID) error
@@ -56,6 +60,57 @@ type DependencyStore interface {
 
 type dependencyDbStore struct {
 	queries *db.Queries
+}
+
+// GetByProjectID implements [DependencyStore].
+func (d *dependencyDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error) {
+	data, err := d.queries.FindAllDependenciesByProject(ctx, projectId.String())
+	if err != nil {
+		return []Dependency{}, err
+	}
+
+	dependencies := make([]Dependency, len(data))
+	for i, d := range data {
+		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
+	}
+	return dependencies, nil
+}
+
+// GetByID implements [DependencyStore].
+func (d *dependencyDbStore) GetByID(ctx context.Context, id uuid.UUID) (Dependency, error) {
+	data, err := d.queries.FindDependencyById(ctx, id.String())
+	if err != nil {
+		return Dependency{}, err
+	}
+	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
+}
+
+// GetByPredecessor implements [DependencyStore].
+func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error) {
+	data, err := d.queries.FindAllDependenciesByPredecessor(ctx, predecessorId.String())
+	if err != nil {
+		return []Dependency{}, err
+	}
+
+	dependencies := make([]Dependency, len(data))
+	for i, d := range data {
+		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
+	}
+	return dependencies, nil
+}
+
+// GetBySuccessor implements [DependencyStore].
+func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error) {
+	data, err := d.queries.FindAllDependenciesBySuccessor(ctx, successorId.String())
+	if err != nil {
+		return []Dependency{}, err
+	}
+
+	dependencies := make([]Dependency, len(data))
+	for i, d := range data {
+		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
+	}
+	return dependencies, nil
 }
 
 // Create implements [DependencyStore].
