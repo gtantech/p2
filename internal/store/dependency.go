@@ -2,12 +2,16 @@ package store
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"uuid"
 
 	"github.com/gtantech/p2/internal/db"
 )
 
 type RelationshipType string
+
+var ErrDependencyNotFound = errors.New("dependency not found")
 
 const (
 	SS RelationshipType = "SS" // start to start relationship
@@ -66,6 +70,10 @@ type dependencyDbStore struct {
 func (d *dependencyDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error) {
 	data, err := d.queries.FindAllDependenciesByProject(ctx, projectId.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Dependency doesn't exist
+			return []Dependency{}, ErrDependencyNotFound
+		}
 		return []Dependency{}, err
 	}
 
@@ -80,6 +88,10 @@ func (d *dependencyDbStore) GetByProjectID(ctx context.Context, projectId uuid.U
 func (d *dependencyDbStore) GetByID(ctx context.Context, id uuid.UUID) (Dependency, error) {
 	data, err := d.queries.FindDependencyById(ctx, id.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Dependency doesn't exist
+			return Dependency{}, ErrDependencyNotFound
+		}
 		return Dependency{}, err
 	}
 	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
@@ -89,6 +101,10 @@ func (d *dependencyDbStore) GetByID(ctx context.Context, id uuid.UUID) (Dependen
 func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error) {
 	data, err := d.queries.FindAllDependenciesByPredecessor(ctx, predecessorId.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Dependency doesn't exist
+			return []Dependency{}, ErrDependencyNotFound
+		}
 		return []Dependency{}, err
 	}
 
@@ -103,6 +119,10 @@ func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId 
 func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error) {
 	data, err := d.queries.FindAllDependenciesBySuccessor(ctx, successorId.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Dependency doesn't exist
+			return []Dependency{}, ErrDependencyNotFound
+		}
 		return []Dependency{}, err
 	}
 
@@ -142,6 +162,10 @@ func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencency
 		ID:                    params.ID.String(),
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Dependency doesn't exist
+			return Dependency{}, ErrDependencyNotFound
+		}
 		return Dependency{}, err
 	}
 	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
