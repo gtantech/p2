@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 	"uuid"
@@ -75,6 +76,10 @@ func (a *activityDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 func (a *activityDbStore) GetByID(ctx context.Context, id uuid.UUID) (Activity, error) {
 	data, err := a.queries.FindActivityById(ctx, id.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Activity doesn't exist
+			return Activity{}, ErrActivityNotFound
+		}
 		return Activity{}, err
 	}
 	return newActivity(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), data.DispName, time.Duration(data.Duration)), nil
@@ -87,6 +92,10 @@ func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetByN
 		ProjectID: params.ProjectID.String(),
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Activity doesn't exist
+			return []Activity{}, ErrActivityNotFound
+		}
 		return []Activity{}, err
 	}
 	activities := make([]Activity, len(data))
@@ -100,6 +109,10 @@ func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetByN
 func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Activity, error) {
 	data, err := a.queries.FindAllActivitiesByProject(ctx, projectId.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Activity doesn't exist
+			return []Activity{}, ErrActivityNotFound
+		}
 		return []Activity{}, err
 	}
 	activities := make([]Activity, len(data))
@@ -117,6 +130,10 @@ func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityDbPar
 		ID:       params.Id.String(),
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Activity doesn't exist
+			return Activity{}, ErrActivityNotFound
+		}
 		return Activity{}, err
 	}
 	return newActivity(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), data.DispName, time.Duration(data.Duration)), nil
