@@ -18,6 +18,122 @@ func (q *Queries) DeleteDependency(ctx context.Context, id string) error {
 	return err
 }
 
+const findAllDependenciesByPredecessor = `-- name: FindAllDependenciesByPredecessor :many
+SELECT id, project_id, relationship, predecessor_activity_id, successor_activity_id FROM dependencies WHERE predecessor_activity_id = ?
+`
+
+func (q *Queries) FindAllDependenciesByPredecessor(ctx context.Context, predecessorActivityID string) ([]Dependency, error) {
+	rows, err := q.db.QueryContext(ctx, findAllDependenciesByPredecessor, predecessorActivityID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Dependency
+	for rows.Next() {
+		var i Dependency
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.Relationship,
+			&i.PredecessorActivityID,
+			&i.SuccessorActivityID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findAllDependenciesByProject = `-- name: FindAllDependenciesByProject :many
+SELECT id, project_id, relationship, predecessor_activity_id, successor_activity_id FROM dependencies WHERE project_id = ?
+`
+
+func (q *Queries) FindAllDependenciesByProject(ctx context.Context, projectID string) ([]Dependency, error) {
+	rows, err := q.db.QueryContext(ctx, findAllDependenciesByProject, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Dependency
+	for rows.Next() {
+		var i Dependency
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.Relationship,
+			&i.PredecessorActivityID,
+			&i.SuccessorActivityID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findAllDependenciesBySuccessor = `-- name: FindAllDependenciesBySuccessor :many
+SELECT id, project_id, relationship, predecessor_activity_id, successor_activity_id FROM dependencies WHERE successor_activity_id = ?
+`
+
+func (q *Queries) FindAllDependenciesBySuccessor(ctx context.Context, successorActivityID string) ([]Dependency, error) {
+	rows, err := q.db.QueryContext(ctx, findAllDependenciesBySuccessor, successorActivityID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Dependency
+	for rows.Next() {
+		var i Dependency
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.Relationship,
+			&i.PredecessorActivityID,
+			&i.SuccessorActivityID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findDependencyById = `-- name: FindDependencyById :one
+SELECT id, project_id, relationship, predecessor_activity_id, successor_activity_id FROM dependencies WHERE id = ?
+`
+
+func (q *Queries) FindDependencyById(ctx context.Context, id string) (Dependency, error) {
+	row := q.db.QueryRowContext(ctx, findDependencyById, id)
+	var i Dependency
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.Relationship,
+		&i.PredecessorActivityID,
+		&i.SuccessorActivityID,
+	)
+	return i, err
+}
+
 const insertDependency = `-- name: InsertDependency :one
 INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) 
 VALUES (?, ?, ?, ?, ?)

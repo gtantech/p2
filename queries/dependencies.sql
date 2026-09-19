@@ -1,3 +1,15 @@
+-- name: FindAllDependenciesByProject :many
+SELECT * FROM dependencies WHERE project_id = ?;
+
+-- name: FindAllDependenciesByPredecessor :many
+SELECT * FROM dependencies WHERE predecessor_activity_id = ?;
+
+-- name: FindAllDependenciesBySuccessor :many
+SELECT * FROM dependencies WHERE successor_activity_id = ?;
+
+-- name: FindDependencyById :one
+SELECT * FROM dependencies WHERE id = ?;
+
 -- name: InsertDependency :one
 INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) 
 VALUES (?, ?, ?, ?, ?)
