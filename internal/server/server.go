@@ -1,10 +1,14 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -14,11 +18,17 @@ type ServerConfig struct {
 
 type Server struct {
 	ServerConfig
+	store *store.Store
 }
 
 func NewServer(config ServerConfig) *http.Server {
+	database, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		log.Fatalf("failed to open database with error: %v", err)
+	}
 	NewServer := &Server{
 		ServerConfig: config,
+		store:        store.NewStoreFromDb(db.New(database)),
 	}
 
 	// Declare Server config
