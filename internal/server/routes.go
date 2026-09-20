@@ -21,7 +21,7 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Get("/", routes.HelloWorldHandler().ServeHTTP)
+	r.Get("/", routes.HelloWorldHandler)
 
 	return r
 }
