@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/routes"
 	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -20,7 +21,6 @@ type Server struct {
 	*http.Server
 	database *sql.DB
 	port     int
-	store    *store.Store
 }
 
 func (s *Server) CloseDb() error {
@@ -32,16 +32,18 @@ func NewServer(config ServerConfig) *Server {
 	if err != nil {
 		log.Fatalf("failed to open database with error: %v", err)
 	}
+
+	store := store.NewStoreFromDb(db.New(database))
+
 	NewServer := &Server{
 		database: database,
 		port:     config.Port,
-		store:    store.NewStoreFromDb(db.New(database)),
 	}
 
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
-		Handler:      NewServer.RegisterRoutes(),
+		Handler:      NewServer.RegisterRoutes(routes.NewRoutes(store)),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
