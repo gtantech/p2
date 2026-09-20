@@ -45,7 +45,7 @@ type CreateDepdencencyParams struct {
 	SuccessorActivityID   uuid.UUID
 }
 
-func (c *CreateDepdencencyParams) ToDbInsertDependencyParams(dependencyId uuid.UUID) db.InsertDependencyParams {
+func (c *CreateDepdencencyParams) toDbInsertDependencyParams(dependencyId uuid.UUID) db.InsertDependencyParams {
 	return db.InsertDependencyParams{
 		ID:                    dependencyId.String(),
 		ProjectID:             c.ProjectID.String(),
@@ -62,7 +62,7 @@ type UpdateDepdencencyParams struct {
 	SuccessorActivityID   uuid.UUID
 }
 
-func (u *UpdateDepdencencyParams) ToDbUpdateDependencyParams() db.UpdateDependencyParams {
+func (u *UpdateDepdencencyParams) toDbUpdateDependencyParams() db.UpdateDependencyParams {
 	return db.UpdateDependencyParams{
 		Relationship:          string(u.Relationship),
 		PredecessorActivityID: u.PredecessorActivityID.String(),
@@ -154,7 +154,7 @@ func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid
 
 // Create implements [DependencyStore].
 func (d *dependencyDbStore) Create(ctx context.Context, params CreateDepdencencyParams) (Dependency, error) {
-	data, err := d.queries.InsertDependency(ctx, params.ToDbInsertDependencyParams(uuid.NewV7()))
+	data, err := d.queries.InsertDependency(ctx, params.toDbInsertDependencyParams(uuid.NewV7()))
 	if err != nil {
 		return Dependency{}, err
 	}
@@ -168,7 +168,7 @@ func (d *dependencyDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 
 // Update implements [DependencyStore].
 func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencencyParams) (Dependency, error) {
-	data, err := d.queries.UpdateDependency(ctx, params.ToDbUpdateDependencyParams())
+	data, err := d.queries.UpdateDependency(ctx, params.toDbUpdateDependencyParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Dependency doesn't exist

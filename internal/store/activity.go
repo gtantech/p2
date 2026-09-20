@@ -29,7 +29,7 @@ type CreateActivityParams struct {
 	Duration    time.Duration
 }
 
-func (c *CreateActivityParams) ToDbInsertActivityParams(activityId uuid.UUID) db.InsertActivityParams {
+func (c *CreateActivityParams) toDbInsertActivityParams(activityId uuid.UUID) db.InsertActivityParams {
 	return db.InsertActivityParams{
 		ID:        activityId.String(),
 		ProjectID: c.ProjectID.String(),
@@ -43,7 +43,7 @@ type GetActivityByNameAndProjectParams struct {
 	DisplayName string
 }
 
-func (g *GetActivityByNameAndProjectParams) ToDbFindAllActivitiesByNameAndProjectParams() db.FindAllActivitiesByNameAndProjectParams {
+func (g *GetActivityByNameAndProjectParams) toDbFindAllActivitiesByNameAndProjectParams() db.FindAllActivitiesByNameAndProjectParams {
 	return db.FindAllActivitiesByNameAndProjectParams{
 		DispName:  g.DisplayName,
 		ProjectID: g.ProjectID.String(),
@@ -56,7 +56,7 @@ type UpdateActivityParams struct {
 	Duration    time.Duration
 }
 
-func (u *UpdateActivityParams) ToUpdateActivityParams() db.UpdateActivityParams {
+func (u *UpdateActivityParams) toUpdateActivityParams() db.UpdateActivityParams {
 	return db.UpdateActivityParams{
 		DispName: u.DisplayName,
 		Duration: int64(u.Duration),
@@ -79,7 +79,7 @@ type activityDbStore struct {
 
 // Create implements [ActivityStore].
 func (a *activityDbStore) Create(ctx context.Context, params CreateActivityParams) (Activity, error) {
-	data, err := a.queries.InsertActivity(ctx, params.ToDbInsertActivityParams(uuid.NewV7()))
+	data, err := a.queries.InsertActivity(ctx, params.toDbInsertActivityParams(uuid.NewV7()))
 	if err != nil {
 		return Activity{}, err
 	}
@@ -106,7 +106,7 @@ func (a *activityDbStore) GetByID(ctx context.Context, id uuid.UUID) (Activity, 
 
 // GetByNameAndProject implements [ActivityStore].
 func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error) {
-	data, err := a.queries.FindAllActivitiesByNameAndProject(ctx, params.ToDbFindAllActivitiesByNameAndProjectParams())
+	data, err := a.queries.FindAllActivitiesByNameAndProject(ctx, params.toDbFindAllActivitiesByNameAndProjectParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Activity doesn't exist
@@ -140,7 +140,7 @@ func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUI
 
 // Update implements [ActivityStore].
 func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityParams) (Activity, error) {
-	data, err := a.queries.UpdateActivity(ctx, params.ToUpdateActivityParams())
+	data, err := a.queries.UpdateActivity(ctx, params.toUpdateActivityParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Activity doesn't exist
