@@ -23,15 +23,31 @@ func newActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration
 	return Activity{ID: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
 }
 
-type CreateActivityDbParams struct {
+type CreateActivityParams struct {
 	ProjectID   uuid.UUID
 	DisplayName string
 	Duration    time.Duration
 }
 
-type GetByNameAndProjectParams struct {
+func (c *CreateActivityParams) ToDbInsertActivityParams(activityId uuid.UUID) db.InsertActivityParams {
+	return db.InsertActivityParams{
+		ID:        activityId.String(),
+		ProjectID: c.ProjectID.String(),
+		DispName:  c.DisplayName,
+		Duration:  int64(c.Duration),
+	}
+}
+
+type GetActivityByNameAndProjectParams struct {
 	ProjectID   uuid.UUID
 	DisplayName string
+}
+
+func (g *GetActivityByNameAndProjectParams) ToDbFindAllActivitiesByNameAndProjectParams() db.FindAllActivitiesByNameAndProjectParams {
+	return db.FindAllActivitiesByNameAndProjectParams{
+		DispName:  g.DisplayName,
+		ProjectID: g.ProjectID.String(),
+	}
 }
 
 type UpdateActivityDbParams struct {
@@ -40,11 +56,19 @@ type UpdateActivityDbParams struct {
 	Duration    time.Duration
 }
 
+func (u *UpdateActivityDbParams) ToUpdateActivityParams() db.UpdateActivityParams {
+	return db.UpdateActivityParams{
+		DispName: u.DisplayName,
+		Duration: int64(u.Duration),
+		ID:       u.Id.String(),
+	}
+}
+
 type ActivityStore interface {
 	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Activity, error)
-	GetByNameAndProject(ctx context.Context, params GetByNameAndProjectParams) ([]Activity, error)
+	GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error)
 	GetByID(ctx context.Context, id uuid.UUID) (Activity, error)
-	Create(ctx context.Context, params CreateActivityDbParams) (Activity, error)
+	Create(ctx context.Context, params CreateActivityParams) (Activity, error)
 	Update(ctx context.Context, params UpdateActivityDbParams) (Activity, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
@@ -54,13 +78,8 @@ type activityDbStore struct {
 }
 
 // Create implements [ActivityStore].
-func (a *activityDbStore) Create(ctx context.Context, params CreateActivityDbParams) (Activity, error) {
-	data, err := a.queries.InsertActivity(ctx, db.InsertActivityParams{
-		ID:        uuid.NewV7().String(),
-		ProjectID: params.ProjectID.String(),
-		DispName:  params.DisplayName,
-		Duration:  int64(params.Duration),
-	})
+func (a *activityDbStore) Create(ctx context.Context, params CreateActivityParams) (Activity, error) {
+	data, err := a.queries.InsertActivity(ctx, params.ToDbInsertActivityParams(uuid.NewV7()))
 	if err != nil {
 		return Activity{}, err
 	}
@@ -86,11 +105,8 @@ func (a *activityDbStore) GetByID(ctx context.Context, id uuid.UUID) (Activity, 
 }
 
 // GetByNameAndProject implements [ActivityStore].
-func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetByNameAndProjectParams) ([]Activity, error) {
-	data, err := a.queries.FindAllActivitiesByNameAndProject(ctx, db.FindAllActivitiesByNameAndProjectParams{
-		DispName:  params.DisplayName,
-		ProjectID: params.ProjectID.String(),
-	})
+func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error) {
+	data, err := a.queries.FindAllActivitiesByNameAndProject(ctx, params.ToDbFindAllActivitiesByNameAndProjectParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Activity doesn't exist
@@ -124,11 +140,7 @@ func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUI
 
 // Update implements [ActivityStore].
 func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityDbParams) (Activity, error) {
-	data, err := a.queries.UpdateActivity(ctx, db.UpdateActivityParams{
-		DispName: params.DisplayName,
-		Duration: int64(params.Duration),
-		ID:       params.Id.String(),
-	})
+	data, err := a.queries.UpdateActivity(ctx, params.ToUpdateActivityParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Activity doesn't exist

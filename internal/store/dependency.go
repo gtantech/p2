@@ -38,18 +38,37 @@ func newDependency(id uuid.UUID, projectId uuid.UUID, relationship RelationshipT
 	}
 }
 
-type CreateDepdencencyDbParams struct {
+type CreateDepdencencyParams struct {
 	ProjectID             uuid.UUID
 	Relationship          RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
 }
 
-type UpdateDepdencencyDbParams struct {
+func (c *CreateDepdencencyParams) ToDbInsertDependencyParams() db.InsertDependencyParams {
+	return db.InsertDependencyParams{
+		ID:                    uuid.NewV7().String(),
+		ProjectID:             c.ProjectID.String(),
+		Relationship:          string(c.Relationship),
+		PredecessorActivityID: c.PredecessorActivityID.String(),
+		SuccessorActivityID:   c.SuccessorActivityID.String(),
+	}
+}
+
+type UpdateDepdencencyParams struct {
 	ID                    uuid.UUID
 	Relationship          RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
+}
+
+func (u *UpdateDepdencencyParams) ToDbUpdateDependencyParams() db.UpdateDependencyParams {
+	return db.UpdateDependencyParams{
+		Relationship:          string(u.Relationship),
+		PredecessorActivityID: u.PredecessorActivityID.String(),
+		SuccessorActivityID:   u.SuccessorActivityID.String(),
+		ID:                    u.ID.String(),
+	}
 }
 
 type DependencyStore interface {
@@ -57,8 +76,8 @@ type DependencyStore interface {
 	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error)
 	GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error)
 	GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error)
-	Create(ctx context.Context, params CreateDepdencencyDbParams) (Dependency, error)
-	Update(ctx context.Context, params UpdateDepdencencyDbParams) (Dependency, error)
+	Create(ctx context.Context, params CreateDepdencencyParams) (Dependency, error)
+	Update(ctx context.Context, params UpdateDepdencencyParams) (Dependency, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -134,14 +153,8 @@ func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid
 }
 
 // Create implements [DependencyStore].
-func (d *dependencyDbStore) Create(ctx context.Context, params CreateDepdencencyDbParams) (Dependency, error) {
-	data, err := d.queries.InsertDependency(ctx, db.InsertDependencyParams{
-		ID:                    uuid.NewV7().String(),
-		ProjectID:             params.ProjectID.String(),
-		Relationship:          string(params.Relationship),
-		PredecessorActivityID: params.PredecessorActivityID.String(),
-		SuccessorActivityID:   params.SuccessorActivityID.String(),
-	})
+func (d *dependencyDbStore) Create(ctx context.Context, params CreateDepdencencyParams) (Dependency, error) {
+	data, err := d.queries.InsertDependency(ctx, params.ToDbInsertDependencyParams())
 	if err != nil {
 		return Dependency{}, err
 	}
@@ -154,13 +167,8 @@ func (d *dependencyDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 // Update implements [DependencyStore].
-func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencencyDbParams) (Dependency, error) {
-	data, err := d.queries.UpdateDependency(ctx, db.UpdateDependencyParams{
-		Relationship:          string(params.Relationship),
-		PredecessorActivityID: params.PredecessorActivityID.String(),
-		SuccessorActivityID:   params.SuccessorActivityID.String(),
-		ID:                    params.ID.String(),
-	})
+func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencencyParams) (Dependency, error) {
+	data, err := d.queries.UpdateDependency(ctx, params.ToDbUpdateDependencyParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Dependency doesn't exist
@@ -171,7 +179,7 @@ func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencency
 	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
 }
 
-func NewDependencyDbStore(queries *db.Queries) *dependencyDbStore {
+func NewDependencyStoreFromDb(queries *db.Queries) *dependencyDbStore {
 	return &dependencyDbStore{
 		queries: queries,
 	}
