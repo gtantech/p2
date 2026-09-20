@@ -17,11 +17,12 @@ type ServerConfig struct {
 }
 
 type Server struct {
+	*http.Server
 	port  int
 	store *store.Store
 }
 
-func NewServer(config ServerConfig) *http.Server {
+func NewServer(config ServerConfig) *Server {
 	database, err := sql.Open("sqlite", ":memory:")
 	if err != nil {
 		log.Fatalf("failed to open database with error: %v", err)
@@ -40,5 +41,7 @@ func NewServer(config ServerConfig) *http.Server {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	return server
+	NewServer.Server = server
+
+	return NewServer
 }

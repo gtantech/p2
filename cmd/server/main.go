@@ -14,7 +14,8 @@ import (
 	"github.com/gtantech/p2/internal/server"
 )
 
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
+func gracefulShutdown(server *server.Server, done chan bool) {
+	apiServer := server.Server
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
