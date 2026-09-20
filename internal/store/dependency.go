@@ -45,11 +45,30 @@ type CreateDepdencencyDbParams struct {
 	SuccessorActivityID   uuid.UUID
 }
 
+func (c *CreateDepdencencyDbParams) ToInsertDependencyParams() db.InsertDependencyParams {
+	return db.InsertDependencyParams{
+		ID:                    uuid.NewV7().String(),
+		ProjectID:             c.ProjectID.String(),
+		Relationship:          string(c.Relationship),
+		PredecessorActivityID: c.PredecessorActivityID.String(),
+		SuccessorActivityID:   c.SuccessorActivityID.String(),
+	}
+}
+
 type UpdateDepdencencyDbParams struct {
 	ID                    uuid.UUID
 	Relationship          RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
+}
+
+func (u *UpdateDepdencencyDbParams) ToUpdateDependencyParams() db.UpdateDependencyParams {
+	return db.UpdateDependencyParams{
+		Relationship:          string(u.Relationship),
+		PredecessorActivityID: u.PredecessorActivityID.String(),
+		SuccessorActivityID:   u.SuccessorActivityID.String(),
+		ID:                    u.ID.String(),
+	}
 }
 
 type DependencyStore interface {
@@ -135,13 +154,7 @@ func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid
 
 // Create implements [DependencyStore].
 func (d *dependencyDbStore) Create(ctx context.Context, params CreateDepdencencyDbParams) (Dependency, error) {
-	data, err := d.queries.InsertDependency(ctx, db.InsertDependencyParams{
-		ID:                    uuid.NewV7().String(),
-		ProjectID:             params.ProjectID.String(),
-		Relationship:          string(params.Relationship),
-		PredecessorActivityID: params.PredecessorActivityID.String(),
-		SuccessorActivityID:   params.SuccessorActivityID.String(),
-	})
+	data, err := d.queries.InsertDependency(ctx, params.ToInsertDependencyParams())
 	if err != nil {
 		return Dependency{}, err
 	}
@@ -155,12 +168,7 @@ func (d *dependencyDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 
 // Update implements [DependencyStore].
 func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencencyDbParams) (Dependency, error) {
-	data, err := d.queries.UpdateDependency(ctx, db.UpdateDependencyParams{
-		Relationship:          string(params.Relationship),
-		PredecessorActivityID: params.PredecessorActivityID.String(),
-		SuccessorActivityID:   params.SuccessorActivityID.String(),
-		ID:                    params.ID.String(),
-	})
+	data, err := d.queries.UpdateDependency(ctx, params.ToUpdateDependencyParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Dependency doesn't exist
