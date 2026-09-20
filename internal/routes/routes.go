@@ -1,7 +1,8 @@
 package routes
 
 import (
-	"github.com/a-h/templ"
+	"net/http"
+
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
 )
@@ -14,6 +15,6 @@ func NewRoutes(store *store.Store) *Routes {
 	return &Routes{store: store}
 }
 
-func (r *Routes) HelloWorldHandler() *templ.ComponentHandler {
-	return templ.Handler(view.Home())
+func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
+	view.Home().Render(r.Context(), w)
 }
