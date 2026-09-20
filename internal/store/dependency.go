@@ -45,9 +45,9 @@ type CreateDepdencencyParams struct {
 	SuccessorActivityID   uuid.UUID
 }
 
-func (c *CreateDepdencencyParams) ToDbInsertDependencyParams() db.InsertDependencyParams {
+func (c *CreateDepdencencyParams) ToDbInsertDependencyParams(dependencyId uuid.UUID) db.InsertDependencyParams {
 	return db.InsertDependencyParams{
-		ID:                    uuid.NewV7().String(),
+		ID:                    dependencyId.String(),
 		ProjectID:             c.ProjectID.String(),
 		Relationship:          string(c.Relationship),
 		PredecessorActivityID: c.PredecessorActivityID.String(),
@@ -154,7 +154,7 @@ func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid
 
 // Create implements [DependencyStore].
 func (d *dependencyDbStore) Create(ctx context.Context, params CreateDepdencencyParams) (Dependency, error) {
-	data, err := d.queries.InsertDependency(ctx, params.ToDbInsertDependencyParams())
+	data, err := d.queries.InsertDependency(ctx, params.ToDbInsertDependencyParams(uuid.NewV7()))
 	if err != nil {
 		return Dependency{}, err
 	}
