@@ -15,8 +15,8 @@ import (
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 
-func NewSQLiteStorage(path string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite", path)
+func NewSQLiteStorage(dataSourceName string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite", dataSourceName)
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
