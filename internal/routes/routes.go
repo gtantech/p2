@@ -10,6 +10,10 @@ type Routes struct {
 	store store.Store
 }
 
+func NewRoutes(store store.Store) *Routes {
+	return &Routes{store: store}
+}
+
 func (r *Routes) HelloWorldHandler() *templ.ComponentHandler {
 	return templ.Handler(view.Home())
 }
