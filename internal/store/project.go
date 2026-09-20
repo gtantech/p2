@@ -24,25 +24,25 @@ type ProjectStore interface {
 	GetByID(ctx context.Context, id uuid.UUID) (Project, error)
 	GetByName(ctx context.Context, search string) ([]Project, error)
 	GetProjects(ctx context.Context) ([]Project, error)
-	Create(ctx context.Context, params CreateProjectDbParams) (Project, error)
-	Update(ctx context.Context, params UpdateProjectDbParams) (Project, error)
+	Create(ctx context.Context, params CreateProjectParams) (Project, error)
+	Update(ctx context.Context, params UpdateProjectParams) (Project, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
-type CreateProjectDbParams struct {
+type CreateProjectParams struct {
 	DisplayName string
 }
 
-func (c *CreateProjectDbParams) ToInsertProjectParams() db.InsertProjectParams {
+func (c *CreateProjectParams) ToDbInsertProjectParams() db.InsertProjectParams {
 	return db.InsertProjectParams{ID: uuid.NewV7().String(), DispName: c.DisplayName}
 }
 
-type UpdateProjectDbParams struct {
+type UpdateProjectParams struct {
 	Id          uuid.UUID
 	DisplayName string
 }
 
-func (u *UpdateProjectDbParams) ToUpdateProjectParams() db.UpdateProjectParams {
+func (u *UpdateProjectParams) ToDbUpdateProjectParams() db.UpdateProjectParams {
 	return db.UpdateProjectParams{ID: u.Id.String(), DispName: u.DisplayName}
 }
 
@@ -51,8 +51,8 @@ type projectDbStore struct {
 }
 
 // Update implements [ProjectStore].
-func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectDbParams) (Project, error) {
-	data, err := p.queries.UpdateProject(ctx, params.ToUpdateProjectParams())
+func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams) (Project, error) {
+	data, err := p.queries.UpdateProject(ctx, params.ToDbUpdateProjectParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Project doesn't exist
@@ -98,8 +98,8 @@ func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]Projec
 }
 
 // Create implements [ProjectStore].
-func (p *projectDbStore) Create(ctx context.Context, params CreateProjectDbParams) (Project, error) {
-	data, err := p.queries.InsertProject(ctx, params.ToInsertProjectParams())
+func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams) (Project, error) {
+	data, err := p.queries.InsertProject(ctx, params.ToDbInsertProjectParams())
 	if err != nil {
 		return Project{}, err
 	}
@@ -124,7 +124,7 @@ func (p *projectDbStore) GetByID(ctx context.Context, id uuid.UUID) (Project, er
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
 }
 
-func NewProjectDbStore(queries *db.Queries) *projectDbStore {
+func NewProjectStoreFromDb(queries *db.Queries) *projectDbStore {
 	return &projectDbStore{
 		queries: queries,
 	}
