@@ -50,13 +50,13 @@ func (g *GetActivityByNameAndProjectParams) ToDbFindAllActivitiesByNameAndProjec
 	}
 }
 
-type UpdateActivityDbParams struct {
+type UpdateActivityParams struct {
 	Id          uuid.UUID
 	DisplayName string
 	Duration    time.Duration
 }
 
-func (u *UpdateActivityDbParams) ToUpdateActivityParams() db.UpdateActivityParams {
+func (u *UpdateActivityParams) ToUpdateActivityParams() db.UpdateActivityParams {
 	return db.UpdateActivityParams{
 		DispName: u.DisplayName,
 		Duration: int64(u.Duration),
@@ -69,7 +69,7 @@ type ActivityStore interface {
 	GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error)
 	GetByID(ctx context.Context, id uuid.UUID) (Activity, error)
 	Create(ctx context.Context, params CreateActivityParams) (Activity, error)
-	Update(ctx context.Context, params UpdateActivityDbParams) (Activity, error)
+	Update(ctx context.Context, params UpdateActivityParams) (Activity, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -139,7 +139,7 @@ func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUI
 }
 
 // Update implements [ActivityStore].
-func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityDbParams) (Activity, error) {
+func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityParams) (Activity, error) {
 	data, err := a.queries.UpdateActivity(ctx, params.ToUpdateActivityParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
