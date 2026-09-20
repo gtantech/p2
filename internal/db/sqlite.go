@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "modernc.org/sqlite"
@@ -25,16 +26,15 @@ func NewSQLiteStorage(dataSourceName string) (*sql.DB, error) {
 	if err := db.Ping(); err != nil {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
-	migrateDB(db)
+	driver, err := sqlite.WithInstance(db, &sqlite.Config{})
+	if err != nil {
+		return nil, err
+	}
+	migrateDB(driver)
 	return db, nil
 }
 
-func migrateDB(db *sql.DB) error {
-	driver, err := sqlite.WithInstance(db, &sqlite.Config{})
-	if err != nil {
-		return err
-	}
-
+func migrateDB(driver database.Driver) error {
 	source, err := iofs.New(migrationsFS, "migrations")
 	if err != nil {
 		return err
