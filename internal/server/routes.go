@@ -3,11 +3,10 @@ package server
 import (
 	"net/http"
 
-	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/gtantech/p2/internal/view"
+	"github.com/gtantech/p2/internal/routes"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -22,11 +21,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Get("/", s.HelloWorldHandler().ServeHTTP)
+	r.Get("/", routes.HelloWorldHandler().ServeHTTP)
 
 	return r
-}
-
-func (s *Server) HelloWorldHandler() *templ.ComponentHandler {
-	return templ.Handler(view.Home())
 }
