@@ -23,6 +23,10 @@ type Server struct {
 	store    *store.Store
 }
 
+func (s *Server) CloseDb() error {
+	return s.database.Close()
+}
+
 func NewServer(config ServerConfig) *Server {
 	database, err := sql.Open("sqlite", ":memory:")
 	if err != nil {
