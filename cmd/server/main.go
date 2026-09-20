@@ -35,6 +35,12 @@ func gracefulShutdown(server *server.Server, done chan bool) {
 	}
 
 	log.Println("Server exiting")
+	log.Println("Closing database...")
+	if err := server.CloseDb(); err != nil {
+		log.Printf("Database closed with error: %v", err)
+	} else {
+		log.Println("Database closed successfully")
+	}
 
 	// Notify the main goroutine that the shutdown is complete
 	done <- true
