@@ -18,8 +18,9 @@ type ServerConfig struct {
 
 type Server struct {
 	*http.Server
-	port  int
-	store *store.Store
+	database *sql.DB
+	port     int
+	store    *store.Store
 }
 
 func NewServer(config ServerConfig) *Server {
@@ -28,8 +29,9 @@ func NewServer(config ServerConfig) *Server {
 		log.Fatalf("failed to open database with error: %v", err)
 	}
 	NewServer := &Server{
-		port:  config.Port,
-		store: store.NewStoreFromDb(db.New(database)),
+		database: database,
+		port:     config.Port,
+		store:    store.NewStoreFromDb(db.New(database)),
 	}
 
 	// Declare Server config
