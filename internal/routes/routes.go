@@ -7,10 +7,10 @@ import (
 )
 
 type Routes struct {
-	store store.Store
+	store *store.Store
 }
 
-func NewRoutes(store store.Store) *Routes {
+func NewRoutes(store *store.Store) *Routes {
 	return &Routes{store: store}
 }
 
