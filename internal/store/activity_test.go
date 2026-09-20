@@ -40,7 +40,7 @@ func TestToDbInsertActivityParams(t *testing.T) {
 	duration := 5 * time.Minute
 
 	params := CreateActivityParams{ProjectID: projectId, DisplayName: displayName, Duration: duration}
-	dbParams := params.ToDbInsertActivityParams(activityId)
+	dbParams := params.toDbInsertActivityParams(activityId)
 
 	if got, want := uuid.MustParse(dbParams.ID), activityId; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -64,7 +64,7 @@ func TestToDbFindAllActivitiesByNameAndProjectParams(t *testing.T) {
 	displayName := "test_disp_name"
 
 	params := GetActivityByNameAndProjectParams{ProjectID: projectId, DisplayName: displayName}
-	dbParams := params.ToDbFindAllActivitiesByNameAndProjectParams()
+	dbParams := params.toDbFindAllActivitiesByNameAndProjectParams()
 
 	if got, want := dbParams.DispName, displayName; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -81,7 +81,7 @@ func TestToUpdateActivityParams(t *testing.T) {
 	duration := 5 * time.Minute
 
 	params := UpdateActivityParams{Id: activityId, DisplayName: displayName, Duration: duration}
-	dbParams := params.ToUpdateActivityParams()
+	dbParams := params.toUpdateActivityParams()
 
 	if got, want := uuid.MustParse(dbParams.ID), activityId; got != want {
 		t.Errorf("got %v, want %v", got, want)

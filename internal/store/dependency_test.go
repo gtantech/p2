@@ -47,7 +47,7 @@ func TestToDbInsertDependencyParams(t *testing.T) {
 		SuccessorActivityID:   successorId,
 	}
 
-	dbParams := params.ToDbInsertDependencyParams(dependencyId)
+	dbParams := params.toDbInsertDependencyParams(dependencyId)
 
 	if got, want := uuid.MustParse(dbParams.ID), dependencyId; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -83,7 +83,7 @@ func TestToDbUpdateDependencyParams(t *testing.T) {
 		SuccessorActivityID:   successorId,
 	}
 
-	dbParams := params.ToDbUpdateDependencyParams()
+	dbParams := params.toDbUpdateDependencyParams()
 
 	if got, want := uuid.MustParse(dbParams.ID), dependencyId; got != want {
 		t.Errorf("got %v, want %v", got, want)
