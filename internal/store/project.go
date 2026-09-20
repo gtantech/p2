@@ -33,8 +33,8 @@ type CreateProjectParams struct {
 	DisplayName string
 }
 
-func (c *CreateProjectParams) ToDbInsertProjectParams() db.InsertProjectParams {
-	return db.InsertProjectParams{ID: uuid.NewV7().String(), DispName: c.DisplayName}
+func (c *CreateProjectParams) ToDbInsertProjectParams(projectId uuid.UUID) db.InsertProjectParams {
+	return db.InsertProjectParams{ID: projectId.String(), DispName: c.DisplayName}
 }
 
 type UpdateProjectParams struct {
@@ -99,7 +99,7 @@ func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]Projec
 
 // Create implements [ProjectStore].
 func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams) (Project, error) {
-	data, err := p.queries.InsertProject(ctx, params.ToDbInsertProjectParams())
+	data, err := p.queries.InsertProject(ctx, params.ToDbInsertProjectParams(uuid.NewV7()))
 	if err != nil {
 		return Project{}, err
 	}
