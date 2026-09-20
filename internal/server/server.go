@@ -17,7 +17,7 @@ type ServerConfig struct {
 }
 
 type Server struct {
-	ServerConfig
+	port  int
 	store *store.Store
 }
 
@@ -27,13 +27,13 @@ func NewServer(config ServerConfig) *http.Server {
 		log.Fatalf("failed to open database with error: %v", err)
 	}
 	NewServer := &Server{
-		ServerConfig: config,
-		store:        store.NewStoreFromDb(db.New(database)),
+		port:  config.Port,
+		store: store.NewStoreFromDb(db.New(database)),
 	}
 
 	// Declare Server config
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", NewServer.Port),
+		Addr:         fmt.Sprintf(":%d", NewServer.port),
 		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
