@@ -151,4 +151,10 @@ func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityDbPar
 	return newActivity(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), data.DispName, time.Duration(data.Duration)), nil
 }
 
+func NewActivityStoreFromDb(queries *db.Queries) *activityDbStore {
+	return &activityDbStore{
+		queries: queries,
+	}
+}
+
 var _ ActivityStore = (*activityDbStore)(nil) //ensures activityDbStore implements ActivityStore at compile time
