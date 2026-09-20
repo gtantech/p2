@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/routes"
 	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -41,7 +42,7 @@ func NewServer(config ServerConfig) *Server {
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
-		Handler:      NewServer.RegisterRoutes(),
+		Handler:      NewServer.RegisterRoutes(routes.NewRoutes(NewServer.store)),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
