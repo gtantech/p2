@@ -1,0 +1,9 @@
+package view
+
+templ displayDependenciesToAdd(activities []activity, successorActivityId string){
+    <ul>
+        for _, item := range activities {
+            <li><button type="button" value={item.ID.String()}>{item.DisplayName}</button></li>
+        }
+    </ul>
+}
