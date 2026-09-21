@@ -30,19 +30,42 @@ templ displayDependencyTable(table *table){
         <tbody>
             for _, row := range table.rows{
                 <tr>
-                    <td>{row.activity.DisplayName}</td>
                     <td>
-                        {
-                            func() string {
-                                values := make([]string, len(row.dependencies))
-                                for i, dependency := range row.dependencies {
-                                    values[i] = dependency.DisplayName
-                                }
-                                return strings.Join(values, ", ")
-                            }()
-                        }    
+                        <input
+                            type="text"
+                            name="activity_name"
+                            class="activity-name"
+                            placeholder="Activity name"
+                            autocomplete="off"
+                            value={row.activity.DisplayName}
+                        >
                     </td>
-                    <td>{row.activity.Duration.String()}</td>
+                    <td>
+                        <input 
+                            type="text" 
+                            name="dependencies[]" 
+                            class="dependency-input"
+                            placeholder="Activity A, Activity B..."
+                            autocomplete="off"
+                            value={
+                                func() string {
+                                    values := make([]string, len(row.dependencies))
+                                    for i, dependency := range row.dependencies {
+                                        values[i] = dependency.DisplayName
+                                    }
+                                    return strings.Join(values, ", ")
+                                }()
+                            } 
+                        >   
+                    </td>
+                    <td>
+                        <input
+                            type="text"
+                            name="duration"
+                            placeholder="e.g. 2h"
+                            value={row.activity.Duration.String()}
+                        >
+                    </td>
                     <td>
                         <button type="button">Add</button>
                     </td>
