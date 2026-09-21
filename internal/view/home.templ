@@ -1,5 +1,375 @@
 package view
 
-templ home() {
-	<div>Hello World</div>
+templ home(table *table) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Task Planner</title>
+			<style>
+				* {
+					box-sizing: border-box;
+				}
+
+				body {
+					margin: 0;
+					padding: 40px;
+					background: #f5f6f8;
+					color: #1f2937;
+					font-family:
+						system-ui,
+						-apple-system,
+						BlinkMacSystemFont,
+						"Segoe UI",
+						sans-serif;
+				}
+
+				.container {
+					max-width: 1000px;
+					margin: 0 auto;
+				}
+
+				h1 {
+					margin: 0 0 24px;
+					font-size: 28px;
+				}
+
+				.table-wrapper {
+					background: white;
+					border: 1px solid #e5e7eb;
+					border-radius: 10px;
+					overflow: visible;
+					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+				}
+
+				table {
+					width: 100%;
+					border-collapse: collapse;
+				}
+
+				th {
+					padding: 14px 16px;
+					background: #f9fafb;
+					border-bottom: 1px solid #e5e7eb;
+					text-align: left;
+					font-size: 14px;
+					font-weight: 600;
+					color: #374151;
+				}
+
+				td {
+					padding: 10px 16px;
+					border-bottom: 1px solid #e5e7eb;
+					vertical-align: top;
+				}
+
+				tbody tr:last-child td {
+					border-bottom: none;
+				}
+
+				input {
+					width: 100%;
+					height: 40px;
+					padding: 0 11px;
+
+					border: 1px solid #d1d5db;
+					border-radius: 6px;
+
+					background: white;
+					color: #111827;
+
+					font: inherit;
+					font-size: 14px;
+				}
+
+				input:focus {
+					outline: none;
+					border-color: #6366f1;
+					box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+				}
+
+				.task-column {
+					width: 35%;
+				}
+
+				.dependency-column {
+					width: 45%;
+				}
+
+				.duration-column {
+					width: 15%;
+				}
+
+				.action-column {
+					width: 50px;
+				}
+
+				.dependency-wrapper {
+					position: relative;
+				}
+
+				/*
+				* Autocomplete dropdown
+				*/
+				.autocomplete {
+					position: absolute;
+
+					top: calc(100% + 4px);
+					left: 0;
+					right: 0;
+
+					z-index: 1000;
+
+					background: white;
+					border: 1px solid #d1d5db;
+					border-radius: 6px;
+
+					box-shadow:
+						0 8px 20px rgba(0, 0, 0, 0.12);
+
+					max-height: 220px;
+					overflow-y: auto;
+				}
+
+				.suggestion {
+					padding: 10px 12px;
+					cursor: pointer;
+					font-size: 14px;
+				}
+
+				.suggestion:hover {
+					background: #f3f4f6;
+				}
+
+				.suggestion strong {
+					color: #111827;
+				}
+
+				/*
+				* Add button
+				*/
+				.add-button {
+					width: 36px;
+					height: 36px;
+
+					border: none;
+					border-radius: 50%;
+
+					background: #4f46e5;
+					color: white;
+
+					font-size: 22px;
+					line-height: 36px;
+
+					cursor: pointer;
+
+					padding: 0;
+				}
+
+				.add-button:hover {
+					background: #4338ca;
+				}
+
+				.add-button:active {
+					transform: scale(0.96);
+				}
+
+				/*
+				* Optional delete button
+				*/
+				.delete-button {
+					margin-left: 5px;
+
+					width: 36px;
+					height: 36px;
+
+					border: none;
+					border-radius: 50%;
+
+					background: #ef4444;
+					color: white;
+
+					font-size: 18px;
+
+					cursor: pointer;
+				}
+
+				.delete-button:hover {
+					background: #dc2626;
+				}
+
+				.actions {
+					display: flex;
+					align-items: center;
+				}
+
+				/*
+				* Mobile
+				*/
+				@media (max-width: 700px) {
+					body {
+						padding: 20px;
+					}
+
+					.table-wrapper {
+						overflow-x: auto;
+					}
+
+					table {
+						min-width: 700px;
+					}
+				}
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<h1>Task Planner</h1>
+				<div class="table-wrapper">
+					@displayDependencyTable(table)
+				</div>
+			</div>
+			<script>
+
+				/*
+				* Add a new task row.
+				*/
+				function addTaskRow(button) {
+
+					const currentRow = button.closest(".task-row");
+
+					const newRow = currentRow.cloneNode(true);
+
+					/*
+					* Clear all input values.
+					*/
+					newRow.querySelectorAll("input").forEach(input => {
+						input.value = "";
+					});
+
+					/*
+					* Clear autocomplete results.
+					*/
+					newRow
+						.querySelector(".autocomplete")
+						.innerHTML = "";
+
+					/*
+					* Insert the new row immediately after
+					* the row whose + button was clicked.
+					*/
+					currentRow.after(newRow);
+
+					/*
+					* HTMX needs to process dynamically-added
+					* elements.
+					*/
+					htmx.process(newRow);
+
+					/*
+					* Focus the new task name.
+					*/
+					newRow
+						.querySelector(".task-name")
+						.focus();
+				}
+
+
+				/*
+				* When the user selects an autocomplete suggestion,
+				* append it to the comma-separated dependency list.
+				*
+				* The server should return:
+				*
+				* <div class="suggestion"
+				*      data-task-name="Build API"
+				*      onclick="selectDependency(this)">
+				*     Build API
+				* </div>
+				*/
+				function selectDependency(element) {
+
+					const taskName =
+						element.dataset.taskName ||
+						element.textContent.trim();
+
+					const input =
+						element
+							.closest(".dependency-wrapper")
+							.querySelector(".dependency-input");
+
+					/*
+					* Get everything before the current
+					* comma-separated value.
+					*/
+					const parts = input.value.split(",");
+
+					/*
+					* Replace the thing currently being typed.
+					*/
+					parts[parts.length - 1] = taskName;
+
+					/*
+					* Rebuild the dependency string.
+					*/
+					input.value = parts
+						.map(value => value.trim())
+						.filter(Boolean)
+						.join(", ");
+
+					/*
+					* Hide suggestions.
+					*/
+					element
+						.closest(".autocomplete")
+						.innerHTML = "";
+
+					/*
+					* Put cursor back in the input.
+					*/
+					input.focus();
+
+					input.setSelectionRange(
+						input.value.length,
+						input.value.length
+					);
+				}
+
+
+				/*
+				* Close autocomplete dropdowns when clicking
+				* somewhere else.
+				*/
+				document.addEventListener("click", function(event) {
+
+					if (
+						!event.target.closest(".dependency-wrapper")
+					) {
+						document
+							.querySelectorAll(".autocomplete")
+							.forEach(function(element) {
+								element.innerHTML = "";
+							});
+					}
+
+				});
+
+
+				/*
+				* Don't allow the autocomplete dropdown to
+				* disappear when clicking a suggestion.
+				*/
+				document.addEventListener("mousedown", function(event) {
+
+					if (
+						event.target.closest(".suggestion")
+					) {
+						event.preventDefault();
+					}
+
+				});
+
+			</script>
+		</body>
+	</html>
 }
