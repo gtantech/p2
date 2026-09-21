@@ -9,12 +9,16 @@ import (
 
 type Routes struct {
 	store *store.Store
+	view  *view.View
 }
 
 func NewRoutes(store *store.Store) *Routes {
-	return &Routes{store: store}
+	return &Routes{
+		store: store,
+		view:  view.NewView(),
+	}
 }
 
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	view.Home().Render(r.Context(), w)
+	rt.view.Home().Render(r.Context(), w)
 }
