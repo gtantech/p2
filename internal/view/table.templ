@@ -20,54 +20,83 @@ templ displayDependencyTable(table *table){
     <table>
         <thead>
             <tr>
-                <th>Activity</th>
-                <th>Dependencies</th>
-                <th>Duration</th>
-                <th>Actions</th>
+                <th class="task-column">
+                    Task
+                </th>
+                <th class="dependency-column">
+                    Dependencies
+                </th>
+                <th class="duration-column">
+                    Duration
+                </th>
+                <th class="action-column">
+                </th>
             </tr>
         </thead>
 
-        <tbody>
+        <tbody id="task-table-body">
             for _, row := range table.rows{
-                <tr>
+                <!--
+                    Task row
+                -->
+                <tr class="task-row">
+                    <!-- Task name -->
                     <td>
                         <input
                             type="text"
-                            name="activity_name"
-                            class="activity-name"
-                            placeholder="Activity name"
+                            name="task_name[]"
+                            class="task-name"
+                            placeholder="Task name"
                             autocomplete="off"
                             value={row.activity.DisplayName}
                         >
                     </td>
+                    <!-- Dependencies -->
                     <td>
-                        <input 
-                            type="text" 
-                            name="dependencies[]" 
-                            class="dependency-input"
-                            placeholder="Activity A, Activity B..."
-                            autocomplete="off"
-                            value={
-                                func() string {
-                                    values := make([]string, len(row.dependencies))
-                                    for i, dependency := range row.dependencies {
-                                        values[i] = dependency.DisplayName
-                                    }
-                                    return strings.Join(values, ", ")
-                                }()
-                            } 
-                        >   
+                        <div class="dependency-wrapper">
+                            <input
+                                type="text"
+                                name="dependencies[]"
+                                class="dependency-input"
+                                placeholder="Task A, Task B..."
+                                autocomplete="off"
+                                value={
+                                    func() string {
+                                        values := make([]string, len(row.dependencies))
+                                        for i, dependency := range row.dependencies {
+                                            values[i] = dependency.DisplayName
+                                        }
+                                        return strings.Join(values, ", ")
+                                    }()
+                                } 
+                            >
+                            <!--
+                                Go server will return suggestions here.
+                            -->
+                            <div class="autocomplete"></div>
+                        </div>
                     </td>
+                    <!-- Duration -->
                     <td>
                         <input
                             type="text"
-                            name="duration"
+                            name="duration[]"
                             placeholder="e.g. 2h"
                             value={row.activity.Duration.String()}
                         >
                     </td>
+                    <!-- Add row -->
                     <td>
-                        <button type="button">Add</button>
+                        <div class="actions">
+                            <button
+                                type="button"
+                                class="add-button"
+                                title="Add task"
+                                onclick="addTaskRow(this)"
+                            >
+                                +
+                            </button>
+                        </div>
                     </td>
                 </tr>
             }
