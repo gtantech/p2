@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/gtantech/p2/internal/routes"
-	"github.com/gtantech/p2/static"
 )
 
 func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
@@ -28,9 +27,7 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 		r.Get("/dependency/add", routes.DisplayDependenciesToAdd)
 	})
 
-	r.Handle("/static/*", http.StripPrefix(
-		"/static/",
-		http.FileServer(http.FS(static.StaticHomeCss)),
-	))
+	r.Get("/static/home_script.js", routes.GetHomeScript)
+	r.Get("/static/home_style.css", routes.GetHomeStyle)
 	return r
 }

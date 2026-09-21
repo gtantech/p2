@@ -1,9 +1,9 @@
 package static
 
-import "embed"
+import _ "embed"
 
 //go:embed home_style.css
-var StaticHomeCss embed.FS
+var StaticHomeCss []byte
 
 //go:embed home_script.js
-var StaticHomeScript embed.FS
+var StaticHomeScript []byte
