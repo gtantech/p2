@@ -23,5 +23,8 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 
 	r.Get("/", routes.HelloWorldHandler)
 
+	r.Route("/web", func(r chi.Router) {
+		r.Get("/dependency/add", routes.DisplayDependenciesToAdd)
+	})
 	return r
 }
