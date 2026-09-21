@@ -1,5 +1,7 @@
 package view
 
+import "strings"
+
 templ displayDependenciesToAdd(activities []activity, successorActivityId string){
     <ul>
         for _, item := range activities {
@@ -12,4 +14,40 @@ templ displayDependenciesToAddNotFound(){
     <ul>
         <li>Activity not found</li>
     </ul>
+}
+
+templ displayDependencyTable(table *table){
+    <table>
+        <thead>
+            <tr>
+                <th>Activity</th>
+                <th>Dependencies</th>
+                <th>Duration</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            for _, row := range table.rows{
+                <tr>
+                    <td>{row.activity.DisplayName}</td>
+                    <td>
+                        {
+                            func() string {
+                                values := make([]string, len(row.dependencies))
+                                for i, dependency := range row.dependencies {
+                                    values[i] = dependency.DisplayName
+                                }
+                                return strings.Join(values, ", ")
+                            }()
+                        }    
+                    </td>
+                    <td>{row.activity.Duration.String()}</td>
+                    <td>
+                        <button type="button">Add</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
