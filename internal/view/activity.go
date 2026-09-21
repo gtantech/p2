@@ -5,7 +5,7 @@ import (
 	"uuid"
 )
 
-type Activity struct {
+type activity struct {
 	ID          uuid.UUID
 	ProjectID   uuid.UUID
 	DisplayName string
