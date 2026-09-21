@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
 )
@@ -19,6 +20,10 @@ func NewRoutes(store *store.Store) *Routes {
 	}
 }
 
+func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *http.Request) {
+	component.Render(r.Context(), w)
+}
+
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	rt.view.Home().Render(r.Context(), w)
+	renderTemplComponent(rt.view.Home(), w, r)
 }
