@@ -30,7 +30,7 @@ func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, proje
 	if err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
 			// activity doesn't exist
-			return nil, ErrActivityNotFound
+			return displayDependenciesToAddNotFound(), nil
 		}
 		return nil, err
 	}
