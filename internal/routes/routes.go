@@ -9,6 +9,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
+	"github.com/gtantech/p2/static"
 )
 
 type Routes struct {
@@ -59,4 +60,9 @@ func (rt *Routes) DisplayDependenciesToAdd(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	renderTemplComponent(component, w, r)
+}
+
+func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	w.Write(static.StaticHomeCss)
 }
