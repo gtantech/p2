@@ -27,7 +27,6 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 		r.Get("/dependency/add", routes.DisplayDependenciesToAdd)
 	})
 
-	r.Get("/static/home_script.js", routes.GetHomeScript)
 	r.Get("/static/home_style.css", routes.GetHomeStyle)
 	return r
 }
