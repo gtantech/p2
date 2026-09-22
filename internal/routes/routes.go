@@ -29,7 +29,21 @@ func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *h
 }
 
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplComponent(rt.view.Home(), w, r)
+	storeProjects, err := rt.store.Project.GetProjects(r.Context())
+	if err != nil {
+		if errors.Is(err, store.ErrProjectNotFound) {
+			storeProject, err := rt.store.Project.Create(r.Context(), store.CreateProjectParams{DisplayName: "Project 1"})
+			if err != nil {
+				http.Error(w, "failed to create new project", http.StatusInternalServerError)
+				return
+			}
+			storeProjects = []store.Project{storeProject}
+		} else {
+			http.Error(w, "failed to get projects", http.StatusInternalServerError)
+			return
+		}
+	}
+	renderTemplComponent(rt.view.Home(storeProjects[0].ID), w, r)
 }
 
 func (rt *Routes) DisplayDependenciesToAdd(w http.ResponseWriter, r *http.Request) {
