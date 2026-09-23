@@ -22,7 +22,7 @@ func NewView(store *store.Store) *View {
 	}
 }
 
-func (v *View) Home(homeProjectId uuid.UUID) templ.Component {
+func (v *View) Home() templ.Component {
 	t := newTable()
 	taskA := &activity{ID: uuid.NewV7(), ProjectID: uuid.NewV7(), DisplayName: "Task A", Duration: 5 * time.Minute}
 	taskB := &activity{ID: uuid.NewV7(), ProjectID: uuid.NewV7(), DisplayName: "Task B", Duration: 3 * time.Minute}
