@@ -20,8 +20,8 @@ type Table struct {
 	rows []*TableRow
 }
 
-func NewTable() *Table {
-	return &Table{rows: []*TableRow{}}
+func NewTable(rows []*TableRow) *Table {
+	return &Table{rows: rows}
 }
 
 type TableRow struct {

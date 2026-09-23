@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 	"uuid"
 
 	"github.com/a-h/templ"
@@ -29,7 +30,13 @@ func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *h
 }
 
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplComponent(rt.view.Home(), w, r)
+	taskA := view.NewActivity(uuid.NewV7(), uuid.NewV7(), "Task A", 5*time.Minute)
+	taskB := view.NewActivity(uuid.NewV7(), uuid.NewV7(), "Task B", 3*time.Minute)
+	rows := []*view.TableRow{}
+	rows = append(rows, view.NewTableRow(taskA, []*view.Activity{}))
+	rows = append(rows, view.NewTableRow(taskB, []*view.Activity{taskA}))
+	t := view.NewTable(rows)
+	renderTemplComponent(rt.view.Home(t), w, r)
 }
 
 func (rt *Routes) DisplayDependenciesToAdd(w http.ResponseWriter, r *http.Request) {

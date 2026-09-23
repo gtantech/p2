@@ -3,7 +3,6 @@ package view
 import (
 	"context"
 	"errors"
-	"time"
 	"uuid"
 
 	"github.com/a-h/templ"
@@ -22,13 +21,8 @@ func NewView(store *store.Store) *View {
 	}
 }
 
-func (v *View) Home() templ.Component {
-	t := NewTable()
-	taskA := &Activity{id: uuid.NewV7(), projectID: uuid.NewV7(), displayName: "Task A", duration: 5 * time.Minute}
-	taskB := &Activity{id: uuid.NewV7(), projectID: uuid.NewV7(), displayName: "Task B", duration: 3 * time.Minute}
-	t.rows = append(t.rows, NewTableRow(taskA, []*Activity{}))
-	t.rows = append(t.rows, NewTableRow(taskB, []*Activity{taskA}))
-	return home(t)
+func (v *View) Home(table *Table) templ.Component {
+	return home(table)
 }
 
 func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, projectId uuid.UUID, successorId uuid.UUID) (templ.Component, error) {
