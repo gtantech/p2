@@ -3,6 +3,8 @@ package view
 import (
 	"time"
 	"uuid"
+
+	"github.com/gtantech/p2/internal/store"
 )
 
 type Activity struct {
@@ -20,8 +22,31 @@ type Table struct {
 	rows []*TableRow
 }
 
-func NewTable() *Table {
-	return &Table{rows: []*TableRow{}}
+func NewTable(rows []*TableRow) *Table {
+	return &Table{rows: rows}
+}
+
+func NewTableFromStorage(storeActivities []store.Activity, storeDependencies map[store.Activity][]store.Activity) *Table {
+	storeActivityMap := make(map[store.Activity]*Activity)
+
+	for _, storeActivity := range storeActivities {
+		//convert activity
+		storeActivityMap[storeActivity] = NewActivity(storeActivity.ID, storeActivity.ProjectID, storeActivity.DisplayName, storeActivity.Duration)
+	}
+
+	table := Table{}
+
+	for _, storeActivity := range storeActivities {
+		viewActivity := storeActivityMap[storeActivity]
+		storeDependency := storeDependencies[storeActivity]
+		viewDependency := make([]*Activity, len(storeDependency))
+		for i, predecessorActivity := range storeDependency {
+			viewDependency[i] = storeActivityMap[predecessorActivity]
+		}
+		table.rows = append(table.rows, NewTableRow(viewActivity, viewDependency))
+	}
+
+	return &table
 }
 
 type TableRow struct {
