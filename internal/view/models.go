@@ -57,3 +57,8 @@ type TableRow struct {
 func NewTableRow(activity *Activity, dependencies []*Activity) *TableRow {
 	return &TableRow{activity: activity, dependencies: dependencies}
 }
+
+type DisplayEmptyTableRowParams struct {
+	ActivityId uuid.UUID
+	ProjectId  uuid.UUID
+}

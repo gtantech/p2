@@ -21,8 +21,8 @@ func NewView(store *store.Store) *View {
 	}
 }
 
-func (v *View) Home(table *Table) templ.Component {
-	return home(table)
+func (v *View) Home(table *Table, homeProjectId uuid.UUID) templ.Component {
+	return home(table, homeProjectId)
 }
 
 func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, projectId uuid.UUID, successorId uuid.UUID) (templ.Component, error) {
@@ -47,4 +47,9 @@ func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, proje
 	}
 
 	return displayDependenciesToAdd(activities, successorId.String()), nil
+}
+
+func (v *View) DisplayEmptyTableRow(params DisplayEmptyTableRowParams) templ.Component {
+	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*Activity{})
+	return displayDependencyTableRow(row, params.ProjectId)
 }

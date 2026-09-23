@@ -27,6 +27,10 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 		r.Get("/dependency/add", routes.DisplayDependenciesToAdd)
 	})
 
+	r.Route("/component", func(r chi.Router) {
+		r.Get("/table/dependency/row/empty", routes.GetEmptyTableRow)
+	})
+
 	r.Get("/static/home_style.css", routes.GetHomeStyle)
 	return r
 }

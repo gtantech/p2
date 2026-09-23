@@ -1,6 +1,8 @@
 package view
 
 import "strings"
+import "uuid"
+import "fmt"
 
 templ displayDependenciesToAdd(activities []Activity, successorActivityId string){
     <ul>
@@ -16,7 +18,7 @@ templ displayDependenciesToAddNotFound(){
     </ul>
 }
 
-templ displayDependencyTable(table *Table){
+templ displayDependencyTable(table *Table, projectId uuid.UUID){
     <table>
         <thead>
             <tr>
@@ -39,13 +41,13 @@ templ displayDependencyTable(table *Table){
                 <!--
                     Task row
                 -->
-                @displayDependencyTableRow(row)
+                @displayDependencyTableRow(row, projectId)
             }
         </tbody>
     </table>
 }
 
-templ displayDependencyTableRow(row *TableRow){
+templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
     <tr class="task-row">
     <!-- Task name -->
     <td>
@@ -99,6 +101,10 @@ templ displayDependencyTableRow(row *TableRow){
                 type="button"
                 class="add-button"
                 title="Add task"
+                
+                hx-get={ fmt.Sprintf("/component/table/dependency/row/empty?project-id=%s", projectId.String()) }
+                hx-target="closest tr"
+                hx-swap="afterend"
             >
                 +
             </button>
