@@ -2,6 +2,7 @@ package view
 
 import "strings"
 import "uuid"
+import "fmt"
 
 templ displayDependenciesToAdd(activities []Activity, successorActivityId string){
     <ul>
@@ -100,6 +101,10 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 type="button"
                 class="add-button"
                 title="Add task"
+                
+                hx-get={ fmt.Sprintf("/component/table/dependency/row/empty?project-id=%s", projectId.String()) }
+                hx-target="closest tr"
+                hx-swap="afterend"
             >
                 +
             </button>
