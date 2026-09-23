@@ -48,3 +48,8 @@ func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, proje
 
 	return displayDependenciesToAdd(activities, successorId.String()), nil
 }
+
+func (v *View) DisplayEmptyTableRow(params DisplayEmptyTableRowParams) templ.Component {
+	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*Activity{})
+	return displayDependencyTableRow(row, params.ProjectId)
+}
