@@ -89,13 +89,12 @@ type dependencyDbStore struct {
 func (d *dependencyDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error) {
 	data, err := d.queries.FindAllDependenciesByProject(ctx, projectId.String())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Dependency doesn't exist
-			return []Dependency{}, ErrDependencyNotFound
-		}
 		return []Dependency{}, err
 	}
-
+	if len(data) == 0 {
+		// Dependency doesn't exist
+		return []Dependency{}, ErrDependencyNotFound
+	}
 	dependencies := make([]Dependency, len(data))
 	for i, d := range data {
 		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
@@ -120,13 +119,12 @@ func (d *dependencyDbStore) GetByID(ctx context.Context, id uuid.UUID) (Dependen
 func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error) {
 	data, err := d.queries.FindAllDependenciesByPredecessor(ctx, predecessorId.String())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Dependency doesn't exist
-			return []Dependency{}, ErrDependencyNotFound
-		}
 		return []Dependency{}, err
 	}
-
+	if len(data) == 0 {
+		// Dependency doesn't exist
+		return []Dependency{}, ErrDependencyNotFound
+	}
 	dependencies := make([]Dependency, len(data))
 	for i, d := range data {
 		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
@@ -138,13 +136,12 @@ func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId 
 func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error) {
 	data, err := d.queries.FindAllDependenciesBySuccessor(ctx, successorId.String())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Dependency doesn't exist
-			return []Dependency{}, ErrDependencyNotFound
-		}
 		return []Dependency{}, err
 	}
-
+	if len(data) == 0 {
+		// Dependency doesn't exist
+		return []Dependency{}, ErrDependencyNotFound
+	}
 	dependencies := make([]Dependency, len(data))
 	for i, d := range data {
 		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))

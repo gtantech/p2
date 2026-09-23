@@ -67,11 +67,11 @@ func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams)
 func (p *projectDbStore) GetProjects(ctx context.Context) ([]Project, error) {
 	data, err := p.queries.FindAllProjects(ctx)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Project doesn't exist
-			return []Project{}, ErrProjectNotFound
-		}
 		return []Project{}, err
+	}
+	if len(data) == 0 {
+		// Project doesn't exist
+		return []Project{}, ErrProjectNotFound
 	}
 	projects := make([]Project, len(data))
 	for i, d := range data {
@@ -84,11 +84,11 @@ func (p *projectDbStore) GetProjects(ctx context.Context) ([]Project, error) {
 func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]Project, error) {
 	data, err := p.queries.FindProjectByName(ctx, search)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Project doesn't exist
-			return []Project{}, ErrProjectNotFound
-		}
 		return []Project{}, err
+	}
+	if len(data) == 0 {
+		// Project doesn't exist
+		return []Project{}, ErrProjectNotFound
 	}
 	projects := make([]Project, len(data))
 	for i, d := range data {
