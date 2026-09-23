@@ -58,6 +58,8 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             placeholder="Task name"
             autocomplete="off"
             value={row.activity.displayName}
+            hx-post={ fmt.Sprintf("/table/row/activity/%v/name", row.activity.id) }
+            hx-trigger="input changed delay:200ms"
         >
     </td>
     <!-- Dependencies -->
