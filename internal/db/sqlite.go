@@ -30,7 +30,9 @@ func NewSQLiteStorage(dataSourceName string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	migrateDB(driver)
+	if err := migrateDB(driver); err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
+	}
 	return db, nil
 }
 
