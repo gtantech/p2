@@ -23,11 +23,11 @@ func NewView(store *store.Store) *View {
 }
 
 func (v *View) Home() templ.Component {
-	t := newTable()
-	taskA := &activity{ID: uuid.NewV7(), ProjectID: uuid.NewV7(), DisplayName: "Task A", Duration: 5 * time.Minute}
-	taskB := &activity{ID: uuid.NewV7(), ProjectID: uuid.NewV7(), DisplayName: "Task B", Duration: 3 * time.Minute}
-	t.rows = append(t.rows, newTableRow(taskA, []*activity{}))
-	t.rows = append(t.rows, newTableRow(taskB, []*activity{taskA}))
+	t := NewTable()
+	taskA := &Activity{id: uuid.NewV7(), projectID: uuid.NewV7(), displayName: "Task A", duration: 5 * time.Minute}
+	taskB := &Activity{id: uuid.NewV7(), projectID: uuid.NewV7(), displayName: "Task B", duration: 3 * time.Minute}
+	t.rows = append(t.rows, NewTableRow(taskA, []*Activity{}))
+	t.rows = append(t.rows, NewTableRow(taskB, []*Activity{taskA}))
 	return home(t)
 }
 
@@ -41,14 +41,14 @@ func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, proje
 		return nil, err
 	}
 
-	activities := make([]activity, len(storeActivities))
+	activities := make([]Activity, len(storeActivities))
 
 	for i, storeActivity := range storeActivities {
-		activities[i] = activity{
-			ID:          storeActivity.ID,
-			ProjectID:   storeActivity.ProjectID,
-			DisplayName: storeActivity.DisplayName,
-			Duration:    storeActivity.Duration,
+		activities[i] = Activity{
+			id:          storeActivity.ID,
+			projectID:   storeActivity.ProjectID,
+			displayName: storeActivity.DisplayName,
+			duration:    storeActivity.Duration,
 		}
 	}
 
