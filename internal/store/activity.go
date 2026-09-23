@@ -108,11 +108,11 @@ func (a *activityDbStore) GetByID(ctx context.Context, id uuid.UUID) (Activity, 
 func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error) {
 	data, err := a.queries.FindAllActivitiesByNameAndProject(ctx, params.toDbFindAllActivitiesByNameAndProjectParams())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Activity doesn't exist
-			return []Activity{}, ErrActivityNotFound
-		}
 		return []Activity{}, err
+	}
+	if len(data) == 0 {
+		// Activity doesn't exist
+		return []Activity{}, ErrActivityNotFound
 	}
 	activities := make([]Activity, len(data))
 	for i, d := range data {
@@ -125,11 +125,11 @@ func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetAct
 func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Activity, error) {
 	data, err := a.queries.FindAllActivitiesByProject(ctx, projectId.String())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// Activity doesn't exist
-			return []Activity{}, ErrActivityNotFound
-		}
 		return []Activity{}, err
+	}
+	if len(data) == 0 {
+		// Activity doesn't exist
+		return []Activity{}, ErrActivityNotFound
 	}
 	activities := make([]Activity, len(data))
 	for i, d := range data {
