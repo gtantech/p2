@@ -2,7 +2,7 @@ package view
 
 import "strings"
 
-templ displayDependenciesToAdd(activities []activity, successorActivityId string){
+templ displayDependenciesToAdd(activities []Activity, successorActivityId string){
     <ul>
         for _, item := range activities {
             <li><button type="button" value={item.ID.String()}>{item.DisplayName}</button></li>
@@ -16,7 +16,7 @@ templ displayDependenciesToAddNotFound(){
     </ul>
 }
 
-templ displayDependencyTable(table *table){
+templ displayDependencyTable(table *Table){
     <table>
         <thead>
             <tr>
@@ -45,7 +45,7 @@ templ displayDependencyTable(table *table){
     </table>
 }
 
-templ displayDependencyTableRow(row *tableRow){
+templ displayDependencyTableRow(row *TableRow){
     <tr class="task-row">
     <!-- Task name -->
     <td>

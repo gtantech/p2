@@ -1,18 +1,18 @@
 package view
 
-type table struct {
-	rows []*tableRow
+type Table struct {
+	rows []*TableRow
 }
 
-func newTable() *table {
-	return &table{rows: []*tableRow{}}
+func NewTable() *Table {
+	return &Table{rows: []*TableRow{}}
 }
 
-type tableRow struct {
-	activity     *activity
-	dependencies []*activity
+type TableRow struct {
+	activity     *Activity
+	dependencies []*Activity
 }
 
-func newTableRow(activity *activity, dependencies []*activity) *tableRow {
-	return &tableRow{activity: activity, dependencies: dependencies}
+func NewTableRow(activity *Activity, dependencies []*Activity) *TableRow {
+	return &TableRow{activity: activity, dependencies: dependencies}
 }
