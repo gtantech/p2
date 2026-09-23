@@ -170,7 +170,7 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<tr class=\"task-row\"><!-- Task name --><td><input type=\"text\" name=\"task_name[]\" class=\"task-name\" placeholder=\"Task name\" autocomplete=\"off\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<tr class=\"task-row\"><!-- Task name --><td><input type=\"text\" name=\"activity_input\" class=\"task-name\" placeholder=\"Task name\" autocomplete=\"off\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
