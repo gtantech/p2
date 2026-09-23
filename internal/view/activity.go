@@ -11,3 +11,7 @@ type Activity struct {
 	DisplayName string
 	Duration    time.Duration
 }
+
+func NewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *Activity {
+	return &Activity{ID: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
+}
