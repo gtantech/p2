@@ -28,7 +28,7 @@ func (s *Server) CloseDb() error {
 }
 
 func NewServer(config ServerConfig) *Server {
-	database, err := sql.Open("sqlite", ":memory:")
+	database, err := db.NewSQLiteStorage(":memory:")
 	if err != nil {
 		log.Fatalf("failed to open database with error: %v", err)
 	}
