@@ -41,7 +41,7 @@ func displayDependenciesToAdd(activities []Activity, successorActivityId string)
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ID.String())
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.id.String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 8, Col: 61}
 			}
@@ -54,7 +54,7 @@ func displayDependenciesToAdd(activities []Activity, successorActivityId string)
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(item.DisplayName)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(item.displayName)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 8, Col: 80}
 			}
@@ -173,7 +173,7 @@ func displayDependencyTableRow(row *TableRow) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.DisplayName)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.displayName)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 58, Col: 43}
 		}
@@ -189,7 +189,7 @@ func displayDependencyTableRow(row *TableRow) templ.Component {
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(func() string {
 			values := make([]string, len(row.dependencies))
 			for i, dependency := range row.dependencies {
-				values[i] = dependency.DisplayName
+				values[i] = dependency.displayName
 			}
 			return strings.Join(values, ", ")
 		}())
@@ -205,7 +205,7 @@ func displayDependencyTableRow(row *TableRow) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.Duration.String())
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.duration.String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 92, Col: 49}
 		}

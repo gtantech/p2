@@ -6,12 +6,12 @@ import (
 )
 
 type Activity struct {
-	ID          uuid.UUID
-	ProjectID   uuid.UUID
-	DisplayName string
-	Duration    time.Duration
+	id          uuid.UUID
+	projectID   uuid.UUID
+	displayName string
+	duration    time.Duration
 }
 
 func NewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *Activity {
-	return &Activity{ID: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
+	return &Activity{id: id, projectID: projectId, displayName: displayName, duration: duration}
 }

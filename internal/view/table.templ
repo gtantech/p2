@@ -5,7 +5,7 @@ import "strings"
 templ displayDependenciesToAdd(activities []Activity, successorActivityId string){
     <ul>
         for _, item := range activities {
-            <li><button type="button" value={item.ID.String()}>{item.DisplayName}</button></li>
+            <li><button type="button" value={item.id.String()}>{item.displayName}</button></li>
         }
     </ul>
 }
@@ -55,7 +55,7 @@ templ displayDependencyTableRow(row *TableRow){
             class="task-name"
             placeholder="Task name"
             autocomplete="off"
-            value={row.activity.DisplayName}
+            value={row.activity.displayName}
         >
     </td>
     <!-- Dependencies -->
@@ -71,7 +71,7 @@ templ displayDependencyTableRow(row *TableRow){
                     func() string {
                         values := make([]string, len(row.dependencies))
                         for i, dependency := range row.dependencies {
-                            values[i] = dependency.DisplayName
+                            values[i] = dependency.displayName
                         }
                         return strings.Join(values, ", ")
                     }()
@@ -89,7 +89,7 @@ templ displayDependencyTableRow(row *TableRow){
             type="text"
             name="duration[]"
             placeholder="e.g. 2h"
-            value={row.activity.Duration.String()}
+            value={row.activity.duration.String()}
         >
     </td>
     <!-- Add row -->
