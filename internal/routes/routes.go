@@ -130,3 +130,21 @@ func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/css; charset=utf-8")
 	w.Write(static.StaticHomeCss)
 }
+
+func (rt *Routes) GetEmptyTableRow(w http.ResponseWriter, r *http.Request) {
+	projectId, err := uuid.Parse(r.URL.Query().Get("project-id"))
+	if err != nil {
+		http.Error(w, "invalid project id parameter", http.StatusBadRequest)
+		return
+	}
+
+	storeActivity, err := rt.store.Activity.Create(r.Context(), store.CreateActivityParams{ProjectID: projectId, DisplayName: "", Duration: 0})
+
+	if err != nil {
+		//TODO check for duplicate name error
+		http.Error(w, "database returned error", http.StatusInternalServerError)
+		return
+	}
+
+	renderTemplComponent(rt.view.DisplayEmptyTableRow(view.DisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID}), w, r)
+}
