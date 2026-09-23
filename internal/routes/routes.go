@@ -7,6 +7,7 @@ import (
 	"uuid"
 
 	"github.com/a-h/templ"
+	"github.com/go-chi/chi/v5"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
 	"github.com/gtantech/p2/static"
@@ -26,6 +27,36 @@ func NewRoutes(store *store.Store) *Routes {
 
 func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
+}
+
+func (rt *Routes) PostActivityNameUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if id == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	activityId, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "malformed id", http.StatusBadRequest)
+		return
+	}
+
+	name := r.FormValue("activity_input")
+	if name == "" {
+		http.Error(w, "missing name", http.StatusBadRequest)
+		return
+	}
+	storeActivity, err := rt.store.Activity.GetByID(r.Context(), activityId)
+
+	if err != nil {
+		http.Error(w, "failed to get activity", http.StatusInternalServerError)
+	}
+	_, err = rt.store.Activity.Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: name, Duration: storeActivity.Duration})
+	if err != nil {
+		http.Error(w, "failed to update activity", http.StatusInternalServerError)
+	}
 }
 
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
