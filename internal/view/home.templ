@@ -1,6 +1,8 @@
 package view
 
-templ home(table *Table) {
+import "uuid"
+
+templ home(table *Table, projectId uuid.UUID) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -17,7 +19,7 @@ templ home(table *Table) {
 			<div class="container">
 				<h1>Task Planner</h1>
 				<div class="table-wrapper">
-					@displayDependencyTable(table)
+					@displayDependencyTable(table, projectId)
 				</div>
 			</div>
 		</body>

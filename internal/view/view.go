@@ -21,8 +21,8 @@ func NewView(store *store.Store) *View {
 	}
 }
 
-func (v *View) Home(table *Table) templ.Component {
-	return home(table)
+func (v *View) Home(table *Table, homeProjectId uuid.UUID) templ.Component {
+	return home(table, homeProjectId)
 }
 
 func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, projectId uuid.UUID, successorId uuid.UUID) (templ.Component, error) {

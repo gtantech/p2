@@ -93,7 +93,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := view.NewTableFromStorage(storeActivities, storeDependenciesMap)
-	renderTemplComponent(rt.view.Home(t), w, r)
+	renderTemplComponent(rt.view.Home(t, firstProjectId), w, r)
 }
 
 func (rt *Routes) DisplayDependenciesToAdd(w http.ResponseWriter, r *http.Request) {
