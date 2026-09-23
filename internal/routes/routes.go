@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"time"
 	"uuid"
 
 	"github.com/a-h/templ"
@@ -30,12 +29,70 @@ func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *h
 }
 
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	taskA := view.NewActivity(uuid.NewV7(), uuid.NewV7(), "Task A", 5*time.Minute)
-	taskB := view.NewActivity(uuid.NewV7(), uuid.NewV7(), "Task B", 3*time.Minute)
-	rows := []*view.TableRow{}
-	rows = append(rows, view.NewTableRow(taskA, []*view.Activity{}))
-	rows = append(rows, view.NewTableRow(taskB, []*view.Activity{taskA}))
-	t := view.NewTable(rows)
+	storeProjects, err := rt.store.Project.GetProjects(r.Context())
+	if err != nil {
+		if errors.Is(err, store.ErrProjectNotFound) {
+			storeProject, err := rt.store.Project.Create(r.Context(), store.CreateProjectParams{DisplayName: "Project 1"})
+			if err != nil {
+				http.Error(w, "failed to create new project", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating new project. encountered error: %v\n", err)
+				return
+			}
+			storeProjects = []store.Project{storeProject}
+		} else {
+			http.Error(w, "failed to get projects", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting projects. encountered error: %v\n", err)
+			return
+		}
+	}
+	firstProject := storeProjects[0]
+	firstProjectId := firstProject.ID
+
+	//get all activities associated with firstProjectId
+	storeActivities, err := rt.store.Activity.GetByProjectID(r.Context(), firstProjectId)
+	if err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			storeActivity, err := rt.store.Activity.Create(r.Context(), store.CreateActivityParams{ProjectID: firstProjectId, DisplayName: "", Duration: 0})
+			if err != nil {
+				http.Error(w, "failed to create new activity", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating activity. encountered error: %v\n", err)
+				return
+			}
+			storeActivities = []store.Activity{storeActivity}
+		} else {
+			http.Error(w, "failed to get activities", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting activities. encountered error: %v\n", err)
+			return
+		}
+	}
+
+	//map activity id to activity
+	storeActivitiesMap := make(map[uuid.UUID]store.Activity)
+	for _, storeActivity := range storeActivities {
+		storeActivitiesMap[storeActivity.ID] = storeActivity
+	}
+
+	//map a list of predecessor activities to a successor activity
+	storeDependenciesMap := make(map[store.Activity][]store.Activity)
+	for _, storeActivity := range storeActivities {
+		storeDependencies, err := rt.store.Dependency.GetBySuccessor(r.Context(), storeActivity.ID)
+		if err != nil {
+			if errors.Is(err, store.ErrDependencyNotFound) {
+				storeDependenciesMap[storeActivity] = []store.Activity{}
+				continue
+			} else {
+				http.Error(w, "failed to get dependency", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while getting dependency. encountered error: %v\n", err)
+				return
+			}
+		}
+		for _, storeDependency := range storeDependencies {
+			predecessor := storeActivitiesMap[storeDependency.PredecessorActivityID]
+			storeDependenciesMap[storeActivity] = append(storeDependenciesMap[storeActivity], predecessor)
+		}
+	}
+
+	t := view.NewTableFromStorage(storeActivities, storeDependenciesMap)
 	renderTemplComponent(rt.view.Home(t), w, r)
 }
 
