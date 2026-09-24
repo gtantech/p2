@@ -87,7 +87,7 @@ func TestFindAllDependencyNamesBySuccessor(t *testing.T) {
 
 	d := New(database)
 
-	results, err := d.FindAllDependencyNamesBySuccessor(context.Background(), activity1.ProjectID)
+	results, err := d.FindAllDependencyNamesBySuccessor(context.Background(), activity2.ID)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}

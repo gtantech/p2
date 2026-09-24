@@ -126,7 +126,7 @@ FROM dependencies d
 JOIN activities predecessor
     ON predecessor.id = d.predecessor_activity_id
    AND predecessor.project_id = d.project_id
-WHERE d.project_id = ?
+WHERE d.successor_activity_id = ?
 `
 
 type FindAllDependencyNamesBySuccessorRow struct {
@@ -135,8 +135,8 @@ type FindAllDependencyNamesBySuccessorRow struct {
 	PredecessorActivityName string
 }
 
-func (q *Queries) FindAllDependencyNamesBySuccessor(ctx context.Context, projectID string) ([]FindAllDependencyNamesBySuccessorRow, error) {
-	rows, err := q.db.QueryContext(ctx, findAllDependencyNamesBySuccessor, projectID)
+func (q *Queries) FindAllDependencyNamesBySuccessor(ctx context.Context, successorActivityID string) ([]FindAllDependencyNamesBySuccessorRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAllDependencyNamesBySuccessor, successorActivityID)
 	if err != nil {
 		return nil, err
 	}

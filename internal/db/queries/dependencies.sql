@@ -16,7 +16,7 @@ FROM dependencies d
 JOIN activities predecessor
     ON predecessor.id = d.predecessor_activity_id
    AND predecessor.project_id = d.project_id
-WHERE d.project_id = ?;
+WHERE d.successor_activity_id = ?;
 
 
 -- name: FindDependencyById :one
