@@ -57,14 +57,11 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 
 	storeDependencies, err := rt.store.Dependency.GetPredecessorNamesBySuccessor(r.Context(), activityId)
 	if err != nil {
-		if errors.Is(err, store.ErrDependencyNotFound) {
-			http.Error(w, "failed to get predecessors for activity", http.StatusBadRequest)
-			log.Printf("returned http bad request while getting dependencies for activity id %v. encountered error: %v\n", activityId, err)
+		if !errors.Is(err, store.ErrDependencyNotFound) {
+			http.Error(w, "failed to get dependencies", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting projects. encountered error: %v\n", err)
 			return
 		}
-		http.Error(w, "failed to get dependencies", http.StatusInternalServerError)
-		log.Printf("returned http internal server error while getting projects. encountered error: %v\n", err)
-		return
 	}
 
 	predecessorNameToDependencyId := make(map[string]uuid.UUID)
