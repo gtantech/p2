@@ -11,6 +11,7 @@ SELECT * FROM dependencies WHERE successor_activity_id = ?;
 SELECT
     d.id,
     d.relationship,
+    predecessor.id AS predecessor_activity_id,
     predecessor.disp_name AS predecessor_activity_name
 FROM dependencies d
 JOIN activities predecessor
