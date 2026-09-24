@@ -92,6 +92,10 @@ func TestFindAllPredecessorNamesBySuccessor(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 
+	if got, want, want2 := []string{results[0].PredecessorActivityID, results[1].PredecessorActivityID}, []string{activity1.ID, activity3.ID}, []string{activity3.ID, activity1.ID}; !(slices.Equal(got, want) || slices.Equal(got, want2)) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+
 	if got, want, want2 := []string{results[0].PredecessorActivityName, results[1].PredecessorActivityName}, []string{activity1.DispName, activity3.DispName}, []string{activity3.DispName, activity1.DispName}; !(slices.Equal(got, want) || slices.Equal(got, want2)) {
 		t.Errorf("got %v, want %v", got, want)
 	}
