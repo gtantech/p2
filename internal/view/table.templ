@@ -58,7 +58,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             placeholder="Task name"
             autocomplete="off"
             value={row.activity.displayName}
-            hx-post={ fmt.Sprintf("/table/row/activity/%v/name", row.activity.id) }
+            hx-post={ fmt.Sprintf("/api/table/row/activity/%v/name", row.activity.id) }
             hx-trigger="input changed delay:200ms"
         >
     </td>
@@ -80,7 +80,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                         return strings.Join(values, ", ")
                     }()
                 } 
-                hx-post={ fmt.Sprintf("/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS") }
+                hx-post={ fmt.Sprintf("/api/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS") }
                 hx-trigger="input changed delay:500ms"
             >
             <!--
@@ -96,7 +96,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             name="duration_input"
             placeholder="e.g. 2h"
             value={row.activity.duration.String()}
-            hx-post={ fmt.Sprintf("/table/row/activity/%v/duration", row.activity.id) }
+            hx-post={ fmt.Sprintf("/api/table/row/activity/%v/duration", row.activity.id) }
             hx-trigger="input changed delay:200ms"
         >
     </td>

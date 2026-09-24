@@ -188,9 +188,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/table/row/activity/%v/name", row.activity.id))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/name", row.activity.id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 61, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 61, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
@@ -220,9 +220,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS"))
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 83, Col: 113}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 83, Col: 117}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
@@ -246,9 +246,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/table/row/activity/%v/duration", row.activity.id))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/duration", row.activity.id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 99, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 99, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
