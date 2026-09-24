@@ -117,7 +117,7 @@ func (q *Queries) FindAllDependenciesBySuccessor(ctx context.Context, successorA
 	return items, nil
 }
 
-const findAllDependencyNamesBySuccessor = `-- name: FindAllDependencyNamesBySuccessor :many
+const findAllPredecessorNamesBySuccessor = `-- name: FindAllPredecessorNamesBySuccessor :many
 SELECT
     d.id,
     d.relationship,
@@ -129,21 +129,21 @@ JOIN activities predecessor
 WHERE d.successor_activity_id = ?
 `
 
-type FindAllDependencyNamesBySuccessorRow struct {
+type FindAllPredecessorNamesBySuccessorRow struct {
 	ID                      string
 	Relationship            string
 	PredecessorActivityName string
 }
 
-func (q *Queries) FindAllDependencyNamesBySuccessor(ctx context.Context, successorActivityID string) ([]FindAllDependencyNamesBySuccessorRow, error) {
-	rows, err := q.db.QueryContext(ctx, findAllDependencyNamesBySuccessor, successorActivityID)
+func (q *Queries) FindAllPredecessorNamesBySuccessor(ctx context.Context, successorActivityID string) ([]FindAllPredecessorNamesBySuccessorRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAllPredecessorNamesBySuccessor, successorActivityID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []FindAllDependencyNamesBySuccessorRow
+	var items []FindAllPredecessorNamesBySuccessorRow
 	for rows.Next() {
-		var i FindAllDependencyNamesBySuccessorRow
+		var i FindAllPredecessorNamesBySuccessorRow
 		if err := rows.Scan(&i.ID, &i.Relationship, &i.PredecessorActivityName); err != nil {
 			return nil, err
 		}

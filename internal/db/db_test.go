@@ -21,7 +21,7 @@ type mock_activity struct {
 	Duration  int64
 }
 
-func TestFindAllDependencyNamesBySuccessor(t *testing.T) {
+func TestFindAllPredecessorNamesBySuccessor(t *testing.T) {
 	database, err := NewSQLiteStorage(":memory:")
 	if err != nil {
 		t.Errorf("failed to open database with error: %v", err)
@@ -87,7 +87,7 @@ func TestFindAllDependencyNamesBySuccessor(t *testing.T) {
 
 	d := New(database)
 
-	results, err := d.FindAllDependencyNamesBySuccessor(context.Background(), activity2.ID)
+	results, err := d.FindAllPredecessorNamesBySuccessor(context.Background(), activity2.ID)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
