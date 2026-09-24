@@ -119,7 +119,7 @@ func (q *Queries) FindAllDependenciesBySuccessor(ctx context.Context, successorA
 
 const findAllPredecessorNamesBySuccessor = `-- name: FindAllPredecessorNamesBySuccessor :many
 SELECT
-    d.id,
+    d.id AS dependency_id,
     d.relationship,
     predecessor.id AS predecessor_activity_id,
     predecessor.disp_name AS predecessor_activity_name
@@ -131,7 +131,7 @@ WHERE d.successor_activity_id = ?
 `
 
 type FindAllPredecessorNamesBySuccessorRow struct {
-	ID                      string
+	DependencyID            string
 	Relationship            string
 	PredecessorActivityID   string
 	PredecessorActivityName string
@@ -147,7 +147,7 @@ func (q *Queries) FindAllPredecessorNamesBySuccessor(ctx context.Context, succes
 	for rows.Next() {
 		var i FindAllPredecessorNamesBySuccessorRow
 		if err := rows.Scan(
-			&i.ID,
+			&i.DependencyID,
 			&i.Relationship,
 			&i.PredecessorActivityID,
 			&i.PredecessorActivityName,
