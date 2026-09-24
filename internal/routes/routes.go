@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 	"uuid"
 
 	"github.com/a-h/templ"
@@ -113,6 +114,44 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 				SuccessorActivityID:   activityId,
 			})
 		}
+	}
+}
+
+func (rt *Routes) PostActivityDurationUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if id == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	activityId, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "malformed id", http.StatusBadRequest)
+		return
+	}
+
+	duration_input := r.FormValue("duration_input")
+	if duration_input == "" {
+		_, err = rt.store.Activity.Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: duration_input, Duration: 0})
+		if err != nil {
+			http.Error(w, "failed to update activity", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while updating activity %v. encountered error: %v\n", activityId, err)
+		}
+		return
+	}
+	duration, err := time.ParseDuration(duration_input)
+	if err != nil {
+		http.Error(w, "invalid duration input", http.StatusBadRequest)
+	}
+	storeActivity, err := rt.store.Activity.GetByID(r.Context(), activityId)
+
+	if err != nil {
+		http.Error(w, "failed to get activity", http.StatusInternalServerError)
+	}
+	_, err = rt.store.Activity.Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: storeActivity.DisplayName, Duration: duration})
+	if err != nil {
+		http.Error(w, "failed to update activity", http.StatusInternalServerError)
 	}
 }
 

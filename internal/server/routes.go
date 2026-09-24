@@ -34,6 +34,7 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 	r.Route("/table", func(r chi.Router) {
 		r.Post("/row/activity/{id}/name", routes.PostActivityNameUpdateFromTableHandler)
 		r.Post("/row/activity/{id}/dependency", routes.PostActivityDependencyUpdateFromTableHandler)
+		r.Post("/row/activity/{id}/duration", routes.PostActivityDurationUpdateFromTableHandler)
 	})
 
 	r.Get("/static/home_style.css", routes.GetHomeStyle)
