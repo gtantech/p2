@@ -228,7 +228,7 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-trigger=\"input changed delay:500ms\"><!--\r\n                Go server will return suggestions here.\r\n            --><div class=\"autocomplete\"></div></div></td><!-- Duration --><td><input type=\"text\" name=\"duration[]\" placeholder=\"e.g. 2h\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-trigger=\"input changed delay:500ms\"><!--\r\n                Go server will return suggestions here.\r\n            --><div class=\"autocomplete\"></div></div></td><!-- Duration --><td><input type=\"text\" name=\"duration_input\" placeholder=\"e.g. 2h\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

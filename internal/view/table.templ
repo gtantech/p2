@@ -93,7 +93,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
     <td>
         <input
             type="text"
-            name="duration[]"
+            name="duration_input"
             placeholder="e.g. 2h"
             value={row.activity.duration.String()}
         >
