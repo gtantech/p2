@@ -4,9 +4,12 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 	"uuid"
 
 	"github.com/a-h/templ"
+	"github.com/go-chi/chi/v5"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
 	"github.com/gtantech/p2/static"
@@ -26,6 +29,160 @@ func NewRoutes(store *store.Store) *Routes {
 
 func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
+}
+
+func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if id == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	activityId, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "malformed id", http.StatusBadRequest)
+		return
+	}
+
+	relationship := r.URL.Query().Get("relationship")
+	if relationship == "" {
+		http.Error(w, "missing relationship parameter", http.StatusBadRequest)
+		return
+	}
+
+	storeActivity, err := rt.store.Activity.GetByID(r.Context(), activityId)
+	if err != nil {
+		http.Error(w, "failed to get activity", http.StatusInternalServerError)
+	}
+
+	storeDependencies, err := rt.store.Dependency.GetPredecessorNamesBySuccessor(r.Context(), activityId)
+	if err != nil {
+		if !errors.Is(err, store.ErrDependencyNotFound) {
+			http.Error(w, "failed to get dependencies", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting projects. encountered error: %v\n", err)
+			return
+		}
+	}
+
+	predecessorNameToDependencyId := make(map[string]uuid.UUID)
+
+	for _, dependency := range storeDependencies {
+		predecessorNameToDependencyId[dependency.PredecessorActivityName] = dependency.DependencyID
+	}
+
+	dependency_input := r.FormValue("dependency_input")
+	if dependency_input == "" {
+		//remove all dependencies
+		for _, dependency := range storeDependencies {
+			rt.store.Dependency.Delete(r.Context(), dependency.DependencyID)
+		}
+		w.Write([]byte("OK"))
+		return
+	}
+	parts := strings.Split(dependency_input, ",")
+
+	dependencyInputMap := make(map[string]bool)
+	for _, part := range parts {
+		dependencyInputMap[strings.TrimSpace(part)] = true
+	}
+
+	// check if user deleted value
+	for key := range predecessorNameToDependencyId {
+		//if key in predecessorNameToDependencyId is not in input, user has deleted value
+		if _, ok := dependencyInputMap[key]; !ok {
+			deleteId := predecessorNameToDependencyId[key]
+			rt.store.Dependency.Delete(r.Context(), deleteId)
+		}
+	}
+
+	// check if user added new value
+	for key := range dependencyInputMap {
+		//if key in dependencyInputMap is not in predecessorNameToDependencyId, user has added value
+		if _, ok := predecessorNameToDependencyId[key]; !ok {
+			findUserSpecifiedActivity, err := rt.store.Activity.GetByNameAndProject(r.Context(), store.GetActivityByNameAndProjectParams{
+				ProjectID:   storeActivity.ProjectID,
+				DisplayName: key})
+			if err != nil {
+				http.Error(w, "failed to get activity", http.StatusBadRequest)
+				return
+			}
+			rt.store.Dependency.Create(r.Context(), store.CreateDepdencencyParams{
+				ProjectID:             storeActivity.ProjectID,
+				Relationship:          store.RelationshipType(relationship),
+				PredecessorActivityID: findUserSpecifiedActivity[0].ID,
+				SuccessorActivityID:   activityId,
+			})
+		}
+	}
+}
+
+func (rt *Routes) PostActivityDurationUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if id == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	activityId, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "malformed id", http.StatusBadRequest)
+		return
+	}
+
+	duration_input := r.FormValue("duration_input")
+	if duration_input == "" {
+		_, err = rt.store.Activity.Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: duration_input, Duration: 0})
+		if err != nil {
+			http.Error(w, "failed to update activity", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while updating activity %v. encountered error: %v\n", activityId, err)
+		}
+		return
+	}
+	duration, err := time.ParseDuration(duration_input)
+	if err != nil {
+		http.Error(w, "invalid duration input", http.StatusBadRequest)
+	}
+	storeActivity, err := rt.store.Activity.GetByID(r.Context(), activityId)
+
+	if err != nil {
+		http.Error(w, "failed to get activity", http.StatusInternalServerError)
+	}
+	_, err = rt.store.Activity.Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: storeActivity.DisplayName, Duration: duration})
+	if err != nil {
+		http.Error(w, "failed to update activity", http.StatusInternalServerError)
+	}
+}
+
+func (rt *Routes) PostActivityNameUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if id == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	activityId, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "malformed id", http.StatusBadRequest)
+		return
+	}
+
+	name := r.FormValue("activity_input")
+	if name == "" {
+		http.Error(w, "missing name", http.StatusBadRequest)
+		return
+	}
+	storeActivity, err := rt.store.Activity.GetByID(r.Context(), activityId)
+
+	if err != nil {
+		http.Error(w, "failed to get activity", http.StatusInternalServerError)
+	}
+	_, err = rt.store.Activity.Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: name, Duration: storeActivity.Duration})
+	if err != nil {
+		http.Error(w, "failed to update activity", http.StatusInternalServerError)
+	}
 }
 
 func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {

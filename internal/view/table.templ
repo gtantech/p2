@@ -53,11 +53,13 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
     <td>
         <input
             type="text"
-            name="task_name[]"
+            name="activity_input"
             class="task-name"
             placeholder="Task name"
             autocomplete="off"
             value={row.activity.displayName}
+            hx-post={ fmt.Sprintf("/table/row/activity/%v/name", row.activity.id) }
+            hx-trigger="input changed delay:200ms"
         >
     </td>
     <!-- Dependencies -->
@@ -65,7 +67,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
         <div class="dependency-wrapper">
             <input
                 type="text"
-                name="dependencies[]"
+                name="dependency_input"
                 class="dependency-input"
                 placeholder="Task A, Task B..."
                 autocomplete="off"
@@ -78,6 +80,8 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                         return strings.Join(values, ", ")
                     }()
                 } 
+                hx-post={ fmt.Sprintf("/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS") }
+                hx-trigger="input changed delay:500ms"
             >
             <!--
                 Go server will return suggestions here.
@@ -89,9 +93,11 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
     <td>
         <input
             type="text"
-            name="duration[]"
+            name="duration_input"
             placeholder="e.g. 2h"
             value={row.activity.duration.String()}
+            hx-post={ fmt.Sprintf("/table/row/activity/%v/duration", row.activity.id) }
+            hx-trigger="input changed delay:200ms"
         >
     </td>
     <!-- Add row -->
