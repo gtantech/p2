@@ -19,7 +19,6 @@ JOIN activities predecessor
    AND predecessor.project_id = d.project_id
 WHERE d.successor_activity_id = ?;
 
-
 -- name: FindDependencyById :one
 SELECT * FROM dependencies WHERE id = ?;
 
