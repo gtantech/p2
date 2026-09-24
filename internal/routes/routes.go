@@ -98,7 +98,7 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 	// check if user added new value
 	for key := range dependencyInputMap {
 		//if key in dependencyInputMap is not in predecessorNameToDependencyId, user has added value
-		if _, ok := dependencyInputMap[key]; !ok {
+		if _, ok := predecessorNameToDependencyId[key]; !ok {
 			findUserSpecifiedActivity, err := rt.store.Activity.GetByNameAndProject(r.Context(), store.GetActivityByNameAndProjectParams{
 				ProjectID:   storeActivity.ProjectID,
 				DisplayName: key})
