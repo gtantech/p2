@@ -80,6 +80,8 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                         return strings.Join(values, ", ")
                     }()
                 } 
+                hx-post={ fmt.Sprintf("/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS") }
+                hx-trigger="input changed delay:500ms"
             >
             <!--
                 Go server will return suggestions here.

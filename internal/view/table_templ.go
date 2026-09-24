@@ -215,33 +215,46 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\"><!--\r\n                Go server will return suggestions here.\r\n            --><div class=\"autocomplete\"></div></div></td><!-- Duration --><td><input type=\"text\" name=\"duration[]\" placeholder=\"e.g. 2h\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.duration.String())
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/table/row/activity/%v/dependency?relationship=%v", row.activity.id, "FS"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 96, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 83, Col: 113}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"></td><!-- Add row --><td><div class=\"actions\"><button type=\"button\" class=\"add-button\" title=\"Add task\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-trigger=\"input changed delay:500ms\"><!--\r\n                Go server will return suggestions here.\r\n            --><div class=\"autocomplete\"></div></div></td><!-- Duration --><td><input type=\"text\" name=\"duration[]\" placeholder=\"e.g. 2h\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/component/table/dependency/row/empty?project-id=%s", projectId.String()))
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.duration.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 107, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 98, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-target=\"closest tr\" hx-swap=\"afterend\">+</button></div></td></tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"></td><!-- Add row --><td><div class=\"actions\"><button type=\"button\" class=\"add-button\" title=\"Add task\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/component/table/dependency/row/empty?project-id=%s", projectId.String()))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 109, Col: 111}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-target=\"closest tr\" hx-swap=\"afterend\">+</button></div></td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
