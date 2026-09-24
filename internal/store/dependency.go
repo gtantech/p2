@@ -28,6 +28,13 @@ type Dependency struct {
 	SuccessorActivityID   uuid.UUID
 }
 
+type GetPredecessorNamesBySuccessorResult struct {
+	DependencyID            uuid.UUID
+	Relationship            RelationshipType
+	PredecessorActivityID   uuid.UUID
+	PredecessorActivityName string
+}
+
 func newDependency(id uuid.UUID, projectId uuid.UUID, relationship RelationshipType, predecessorActivityId uuid.UUID, successorActivityId uuid.UUID) Dependency {
 	return Dependency{
 		ID:                    id,
@@ -76,6 +83,7 @@ type DependencyStore interface {
 	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error)
 	GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error)
 	GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error)
+	GetPredecessorNamesBySuccessor(ctx context.Context, successorId uuid.UUID) ([]GetPredecessorNamesBySuccessorResult, error)
 	Create(ctx context.Context, params CreateDepdencencyParams) (Dependency, error)
 	Update(ctx context.Context, params UpdateDepdencencyParams) (Dependency, error)
 	Delete(ctx context.Context, id uuid.UUID) error
@@ -83,6 +91,23 @@ type DependencyStore interface {
 
 type dependencyDbStore struct {
 	queries *db.Queries
+}
+
+// GetPredecessorNamesBySuccessor implements [DependencyStore].
+func (d *dependencyDbStore) GetPredecessorNamesBySuccessor(ctx context.Context, successorId uuid.UUID) ([]GetPredecessorNamesBySuccessorResult, error) {
+	data, err := d.queries.FindAllPredecessorNamesBySuccessor(ctx, successorId.String())
+	if err != nil {
+		return []GetPredecessorNamesBySuccessorResult{}, err
+	}
+	if len(data) == 0 {
+		// Dependency doesn't exist
+		return []GetPredecessorNamesBySuccessorResult{}, ErrDependencyNotFound
+	}
+	predecessors := make([]GetPredecessorNamesBySuccessorResult, len(data))
+	for i, d := range data {
+		predecessors[i] = GetPredecessorNamesBySuccessorResult{DependencyID: uuid.MustParse(d.DependencyID), Relationship: RelationshipType(d.Relationship), PredecessorActivityID: uuid.MustParse(d.PredecessorActivityID), PredecessorActivityName: d.PredecessorActivityName}
+	}
+	return predecessors, nil
 }
 
 // GetByProjectID implements [DependencyStore].
