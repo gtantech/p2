@@ -96,6 +96,8 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             name="duration_input"
             placeholder="e.g. 2h"
             value={row.activity.duration.String()}
+            hx-post={ fmt.Sprintf("/table/row/activity/%v/duration", row.activity.id) }
+            hx-trigger="input changed delay:200ms"
         >
     </td>
     <!-- Add row -->
