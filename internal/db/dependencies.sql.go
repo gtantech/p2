@@ -117,6 +117,47 @@ func (q *Queries) FindAllDependenciesBySuccessor(ctx context.Context, successorA
 	return items, nil
 }
 
+const findAllDependencyNamesBySuccessor = `-- name: FindAllDependencyNamesBySuccessor :many
+SELECT
+    d.id,
+    d.relationship,
+    predecessor.disp_name AS predecessor_activity_name
+FROM dependencies d
+JOIN activities predecessor
+    ON predecessor.id = d.predecessor_activity_id
+   AND predecessor.project_id = d.project_id
+WHERE d.project_id = ?
+`
+
+type FindAllDependencyNamesBySuccessorRow struct {
+	ID                      string
+	Relationship            string
+	PredecessorActivityName string
+}
+
+func (q *Queries) FindAllDependencyNamesBySuccessor(ctx context.Context, projectID string) ([]FindAllDependencyNamesBySuccessorRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAllDependencyNamesBySuccessor, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindAllDependencyNamesBySuccessorRow
+	for rows.Next() {
+		var i FindAllDependencyNamesBySuccessorRow
+		if err := rows.Scan(&i.ID, &i.Relationship, &i.PredecessorActivityName); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findDependencyById = `-- name: FindDependencyById :one
 SELECT id, project_id, relationship, predecessor_activity_id, successor_activity_id FROM dependencies WHERE id = ?
 `

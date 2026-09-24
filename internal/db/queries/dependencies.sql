@@ -7,6 +7,18 @@ SELECT * FROM dependencies WHERE predecessor_activity_id = ?;
 -- name: FindAllDependenciesBySuccessor :many
 SELECT * FROM dependencies WHERE successor_activity_id = ?;
 
+-- name: FindAllDependencyNamesBySuccessor :many
+SELECT
+    d.id,
+    d.relationship,
+    predecessor.disp_name AS predecessor_activity_name
+FROM dependencies d
+JOIN activities predecessor
+    ON predecessor.id = d.predecessor_activity_id
+   AND predecessor.project_id = d.project_id
+WHERE d.project_id = ?;
+
+
 -- name: FindDependencyById :one
 SELECT * FROM dependencies WHERE id = ?;
 
