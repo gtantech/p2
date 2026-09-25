@@ -11,10 +11,6 @@ const (
 	FF RelationshipType = "FF" // finish to finish relationship
 )
 
-type PostActivityDependencyUpdateFromTableParams struct {
-	Relationship RelationshipType `json:"relationship"`
-}
-
 type PostEmptyTableRow struct {
 	ProjectId uuid.UUID `json:"projectId"`
 }

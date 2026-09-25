@@ -10,6 +10,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
+	"github.com/gtantech/p2/internal/routes/models"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
 	"github.com/gtantech/p2/static"
@@ -45,7 +46,7 @@ func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWri
 		return
 	}
 
-	relationship := r.FormValue("relationship")
+	relationship := models.FS
 	if relationship == "" {
 		http.Error(w, "missing relationship parameter", http.StatusBadRequest)
 		return
