@@ -33,9 +33,9 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/table", func(r chi.Router) {
-			r.Post("/row/activity/{id}/name", routes.PostActivityNameUpdateFromTableHandler)
-			r.Post("/row/activity/{id}/dependency", routes.PostActivityDependencyUpdateFromTableHandler)
-			r.Post("/row/activity/{id}/duration", routes.PostActivityDurationUpdateFromTableHandler)
+			r.Put("/row/activity/{id}/name", routes.PutActivityNameUpdateFromTableHandler)
+			r.Put("/row/activity/{id}/dependency", routes.PutActivityDependencyUpdateFromTableHandler)
+			r.Put("/row/activity/{id}/duration", routes.PutActivityDurationUpdateFromTableHandler)
 		})
 	})
 

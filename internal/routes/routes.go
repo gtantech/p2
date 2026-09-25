@@ -31,7 +31,7 @@ func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *h
 	component.Render(r.Context(), w)
 }
 
-func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if id == "" {
@@ -117,7 +117,7 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 	}
 }
 
-func (rt *Routes) PostActivityDurationUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) PutActivityDurationUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if id == "" {
@@ -155,7 +155,7 @@ func (rt *Routes) PostActivityDurationUpdateFromTableHandler(w http.ResponseWrit
 	}
 }
 
-func (rt *Routes) PostActivityNameUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) PutActivityNameUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if id == "" {
