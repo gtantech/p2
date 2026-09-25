@@ -59,7 +59,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             placeholder="Task name"
             autocomplete="off"
             value={row.activity.displayName}
-            hx-post={ fmt.Sprintf("/api/table/row/activity/%v/name", row.activity.id) }
+            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/name", row.activity.id) }
             hx-trigger="input changed delay:200ms"
         >
     </td>
@@ -81,7 +81,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                         return strings.Join(values, ", ")
                     }()
                 } 
-                hx-post={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.activity.id) }
+                hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.activity.id) }
                 hx-vals={ marshalParams(models.PostActivityDependencyUpdateFromTableParams{Relationship: models.FS}) }
                 hx-trigger="input changed delay:500ms"
             >
@@ -98,7 +98,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             name="duration_input"
             placeholder="e.g. 2h"
             value={row.activity.duration.String()}
-            hx-post={ fmt.Sprintf("/api/table/row/activity/%v/duration", row.activity.id) }
+            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/duration", row.activity.id) }
             hx-trigger="input changed delay:200ms"
         >
     </td>
@@ -110,7 +110,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 class="add-button"
                 title="Add task"
                 
-                hx-post={ fmt.Sprintf("/component/table/dependency/row/empty") }
+                hx-put={ fmt.Sprintf("/component/table/dependency/row/empty") }
                 hx-vals={ marshalParams(models.PostEmptyTableRow{ProjectId: projectId})}
                 hx-target="closest tr"
                 hx-swap="afterend"
