@@ -4,7 +4,6 @@ import "strings"
 import "uuid"
 import "fmt"
 import "github.com/gtantech/p2/internal/routes/models"
-import json "encoding/json/v2"
 
 templ displayDependenciesToAdd(activities []Activity, successorActivityId string){
     <ul>
@@ -83,14 +82,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                     }()
                 } 
                 hx-post={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.activity.id) }
-                hx-vals={ func() string{
-                    params := models.PostActivityDependencyUpdateFromTableParams{Relationship: models.FS}
-                    out, err := json.Marshal(params)
-                    if err != nil{
-                        panic(fmt.Sprintf("failed to marshal json from params: %v", params))
-                    }
-                    return string(out)
-                }() }
+                hx-vals={ marshalParams(models.PostActivityDependencyUpdateFromTableParams{Relationship: models.FS}) }
                 hx-trigger="input changed delay:500ms"
             >
             <!--
@@ -119,14 +111,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 title="Add task"
                 
                 hx-post={ fmt.Sprintf("/component/table/dependency/row/empty") }
-                hx-vals={ func() string{
-                    params := models.PostEmptyTableRow{ProjectId: projectId}
-                    out, err := json.Marshal(params)
-                    if err != nil{
-                        panic(fmt.Sprintf("failed to marshal json from params: %v", params))
-                    }
-                    return string(out)
-                }() }
+                hx-vals={ marshalParams(models.PostEmptyTableRow{ProjectId: projectId})}
                 hx-target="closest tr"
                 hx-swap="afterend"
             >

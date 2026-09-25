@@ -2,7 +2,9 @@ package view
 
 import (
 	"context"
+	json "encoding/json/v2"
 	"errors"
+	"fmt"
 	"uuid"
 
 	"github.com/a-h/templ"
@@ -52,4 +54,12 @@ func (v *View) DisplayDependenciesToAdd(ctx context.Context, query string, proje
 func (v *View) DisplayEmptyTableRow(params DisplayEmptyTableRowParams) templ.Component {
 	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*Activity{})
 	return displayDependencyTableRow(row, params.ProjectId)
+}
+
+func marshalParams(in any) string {
+	out, err := json.Marshal(in)
+	if err != nil {
+		panic(fmt.Sprintf("failed to marshal json from params: %v", in))
+	}
+	return string(out)
 }
