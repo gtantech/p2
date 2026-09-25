@@ -110,7 +110,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 class="add-button"
                 title="Add task"
                 
-                hx-put={ fmt.Sprintf("/component/table/dependency/row/empty") }
+                hx-post={ fmt.Sprintf("/component/table/dependency/row/empty") }
                 hx-vals={ marshalParams(models.PostEmptyTableRow{ProjectId: projectId})}
                 hx-target="closest tr"
                 hx-swap="afterend"
