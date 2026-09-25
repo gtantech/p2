@@ -4,6 +4,7 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/gtantech/p2/internal/routes/models"
 	"github.com/gtantech/p2/internal/store"
 )
 
@@ -52,6 +53,10 @@ func NewTableFromStorage(storeActivities []store.Activity, storeDependencies map
 type TableRow struct {
 	activity     *Activity
 	dependencies []*Activity
+}
+
+func (t *TableRow) ToPostEmptyTableRow() models.PostEmptyTableRow {
+	return models.PostEmptyTableRow{ProjectId: t.activity.projectID}
 }
 
 func NewTableRow(activity *Activity, dependencies []*Activity) *TableRow {
