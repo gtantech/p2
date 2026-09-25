@@ -28,7 +28,7 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 	})
 
 	r.Route("/component", func(r chi.Router) {
-		r.Get("/table/dependency/row/empty", routes.GetEmptyTableRow)
+		r.Post("/table/dependency/row/empty", routes.PostEmptyTableRow)
 	})
 
 	r.Route("/api", func(r chi.Router) {

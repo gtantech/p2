@@ -45,7 +45,7 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 		return
 	}
 
-	relationship := r.URL.Query().Get("relationship")
+	relationship := r.FormValue("relationship")
 	if relationship == "" {
 		http.Error(w, "missing relationship parameter", http.StatusBadRequest)
 		return
@@ -288,8 +288,8 @@ func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
 	w.Write(static.StaticHomeCss)
 }
 
-func (rt *Routes) GetEmptyTableRow(w http.ResponseWriter, r *http.Request) {
-	projectId, err := uuid.Parse(r.URL.Query().Get("project-id"))
+func (rt *Routes) PostEmptyTableRow(w http.ResponseWriter, r *http.Request) {
+	projectId, err := uuid.Parse(r.FormValue("projectId"))
 	if err != nil {
 		http.Error(w, "invalid project id parameter", http.StatusBadRequest)
 		return
