@@ -45,7 +45,7 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 		return
 	}
 
-	relationship := r.URL.Query().Get("relationship")
+	relationship := r.FormValue("relationship")
 	if relationship == "" {
 		http.Error(w, "missing relationship parameter", http.StatusBadRequest)
 		return
