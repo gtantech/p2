@@ -82,7 +82,6 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                     }()
                 } 
                 hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.activity.id) }
-                hx-vals={ marshalParams(models.PostActivityDependencyUpdateFromTableParams{Relationship: models.FS}) }
                 hx-trigger="input changed delay:500ms"
             >
             <!--
