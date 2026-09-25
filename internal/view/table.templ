@@ -118,7 +118,15 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 class="add-button"
                 title="Add task"
                 
-                hx-get={ fmt.Sprintf("/component/table/dependency/row/empty?project-id=%s", projectId.String()) }
+                hx-post={ fmt.Sprintf("/component/table/dependency/row/empty") }
+                hx-vals={ func() string{
+                    params := models.PostEmptyTableRow{ProjectId: projectId}
+                    out, err := json.Marshal(params)
+                    if err != nil{
+                        panic(fmt.Sprintf("failed to marshal json from params: %v", params))
+                    }
+                    return string(out)
+                }() }
                 hx-target="closest tr"
                 hx-swap="afterend"
             >

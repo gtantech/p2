@@ -1,5 +1,7 @@
 package models
 
+import "uuid"
+
 type RelationshipType string
 
 const (
@@ -11,4 +13,8 @@ const (
 
 type PostActivityDependencyUpdateFromTableParams struct {
 	Relationship RelationshipType `json:"relationship"`
+}
+
+type PostEmptyTableRow struct {
+	ProjectId uuid.UUID `json:"projectId"`
 }
