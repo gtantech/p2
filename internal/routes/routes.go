@@ -108,7 +108,7 @@ func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWri
 				http.Error(w, "failed to get activity", http.StatusBadRequest)
 				return
 			}
-			rt.store.Dependency().Create(r.Context(), store.CreateDepdencencyParams{
+			rt.store.Dependency().Create(r.Context(), models.CreateDepdencencyParams{
 				ProjectID:             storeActivity.ProjectID,
 				Relationship:          models.RelationshipType(relationship),
 				PredecessorActivityID: findUserSpecifiedActivity[0].ID,
