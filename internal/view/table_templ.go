@@ -272,7 +272,7 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(marshalParams(ToPostEmptyTableRow(row)))
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(marshalParams(toPostEmptyTableRow(row)))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 112, Col: 65}
 		}
