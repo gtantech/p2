@@ -10,7 +10,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
-	"github.com/gtantech/p2/internal/routes/models"
+	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/view"
 	"github.com/gtantech/p2/static"
@@ -196,7 +196,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 				log.Printf("returned http internal server error while creating new project. encountered error: %v\n", err)
 				return
 			}
-			storeProjects = []store.Project{storeProject}
+			storeProjects = []models.StoreProject{storeProject}
 		} else {
 			http.Error(w, "failed to get projects", http.StatusInternalServerError)
 			log.Printf("returned http internal server error while getting projects. encountered error: %v\n", err)
