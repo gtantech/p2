@@ -18,7 +18,7 @@ type StoreUpdateProjectParams struct {
 	DisplayName string
 }
 
-type Dependency struct {
+type StoreDependency struct {
 	ID                    uuid.UUID
 	ProjectID             uuid.UUID
 	Relationship          RelationshipType
@@ -26,21 +26,21 @@ type Dependency struct {
 	SuccessorActivityID   uuid.UUID
 }
 
-type GetPredecessorNamesBySuccessorResult struct {
+type StoreGetPredecessorNamesBySuccessorResult struct {
 	DependencyID            uuid.UUID
 	Relationship            RelationshipType
 	PredecessorActivityID   uuid.UUID
 	PredecessorActivityName string
 }
 
-type CreateDepdencencyParams struct {
+type StoreCreateDepdencencyParams struct {
 	ProjectID             uuid.UUID
 	Relationship          RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
 }
 
-type UpdateDepdencencyParams struct {
+type StoreUpdateDepdencencyParams struct {
 	ID                    uuid.UUID
 	Relationship          RelationshipType
 	PredecessorActivityID uuid.UUID

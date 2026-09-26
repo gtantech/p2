@@ -33,12 +33,12 @@ type ProjectStoreService interface {
 }
 
 type DependencyStoreService interface {
-	GetByID(ctx context.Context, id uuid.UUID) (models.Dependency, error)
-	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]models.Dependency, error)
-	GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]models.Dependency, error)
-	GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]models.Dependency, error)
-	GetPredecessorNamesBySuccessor(ctx context.Context, successorId uuid.UUID) ([]models.GetPredecessorNamesBySuccessorResult, error)
-	Create(ctx context.Context, params models.CreateDepdencencyParams) (models.Dependency, error)
-	Update(ctx context.Context, params models.UpdateDepdencencyParams) (models.Dependency, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.StoreDependency, error)
+	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]models.StoreDependency, error)
+	GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]models.StoreDependency, error)
+	GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]models.StoreDependency, error)
+	GetPredecessorNamesBySuccessor(ctx context.Context, successorId uuid.UUID) ([]models.StoreGetPredecessorNamesBySuccessorResult, error)
+	Create(ctx context.Context, params models.StoreCreateDepdencencyParams) (models.StoreDependency, error)
+	Update(ctx context.Context, params models.StoreUpdateDepdencencyParams) (models.StoreDependency, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }

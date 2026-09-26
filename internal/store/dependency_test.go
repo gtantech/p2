@@ -58,7 +58,7 @@ func TestToDbInsertDependencyParams(t *testing.T) {
 	predecessorId := uuid.New()
 	successorId := uuid.New()
 
-	params := models.CreateDepdencencyParams{
+	params := models.StoreCreateDepdencencyParams{
 		ProjectID:             projectId,
 		Relationship:          relationship,
 		PredecessorActivityID: predecessorId,
@@ -94,7 +94,7 @@ func TestToDbUpdateDependencyParams(t *testing.T) {
 	predecessorId := uuid.New()
 	successorId := uuid.New()
 
-	params := models.UpdateDepdencencyParams{
+	params := models.StoreUpdateDepdencencyParams{
 		ID:                    dependencyId,
 		Relationship:          relationship,
 		PredecessorActivityID: predecessorId,
