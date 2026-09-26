@@ -20,15 +20,6 @@ func newProject(id uuid.UUID, displayName string) Project {
 	return Project{ID: id, DisplayName: displayName}
 }
 
-type ProjectStore interface {
-	GetByID(ctx context.Context, id uuid.UUID) (Project, error)
-	GetByName(ctx context.Context, search string) ([]Project, error)
-	GetProjects(ctx context.Context) ([]Project, error)
-	Create(ctx context.Context, params CreateProjectParams) (Project, error)
-	Update(ctx context.Context, params UpdateProjectParams) (Project, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-}
-
 type CreateProjectParams struct {
 	DisplayName string
 }
@@ -50,7 +41,6 @@ type projectDbStore struct {
 	queries *db.Queries
 }
 
-// Update implements [ProjectStore].
 func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams) (Project, error) {
 	data, err := p.queries.UpdateProject(ctx, params.toDbUpdateProjectParams())
 	if err != nil {
@@ -63,7 +53,6 @@ func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams)
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
 }
 
-// GetProjects implements [ProjectStore].
 func (p *projectDbStore) GetProjects(ctx context.Context) ([]Project, error) {
 	data, err := p.queries.FindAllProjects(ctx)
 	if err != nil {
@@ -80,7 +69,6 @@ func (p *projectDbStore) GetProjects(ctx context.Context) ([]Project, error) {
 	return projects, nil
 }
 
-// GetByName implements [ProjectStore].
 func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]Project, error) {
 	data, err := p.queries.FindProjectByName(ctx, search)
 	if err != nil {
@@ -97,7 +85,6 @@ func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]Projec
 	return projects, nil
 }
 
-// Create implements [ProjectStore].
 func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams) (Project, error) {
 	data, err := p.queries.InsertProject(ctx, params.toDbInsertProjectParams(uuid.NewV7()))
 	if err != nil {
@@ -106,12 +93,10 @@ func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams)
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
 }
 
-// Delete implements [ProjectStore].
 func (p *projectDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 	return p.queries.DeleteProject(ctx, id.String())
 }
 
-// GetByID implements [ProjectStore].
 func (p *projectDbStore) GetByID(ctx context.Context, id uuid.UUID) (Project, error) {
 	data, err := p.queries.FindProjectById(ctx, id.String())
 	if err != nil {
@@ -129,5 +114,3 @@ func NewProjectStoreFromDb(queries *db.Queries) *projectDbStore {
 		queries: queries,
 	}
 }
-
-var _ ProjectStore = (*projectDbStore)(nil) //ensures projectStore implements ProjectStore at compile time

@@ -64,20 +64,10 @@ func (u *UpdateActivityParams) toUpdateActivityParams() db.UpdateActivityParams 
 	}
 }
 
-type ActivityStore interface {
-	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Activity, error)
-	GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error)
-	GetByID(ctx context.Context, id uuid.UUID) (Activity, error)
-	Create(ctx context.Context, params CreateActivityParams) (Activity, error)
-	Update(ctx context.Context, params UpdateActivityParams) (Activity, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-}
-
 type activityDbStore struct {
 	queries *db.Queries
 }
 
-// Create implements [ActivityStore].
 func (a *activityDbStore) Create(ctx context.Context, params CreateActivityParams) (Activity, error) {
 	data, err := a.queries.InsertActivity(ctx, params.toDbInsertActivityParams(uuid.NewV7()))
 	if err != nil {
@@ -86,12 +76,10 @@ func (a *activityDbStore) Create(ctx context.Context, params CreateActivityParam
 	return newActivity(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), data.DispName, time.Duration(data.Duration)), nil
 }
 
-// Delete implements [ActivityStore].
 func (a *activityDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 	return a.queries.DeleteActivity(ctx, id.String())
 }
 
-// GetByID implements [ActivityStore].
 func (a *activityDbStore) GetByID(ctx context.Context, id uuid.UUID) (Activity, error) {
 	data, err := a.queries.FindActivityById(ctx, id.String())
 	if err != nil {
@@ -104,7 +92,6 @@ func (a *activityDbStore) GetByID(ctx context.Context, id uuid.UUID) (Activity, 
 	return newActivity(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), data.DispName, time.Duration(data.Duration)), nil
 }
 
-// GetByNameAndProject implements [ActivityStore].
 func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error) {
 	data, err := a.queries.FindAllActivitiesByNameAndProject(ctx, params.toDbFindAllActivitiesByNameAndProjectParams())
 	if err != nil {
@@ -121,7 +108,6 @@ func (a *activityDbStore) GetByNameAndProject(ctx context.Context, params GetAct
 	return activities, nil
 }
 
-// GetByProjectID implements [ActivityStore].
 func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Activity, error) {
 	data, err := a.queries.FindAllActivitiesByProject(ctx, projectId.String())
 	if err != nil {
@@ -138,7 +124,6 @@ func (a *activityDbStore) GetByProjectID(ctx context.Context, projectId uuid.UUI
 	return activities, nil
 }
 
-// Update implements [ActivityStore].
 func (a *activityDbStore) Update(ctx context.Context, params UpdateActivityParams) (Activity, error) {
 	data, err := a.queries.UpdateActivity(ctx, params.toUpdateActivityParams())
 	if err != nil {
@@ -156,5 +141,3 @@ func NewActivityStoreFromDb(queries *db.Queries) *activityDbStore {
 		queries: queries,
 	}
 }
-
-var _ ActivityStore = (*activityDbStore)(nil) //ensures activityDbStore implements ActivityStore at compile time
