@@ -20,15 +20,6 @@ func newProject(id uuid.UUID, displayName string) Project {
 	return Project{ID: id, DisplayName: displayName}
 }
 
-type ProjectStore interface {
-	GetByID(ctx context.Context, id uuid.UUID) (Project, error)
-	GetByName(ctx context.Context, search string) ([]Project, error)
-	GetProjects(ctx context.Context) ([]Project, error)
-	Create(ctx context.Context, params CreateProjectParams) (Project, error)
-	Update(ctx context.Context, params UpdateProjectParams) (Project, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-}
-
 type CreateProjectParams struct {
 	DisplayName string
 }
@@ -129,5 +120,3 @@ func NewProjectStoreFromDb(queries *db.Queries) *projectDbStore {
 		queries: queries,
 	}
 }
-
-var _ ProjectStore = (*projectDbStore)(nil) //ensures projectStore implements ProjectStore at compile time

@@ -78,17 +78,6 @@ func (u *UpdateDepdencencyParams) toDbUpdateDependencyParams() db.UpdateDependen
 	}
 }
 
-type DependencyStore interface {
-	GetByID(ctx context.Context, id uuid.UUID) (Dependency, error)
-	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Dependency, error)
-	GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error)
-	GetBySuccessor(ctx context.Context, successorId uuid.UUID) ([]Dependency, error)
-	GetPredecessorNamesBySuccessor(ctx context.Context, successorId uuid.UUID) ([]GetPredecessorNamesBySuccessorResult, error)
-	Create(ctx context.Context, params CreateDepdencencyParams) (Dependency, error)
-	Update(ctx context.Context, params UpdateDepdencencyParams) (Dependency, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-}
-
 type dependencyDbStore struct {
 	queries *db.Queries
 }
@@ -206,5 +195,3 @@ func NewDependencyStoreFromDb(queries *db.Queries) *dependencyDbStore {
 		queries: queries,
 	}
 }
-
-var _ DependencyStore = (*dependencyDbStore)(nil) //ensures dependencyDbStore implements DependencyStore at compile time

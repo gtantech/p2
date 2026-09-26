@@ -64,15 +64,6 @@ func (u *UpdateActivityParams) toUpdateActivityParams() db.UpdateActivityParams 
 	}
 }
 
-type ActivityStore interface {
-	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]Activity, error)
-	GetByNameAndProject(ctx context.Context, params GetActivityByNameAndProjectParams) ([]Activity, error)
-	GetByID(ctx context.Context, id uuid.UUID) (Activity, error)
-	Create(ctx context.Context, params CreateActivityParams) (Activity, error)
-	Update(ctx context.Context, params UpdateActivityParams) (Activity, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-}
-
 type activityDbStore struct {
 	queries *db.Queries
 }
@@ -156,5 +147,3 @@ func NewActivityStoreFromDb(queries *db.Queries) *activityDbStore {
 		queries: queries,
 	}
 }
-
-var _ ActivityStore = (*activityDbStore)(nil) //ensures activityDbStore implements ActivityStore at compile time
