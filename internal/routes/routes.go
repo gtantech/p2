@@ -190,7 +190,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	storeProjects, err := rt.store.Project().GetProjects(r.Context())
 	if err != nil {
 		if errors.Is(err, store.ErrProjectNotFound) {
-			storeProject, err := rt.store.Project().Create(r.Context(), store.CreateProjectParams{DisplayName: "Project 1"})
+			storeProject, err := rt.store.Project().Create(r.Context(), models.CreateProjectParams{DisplayName: "Project 1"})
 			if err != nil {
 				http.Error(w, "failed to create new project", http.StatusInternalServerError)
 				log.Printf("returned http internal server error while creating new project. encountered error: %v\n", err)

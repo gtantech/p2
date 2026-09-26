@@ -16,20 +16,11 @@ func newProject(id uuid.UUID, displayName string) models.StoreProject {
 	return models.StoreProject{ID: id, DisplayName: displayName}
 }
 
-type CreateProjectParams struct {
-	DisplayName string
-}
-
-func toDbInsertProjectParams(projectId uuid.UUID, c *CreateProjectParams) db.InsertProjectParams {
+func toDbInsertProjectParams(projectId uuid.UUID, c *models.CreateProjectParams) db.InsertProjectParams {
 	return db.InsertProjectParams{ID: projectId.String(), DispName: c.DisplayName}
 }
 
-type UpdateProjectParams struct {
-	Id          uuid.UUID
-	DisplayName string
-}
-
-func toDbUpdateProjectParams(u *UpdateProjectParams) db.UpdateProjectParams {
+func toDbUpdateProjectParams(u *models.UpdateProjectParams) db.UpdateProjectParams {
 	return db.UpdateProjectParams{ID: u.Id.String(), DispName: u.DisplayName}
 }
 
@@ -37,7 +28,7 @@ type projectDbStore struct {
 	queries *db.Queries
 }
 
-func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams) (models.StoreProject, error) {
+func (p *projectDbStore) Update(ctx context.Context, params models.UpdateProjectParams) (models.StoreProject, error) {
 	data, err := p.queries.UpdateProject(ctx, toDbUpdateProjectParams(&params))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -81,7 +72,7 @@ func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]models
 	return projects, nil
 }
 
-func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams) (models.StoreProject, error) {
+func (p *projectDbStore) Create(ctx context.Context, params models.CreateProjectParams) (models.StoreProject, error) {
 	data, err := p.queries.InsertProject(ctx, toDbInsertProjectParams(uuid.NewV7(), &params))
 	if err != nil {
 		return models.StoreProject{}, err

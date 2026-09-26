@@ -5,6 +5,7 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/models"
 )
 
 func TestNewProject(t *testing.T) {
@@ -26,7 +27,7 @@ func TestToDbInsertProjectParams(t *testing.T) {
 	projectId := uuid.New()
 	displayName := "test_disp_name"
 
-	params := CreateProjectParams{
+	params := models.CreateProjectParams{
 		DisplayName: displayName,
 	}
 
@@ -45,7 +46,7 @@ func TestToDbUpdateProjectParams(t *testing.T) {
 	projectId := uuid.New()
 	displayName := "test_disp_name"
 
-	params := UpdateProjectParams{
+	params := models.UpdateProjectParams{
 		Id:          projectId,
 		DisplayName: displayName,
 	}

@@ -27,8 +27,8 @@ type ProjectStoreService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (models.StoreProject, error)
 	GetByName(ctx context.Context, search string) ([]models.StoreProject, error)
 	GetProjects(ctx context.Context) ([]models.StoreProject, error)
-	Create(ctx context.Context, params store.CreateProjectParams) (models.StoreProject, error)
-	Update(ctx context.Context, params store.UpdateProjectParams) (models.StoreProject, error)
+	Create(ctx context.Context, params models.CreateProjectParams) (models.StoreProject, error)
+	Update(ctx context.Context, params models.UpdateProjectParams) (models.StoreProject, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
