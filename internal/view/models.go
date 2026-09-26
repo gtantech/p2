@@ -54,7 +54,7 @@ type TableRow struct {
 	dependencies []*Activity
 }
 
-func (t *TableRow) ToPostEmptyTableRow() models.PostEmptyTableRow {
+func ToPostEmptyTableRow(t *TableRow) models.PostEmptyTableRow {
 	return models.PostEmptyTableRow{ProjectId: t.activity.projectID}
 }
 
