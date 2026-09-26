@@ -12,8 +12,8 @@ import (
 
 var ErrProjectNotFound = errors.New("project not found")
 
-func newProject(id uuid.UUID, displayName string) models.Project {
-	return models.Project{ID: id, DisplayName: displayName}
+func newProject(id uuid.UUID, displayName string) models.StoreProject {
+	return models.StoreProject{ID: id, DisplayName: displayName}
 }
 
 type CreateProjectParams struct {
@@ -37,54 +37,54 @@ type projectDbStore struct {
 	queries *db.Queries
 }
 
-func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams) (models.Project, error) {
+func (p *projectDbStore) Update(ctx context.Context, params UpdateProjectParams) (models.StoreProject, error) {
 	data, err := p.queries.UpdateProject(ctx, params.toDbUpdateProjectParams())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Project doesn't exist
-			return models.Project{}, ErrProjectNotFound
+			return models.StoreProject{}, ErrProjectNotFound
 		}
-		return models.Project{}, err
+		return models.StoreProject{}, err
 	}
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
 }
 
-func (p *projectDbStore) GetProjects(ctx context.Context) ([]models.Project, error) {
+func (p *projectDbStore) GetProjects(ctx context.Context) ([]models.StoreProject, error) {
 	data, err := p.queries.FindAllProjects(ctx)
 	if err != nil {
-		return []models.Project{}, err
+		return []models.StoreProject{}, err
 	}
 	if len(data) == 0 {
 		// Project doesn't exist
-		return []models.Project{}, ErrProjectNotFound
+		return []models.StoreProject{}, ErrProjectNotFound
 	}
-	projects := make([]models.Project, len(data))
+	projects := make([]models.StoreProject, len(data))
 	for i, d := range data {
 		projects[i] = newProject(uuid.MustParse(d.ID), d.DispName)
 	}
 	return projects, nil
 }
 
-func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]models.Project, error) {
+func (p *projectDbStore) GetByName(ctx context.Context, search string) ([]models.StoreProject, error) {
 	data, err := p.queries.FindProjectByName(ctx, search)
 	if err != nil {
-		return []models.Project{}, err
+		return []models.StoreProject{}, err
 	}
 	if len(data) == 0 {
 		// Project doesn't exist
-		return []models.Project{}, ErrProjectNotFound
+		return []models.StoreProject{}, ErrProjectNotFound
 	}
-	projects := make([]models.Project, len(data))
+	projects := make([]models.StoreProject, len(data))
 	for i, d := range data {
 		projects[i] = newProject(uuid.MustParse(d.ID), d.DispName)
 	}
 	return projects, nil
 }
 
-func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams) (models.Project, error) {
+func (p *projectDbStore) Create(ctx context.Context, params CreateProjectParams) (models.StoreProject, error) {
 	data, err := p.queries.InsertProject(ctx, params.toDbInsertProjectParams(uuid.NewV7()))
 	if err != nil {
-		return models.Project{}, err
+		return models.StoreProject{}, err
 	}
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
 }
@@ -93,14 +93,14 @@ func (p *projectDbStore) Delete(ctx context.Context, id uuid.UUID) error {
 	return p.queries.DeleteProject(ctx, id.String())
 }
 
-func (p *projectDbStore) GetByID(ctx context.Context, id uuid.UUID) (models.Project, error) {
+func (p *projectDbStore) GetByID(ctx context.Context, id uuid.UUID) (models.StoreProject, error) {
 	data, err := p.queries.FindProjectById(ctx, id.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Project doesn't exist
-			return models.Project{}, ErrProjectNotFound
+			return models.StoreProject{}, ErrProjectNotFound
 		}
-		return models.Project{}, err
+		return models.StoreProject{}, err
 	}
 	return newProject(uuid.MustParse(data.ID), data.DispName), nil
 }

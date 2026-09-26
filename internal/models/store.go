@@ -2,7 +2,7 @@ package models
 
 import "uuid"
 
-type Project struct {
+type StoreProject struct {
 	ID          uuid.UUID
 	DisplayName string
 }
