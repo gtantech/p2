@@ -24,7 +24,7 @@ func (v *View) Home(table *models.ViewTable, homeProjectId uuid.UUID) templ.Comp
 	return home(table, homeProjectId)
 }
 
-func (v *View) DisplayEmptyTableRow(params models.DisplayEmptyTableRowParams) templ.Component {
+func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) templ.Component {
 	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
 	return displayDependencyTableRow(row, params.ProjectId)
 }
@@ -68,8 +68,8 @@ func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependenci
 	return &table
 }
 
-func toPostEmptyTableRow(t *models.ViewTableRow) models.PostEmptyTableRow {
-	return models.PostEmptyTableRow{ProjectId: t.Activity.ProjectID}
+func toPostEmptyTableRow(t *models.ViewTableRow) models.RoutesPostEmptyTableRow {
+	return models.RoutesPostEmptyTableRow{ProjectId: t.Activity.ProjectID}
 }
 
 func NewTableRow(activity *models.ViewActivity, dependencies []*models.ViewActivity) *models.ViewTableRow {

@@ -21,7 +21,7 @@ type ViewTableRow struct {
 	Dependencies []*ViewActivity
 }
 
-type DisplayEmptyTableRowParams struct {
+type ViewDisplayEmptyTableRowParams struct {
 	ActivityId uuid.UUID
 	ProjectId  uuid.UUID
 }

@@ -2,6 +2,6 @@ package models
 
 import "uuid"
 
-type PostEmptyTableRow struct {
+type RoutesPostEmptyTableRow struct {
 	ProjectId uuid.UUID `json:"projectId"`
 }
