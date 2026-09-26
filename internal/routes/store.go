@@ -4,6 +4,7 @@ import (
 	"context"
 	"uuid"
 
+	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/store"
 )
 
@@ -23,11 +24,11 @@ type ActivityStoreService interface {
 }
 
 type ProjectStoreService interface {
-	GetByID(ctx context.Context, id uuid.UUID) (store.Project, error)
-	GetByName(ctx context.Context, search string) ([]store.Project, error)
-	GetProjects(ctx context.Context) ([]store.Project, error)
-	Create(ctx context.Context, params store.CreateProjectParams) (store.Project, error)
-	Update(ctx context.Context, params store.UpdateProjectParams) (store.Project, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.StoreProject, error)
+	GetByName(ctx context.Context, search string) ([]models.StoreProject, error)
+	GetProjects(ctx context.Context) ([]models.StoreProject, error)
+	Create(ctx context.Context, params store.CreateProjectParams) (models.StoreProject, error)
+	Update(ctx context.Context, params store.UpdateProjectParams) (models.StoreProject, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
