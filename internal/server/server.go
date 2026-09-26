@@ -8,14 +8,11 @@ import (
 	"time"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/routes"
 	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
-
-type ServerConfig struct {
-	Port int
-}
 
 type Server struct {
 	*http.Server
@@ -27,7 +24,7 @@ func (s *Server) CloseDb() error {
 	return s.database.Close()
 }
 
-func NewServer(config ServerConfig) *Server {
+func NewServer(config models.ServerConfig) *Server {
 	database, err := db.NewSQLiteStorage(":memory:")
 	if err != nil {
 		log.Fatalf("failed to open database with error: %v", err)
