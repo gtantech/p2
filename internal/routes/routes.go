@@ -101,7 +101,7 @@ func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWri
 	for key := range dependencyInputMap {
 		//if key in dependencyInputMap is not in predecessorNameToDependencyId, user has added value
 		if _, ok := predecessorNameToDependencyId[key]; !ok {
-			findUserSpecifiedActivity, err := rt.store.Activity().GetByNameAndProject(r.Context(), store.GetActivityByNameAndProjectParams{
+			findUserSpecifiedActivity, err := rt.store.Activity().GetByNameAndProject(r.Context(), models.GetActivityByNameAndProjectParams{
 				ProjectID:   storeActivity.ProjectID,
 				DisplayName: key})
 			if err != nil {
@@ -134,7 +134,7 @@ func (rt *Routes) PutActivityDurationUpdateFromTableHandler(w http.ResponseWrite
 
 	duration_input := r.FormValue("duration_input")
 	if duration_input == "" {
-		_, err = rt.store.Activity().Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: duration_input, Duration: 0})
+		_, err = rt.store.Activity().Update(r.Context(), models.UpdateActivityParams{Id: activityId, DisplayName: duration_input, Duration: 0})
 		if err != nil {
 			http.Error(w, "failed to update activity", http.StatusInternalServerError)
 			log.Printf("returned http internal server error while updating activity %v. encountered error: %v\n", activityId, err)
@@ -150,7 +150,7 @@ func (rt *Routes) PutActivityDurationUpdateFromTableHandler(w http.ResponseWrite
 	if err != nil {
 		http.Error(w, "failed to get activity", http.StatusInternalServerError)
 	}
-	_, err = rt.store.Activity().Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: storeActivity.DisplayName, Duration: duration})
+	_, err = rt.store.Activity().Update(r.Context(), models.UpdateActivityParams{Id: activityId, DisplayName: storeActivity.DisplayName, Duration: duration})
 	if err != nil {
 		http.Error(w, "failed to update activity", http.StatusInternalServerError)
 	}
@@ -180,7 +180,7 @@ func (rt *Routes) PutActivityNameUpdateFromTableHandler(w http.ResponseWriter, r
 	if err != nil {
 		http.Error(w, "failed to get activity", http.StatusInternalServerError)
 	}
-	_, err = rt.store.Activity().Update(r.Context(), store.UpdateActivityParams{Id: activityId, DisplayName: name, Duration: storeActivity.Duration})
+	_, err = rt.store.Activity().Update(r.Context(), models.UpdateActivityParams{Id: activityId, DisplayName: name, Duration: storeActivity.Duration})
 	if err != nil {
 		http.Error(w, "failed to update activity", http.StatusInternalServerError)
 	}
@@ -210,13 +210,13 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	storeActivities, err := rt.store.Activity().GetByProjectID(r.Context(), firstProjectId)
 	if err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
-			storeActivity, err := rt.store.Activity().Create(r.Context(), store.CreateActivityParams{ProjectID: firstProjectId, DisplayName: "", Duration: 0})
+			storeActivity, err := rt.store.Activity().Create(r.Context(), models.CreateActivityParams{ProjectID: firstProjectId, DisplayName: "", Duration: 0})
 			if err != nil {
 				http.Error(w, "failed to create new activity", http.StatusInternalServerError)
 				log.Printf("returned http internal server error while creating activity. encountered error: %v\n", err)
 				return
 			}
-			storeActivities = []store.Activity{storeActivity}
+			storeActivities = []models.Activity{storeActivity}
 		} else {
 			http.Error(w, "failed to get activities", http.StatusInternalServerError)
 			log.Printf("returned http internal server error while getting activities. encountered error: %v\n", err)
@@ -225,18 +225,18 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//map activity id to activity
-	storeActivitiesMap := make(map[uuid.UUID]store.Activity)
+	storeActivitiesMap := make(map[uuid.UUID]models.Activity)
 	for _, storeActivity := range storeActivities {
 		storeActivitiesMap[storeActivity.ID] = storeActivity
 	}
 
 	//map a list of predecessor activities to a successor activity
-	storeDependenciesMap := make(map[store.Activity][]store.Activity)
+	storeDependenciesMap := make(map[models.Activity][]models.Activity)
 	for _, storeActivity := range storeActivities {
 		storeDependencies, err := rt.store.Dependency().GetBySuccessor(r.Context(), storeActivity.ID)
 		if err != nil {
 			if errors.Is(err, store.ErrDependencyNotFound) {
-				storeDependenciesMap[storeActivity] = []store.Activity{}
+				storeDependenciesMap[storeActivity] = []models.Activity{}
 				continue
 			} else {
 				http.Error(w, "failed to get dependency", http.StatusInternalServerError)
@@ -266,7 +266,7 @@ func (rt *Routes) PostEmptyTableRow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	storeActivity, err := rt.store.Activity().Create(r.Context(), store.CreateActivityParams{ProjectID: projectId, DisplayName: "", Duration: 0})
+	storeActivity, err := rt.store.Activity().Create(r.Context(), models.CreateActivityParams{ProjectID: projectId, DisplayName: "", Duration: 0})
 
 	if err != nil {
 		//TODO check for duplicate name error

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"time"
 	"uuid"
 )
 
@@ -45,4 +46,28 @@ type StoreUpdateDepdencencyParams struct {
 	Relationship          RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
+}
+
+type Activity struct {
+	ID          uuid.UUID
+	ProjectID   uuid.UUID
+	DisplayName string
+	Duration    time.Duration
+}
+
+type CreateActivityParams struct {
+	ProjectID   uuid.UUID
+	DisplayName string
+	Duration    time.Duration
+}
+
+type GetActivityByNameAndProjectParams struct {
+	ProjectID   uuid.UUID
+	DisplayName string
+}
+
+type UpdateActivityParams struct {
+	Id          uuid.UUID
+	DisplayName string
+	Duration    time.Duration
 }

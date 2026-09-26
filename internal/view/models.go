@@ -5,7 +5,6 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/models"
-	"github.com/gtantech/p2/internal/store"
 )
 
 type Activity struct {
@@ -27,8 +26,8 @@ func NewTable(rows []*TableRow) *Table {
 	return &Table{rows: rows}
 }
 
-func NewTableFromStorage(storeActivities []store.Activity, storeDependencies map[store.Activity][]store.Activity) *Table {
-	storeActivityMap := make(map[store.Activity]*Activity)
+func NewTableFromStorage(storeActivities []models.Activity, storeDependencies map[models.Activity][]models.Activity) *Table {
+	storeActivityMap := make(map[models.Activity]*Activity)
 
 	for _, storeActivity := range storeActivities {
 		//convert activity
