@@ -27,7 +27,7 @@ func TestToDbInsertProjectParams(t *testing.T) {
 	projectId := uuid.New()
 	displayName := "test_disp_name"
 
-	params := models.CreateProjectParams{
+	params := models.StoreCreateProjectParams{
 		DisplayName: displayName,
 	}
 
@@ -46,7 +46,7 @@ func TestToDbUpdateProjectParams(t *testing.T) {
 	projectId := uuid.New()
 	displayName := "test_disp_name"
 
-	params := models.UpdateProjectParams{
+	params := models.StoreUpdateProjectParams{
 		Id:          projectId,
 		DisplayName: displayName,
 	}

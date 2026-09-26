@@ -7,11 +7,11 @@ type StoreProject struct {
 	DisplayName string
 }
 
-type CreateProjectParams struct {
+type StoreCreateProjectParams struct {
 	DisplayName string
 }
 
-type UpdateProjectParams struct {
+type StoreUpdateProjectParams struct {
 	Id          uuid.UUID
 	DisplayName string
 }
