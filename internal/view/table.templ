@@ -108,7 +108,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 class="add-button"
                 title="Add task"
                 
-                hx-post={ fmt.Sprintf("/component/table/dependency/row/empty") }
+                hx-post={ fmt.Sprintf("/component/table/row/empty") }
                 hx-vals={ marshalParams(row.ToPostEmptyTableRow()) }
                 hx-target="closest tr"
                 hx-swap="afterend"
