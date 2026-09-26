@@ -7,6 +7,7 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/models"
 )
 
 type mock_dependency struct {
@@ -27,7 +28,7 @@ type mock_activity struct {
 func TestNewDependency(t *testing.T) {
 	dependencyId := uuid.New()
 	projectId := uuid.New()
-	relationship := SS
+	relationship := models.SS
 	predecessorId := uuid.New()
 	successorId := uuid.New()
 
@@ -53,18 +54,18 @@ func TestNewDependency(t *testing.T) {
 func TestToDbInsertDependencyParams(t *testing.T) {
 	dependencyId := uuid.New()
 	projectId := uuid.New()
-	relationship := SS
+	relationship := models.SS
 	predecessorId := uuid.New()
 	successorId := uuid.New()
 
-	params := CreateDepdencencyParams{
+	params := models.StoreCreateDepdencencyParams{
 		ProjectID:             projectId,
 		Relationship:          relationship,
 		PredecessorActivityID: predecessorId,
 		SuccessorActivityID:   successorId,
 	}
 
-	dbParams := params.toDbInsertDependencyParams(dependencyId)
+	dbParams := toDbInsertDependencyParams(dependencyId, &params)
 
 	if got, want := uuid.MustParse(dbParams.ID), dependencyId; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -74,7 +75,7 @@ func TestToDbInsertDependencyParams(t *testing.T) {
 		t.Errorf("got %v, want %v", got, want)
 	}
 
-	if got, want := RelationshipType(dbParams.Relationship), relationship; got != want {
+	if got, want := models.RelationshipType(dbParams.Relationship), relationship; got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
 
@@ -89,24 +90,24 @@ func TestToDbInsertDependencyParams(t *testing.T) {
 
 func TestToDbUpdateDependencyParams(t *testing.T) {
 	dependencyId := uuid.New()
-	relationship := SS
+	relationship := models.SS
 	predecessorId := uuid.New()
 	successorId := uuid.New()
 
-	params := UpdateDepdencencyParams{
+	params := models.StoreUpdateDepdencencyParams{
 		ID:                    dependencyId,
 		Relationship:          relationship,
 		PredecessorActivityID: predecessorId,
 		SuccessorActivityID:   successorId,
 	}
 
-	dbParams := params.toDbUpdateDependencyParams()
+	dbParams := toDbUpdateDependencyParams(&params)
 
 	if got, want := uuid.MustParse(dbParams.ID), dependencyId; got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
 
-	if got, want := RelationshipType(dbParams.Relationship), relationship; got != want {
+	if got, want := models.RelationshipType(dbParams.Relationship), relationship; got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
 

@@ -5,6 +5,7 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/models"
 )
 
 func TestNewProject(t *testing.T) {
@@ -26,11 +27,11 @@ func TestToDbInsertProjectParams(t *testing.T) {
 	projectId := uuid.New()
 	displayName := "test_disp_name"
 
-	params := CreateProjectParams{
+	params := models.StoreCreateProjectParams{
 		DisplayName: displayName,
 	}
 
-	dbParams := params.toDbInsertProjectParams(projectId)
+	dbParams := toDbInsertProjectParams(projectId, &params)
 
 	if got, want := uuid.MustParse(dbParams.ID), projectId; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -45,12 +46,12 @@ func TestToDbUpdateProjectParams(t *testing.T) {
 	projectId := uuid.New()
 	displayName := "test_disp_name"
 
-	params := UpdateProjectParams{
+	params := models.StoreUpdateProjectParams{
 		Id:          projectId,
 		DisplayName: displayName,
 	}
 
-	dbParams := params.toDbUpdateProjectParams()
+	dbParams := toDbUpdateProjectParams(&params)
 
 	if got, want := uuid.MustParse(dbParams.ID), projectId; got != want {
 		t.Errorf("got %v, want %v", got, want)

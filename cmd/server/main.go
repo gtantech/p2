@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
 )
 
@@ -49,7 +50,7 @@ func gracefulShutdown(server *server.Server, done chan bool) {
 func main() {
 
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	serverConfig := server.ServerConfig{Port: port}
+	serverConfig := models.ServerConfig{Port: port}
 	server := server.NewServer(serverConfig)
 
 	// Create a done channel to signal when the shutdown is complete

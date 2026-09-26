@@ -11,8 +11,9 @@ import templruntime "github.com/a-h/templ/runtime"
 import "strings"
 import "uuid"
 import "fmt"
+import "github.com/gtantech/p2/internal/models"
 
-func displayDependenciesToAdd(activities []Activity, successorActivityId string) templ.Component {
+func displayDependenciesToAdd(activities []models.ViewActivity, successorActivityId string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,9 +44,9 @@ func displayDependenciesToAdd(activities []Activity, successorActivityId string)
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.id.String())
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Id.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 10, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 11, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 			if templ_7745c5c3_Err != nil {
@@ -56,9 +57,9 @@ func displayDependenciesToAdd(activities []Activity, successorActivityId string)
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(item.displayName)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(item.DisplayName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 10, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 11, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -106,7 +107,7 @@ func displayDependenciesToAddNotFound() templ.Component {
 	})
 }
 
-func displayDependencyTable(table *Table, projectId uuid.UUID) templ.Component {
+func displayDependencyTable(table *models.ViewTable, projectId uuid.UUID) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -131,7 +132,7 @@ func displayDependencyTable(table *Table, projectId uuid.UUID) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, row := range table.rows {
+		for _, row := range table.Rows {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!--\r\n                    Task row\r\n                --> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -149,7 +150,7 @@ func displayDependencyTable(table *Table, projectId uuid.UUID) templ.Component {
 	})
 }
 
-func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Component {
+func displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -175,9 +176,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.displayName)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.Activity.DisplayName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 60, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 61, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -188,9 +189,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/name", row.activity.id))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/name", row.Activity.Id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 61, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 62, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
@@ -202,14 +203,14 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(func() string {
-			values := make([]string, len(row.dependencies))
-			for i, dependency := range row.dependencies {
-				values[i] = dependency.displayName
+			values := make([]string, len(row.Dependencies))
+			for i, dependency := range row.Dependencies {
+				values[i] = dependency.DisplayName
 			}
 			return strings.Join(values, ", ")
 		}())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 81, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 82, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -220,9 +221,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/dependency", row.activity.id))
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 83, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 84, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
@@ -233,9 +234,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.activity.duration.String())
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.Activity.Duration.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 98, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 99, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -246,9 +247,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/duration", row.activity.id))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/api/table/row/activity/%v/duration", row.Activity.Id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 99, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 100, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
@@ -261,7 +262,7 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/component/table/row/empty"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 111, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 112, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -272,9 +273,9 @@ func displayDependencyTableRow(row *TableRow, projectId uuid.UUID) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(marshalParams(row.ToPostEmptyTableRow()))
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(marshalParams(toPostEmptyTableRow(row)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 112, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 113, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {

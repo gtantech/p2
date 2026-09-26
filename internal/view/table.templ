@@ -3,11 +3,12 @@ package view
 import "strings"
 import "uuid"
 import "fmt"
+import "github.com/gtantech/p2/internal/models"
 
-templ displayDependenciesToAdd(activities []Activity, successorActivityId string){
+templ displayDependenciesToAdd(activities []models.ViewActivity, successorActivityId string){
     <ul>
         for _, item := range activities {
-            <li><button type="button" value={item.id.String()}>{item.displayName}</button></li>
+            <li><button type="button" value={item.Id.String()}>{item.DisplayName}</button></li>
         }
     </ul>
 }
@@ -18,7 +19,7 @@ templ displayDependenciesToAddNotFound(){
     </ul>
 }
 
-templ displayDependencyTable(table *Table, projectId uuid.UUID){
+templ displayDependencyTable(table *models.ViewTable, projectId uuid.UUID){
     <table>
         <thead>
             <tr>
@@ -37,7 +38,7 @@ templ displayDependencyTable(table *Table, projectId uuid.UUID){
         </thead>
 
         <tbody id="task-table-body">
-            for _, row := range table.rows{
+            for _, row := range table.Rows{
                 <!--
                     Task row
                 -->
@@ -47,7 +48,7 @@ templ displayDependencyTable(table *Table, projectId uuid.UUID){
     </table>
 }
 
-templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
+templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     <tr class="task-row">
     <!-- Task name -->
     <td>
@@ -57,8 +58,8 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             class="task-name"
             placeholder="Task name"
             autocomplete="off"
-            value={row.activity.displayName}
-            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/name", row.activity.id) }
+            value={row.Activity.DisplayName}
+            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/name", row.Activity.Id) }
             hx-trigger="input changed delay:200ms"
         >
     </td>
@@ -73,14 +74,14 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 autocomplete="off"
                 value={
                     func() string {
-                        values := make([]string, len(row.dependencies))
-                        for i, dependency := range row.dependencies {
-                            values[i] = dependency.displayName
+                        values := make([]string, len(row.Dependencies))
+                        for i, dependency := range row.Dependencies {
+                            values[i] = dependency.DisplayName
                         }
                         return strings.Join(values, ", ")
                     }()
                 } 
-                hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.activity.id) }
+                hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id) }
                 hx-trigger="input changed delay:500ms"
             >
             <!--
@@ -95,8 +96,8 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
             type="text"
             name="duration_input"
             placeholder="e.g. 2h"
-            value={row.activity.duration.String()}
-            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/duration", row.activity.id) }
+            value={row.Activity.Duration.String()}
+            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/duration", row.Activity.Id) }
             hx-trigger="input changed delay:200ms"
         >
     </td>
@@ -109,7 +110,7 @@ templ displayDependencyTableRow(row *TableRow, projectId uuid.UUID){
                 title="Add task"
                 
                 hx-post={ fmt.Sprintf("/component/table/row/empty") }
-                hx-vals={ marshalParams(row.ToPostEmptyTableRow()) }
+                hx-vals={ marshalParams(toPostEmptyTableRow(row)) }
                 hx-target="closest tr"
                 hx-swap="afterend"
             >

@@ -1,8 +1,8 @@
 package view
 
 import "uuid"
-
-templ home(table *Table, projectId uuid.UUID) {
+import "github.com/gtantech/p2/internal/models"
+templ home(table *models.ViewTable, projectId uuid.UUID) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>

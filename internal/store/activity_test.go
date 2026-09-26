@@ -6,6 +6,7 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/models"
 )
 
 func TestNewActivity(t *testing.T) {
@@ -39,8 +40,8 @@ func TestToDbInsertActivityParams(t *testing.T) {
 	displayName := "test_disp_name"
 	duration := 5 * time.Minute
 
-	params := CreateActivityParams{ProjectID: projectId, DisplayName: displayName, Duration: duration}
-	dbParams := params.toDbInsertActivityParams(activityId)
+	params := models.StoreCreateActivityParams{ProjectID: projectId, DisplayName: displayName, Duration: duration}
+	dbParams := toDbInsertActivityParams(activityId, &params)
 
 	if got, want := uuid.MustParse(dbParams.ID), activityId; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -63,8 +64,8 @@ func TestToDbFindAllActivitiesByNameAndProjectParams(t *testing.T) {
 	projectId := uuid.NewV7()
 	displayName := "test_disp_name"
 
-	params := GetActivityByNameAndProjectParams{ProjectID: projectId, DisplayName: displayName}
-	dbParams := params.toDbFindAllActivitiesByNameAndProjectParams()
+	params := models.StoreGetActivityByNameAndProjectParams{ProjectID: projectId, DisplayName: displayName}
+	dbParams := toDbFindAllActivitiesByNameAndProjectParams(&params)
 
 	if got, want := dbParams.DispName, displayName; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -80,8 +81,8 @@ func TestToUpdateActivityParams(t *testing.T) {
 	displayName := "test_disp_name"
 	duration := 5 * time.Minute
 
-	params := UpdateActivityParams{Id: activityId, DisplayName: displayName, Duration: duration}
-	dbParams := params.toUpdateActivityParams()
+	params := models.StoreUpdateActivityParams{Id: activityId, DisplayName: displayName, Duration: duration}
+	dbParams := toUpdateActivityParams(&params)
 
 	if got, want := uuid.MustParse(dbParams.ID), activityId; got != want {
 		t.Errorf("got %v, want %v", got, want)
