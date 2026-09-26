@@ -7,19 +7,15 @@ import (
 	"uuid"
 
 	"github.com/a-h/templ"
-	"github.com/gtantech/p2/internal/store"
 )
 
 type View struct {
-	store *store.Store
 }
 
 var ErrActivityNotFound = errors.New("activity not found")
 
-func NewView(store *store.Store) *View {
-	return &View{
-		store: store,
-	}
+func NewView() *View {
+	return &View{}
 }
 
 func (v *View) Home(table *Table, homeProjectId uuid.UUID) templ.Component {
