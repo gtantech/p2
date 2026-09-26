@@ -48,25 +48,25 @@ type StoreUpdateDepdencencyParams struct {
 	SuccessorActivityID   uuid.UUID
 }
 
-type Activity struct {
+type StoreActivity struct {
 	ID          uuid.UUID
 	ProjectID   uuid.UUID
 	DisplayName string
 	Duration    time.Duration
 }
 
-type CreateActivityParams struct {
+type StoreCreateActivityParams struct {
 	ProjectID   uuid.UUID
 	DisplayName string
 	Duration    time.Duration
 }
 
-type GetActivityByNameAndProjectParams struct {
+type StoreGetActivityByNameAndProjectParams struct {
 	ProjectID   uuid.UUID
 	DisplayName string
 }
 
-type UpdateActivityParams struct {
+type StoreUpdateActivityParams struct {
 	Id          uuid.UUID
 	DisplayName string
 	Duration    time.Duration

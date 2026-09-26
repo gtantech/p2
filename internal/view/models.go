@@ -26,8 +26,8 @@ func NewTable(rows []*TableRow) *Table {
 	return &Table{rows: rows}
 }
 
-func NewTableFromStorage(storeActivities []models.Activity, storeDependencies map[models.Activity][]models.Activity) *Table {
-	storeActivityMap := make(map[models.Activity]*Activity)
+func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependencies map[models.StoreActivity][]models.StoreActivity) *Table {
+	storeActivityMap := make(map[models.StoreActivity]*Activity)
 
 	for _, storeActivity := range storeActivities {
 		//convert activity

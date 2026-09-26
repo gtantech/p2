@@ -40,7 +40,7 @@ func TestToDbInsertActivityParams(t *testing.T) {
 	displayName := "test_disp_name"
 	duration := 5 * time.Minute
 
-	params := models.CreateActivityParams{ProjectID: projectId, DisplayName: displayName, Duration: duration}
+	params := models.StoreCreateActivityParams{ProjectID: projectId, DisplayName: displayName, Duration: duration}
 	dbParams := toDbInsertActivityParams(activityId, &params)
 
 	if got, want := uuid.MustParse(dbParams.ID), activityId; got != want {
@@ -64,7 +64,7 @@ func TestToDbFindAllActivitiesByNameAndProjectParams(t *testing.T) {
 	projectId := uuid.NewV7()
 	displayName := "test_disp_name"
 
-	params := models.GetActivityByNameAndProjectParams{ProjectID: projectId, DisplayName: displayName}
+	params := models.StoreGetActivityByNameAndProjectParams{ProjectID: projectId, DisplayName: displayName}
 	dbParams := toDbFindAllActivitiesByNameAndProjectParams(&params)
 
 	if got, want := dbParams.DispName, displayName; got != want {
@@ -81,7 +81,7 @@ func TestToUpdateActivityParams(t *testing.T) {
 	displayName := "test_disp_name"
 	duration := 5 * time.Minute
 
-	params := models.UpdateActivityParams{Id: activityId, DisplayName: displayName, Duration: duration}
+	params := models.StoreUpdateActivityParams{Id: activityId, DisplayName: displayName, Duration: duration}
 	dbParams := toUpdateActivityParams(&params)
 
 	if got, want := uuid.MustParse(dbParams.ID), activityId; got != want {

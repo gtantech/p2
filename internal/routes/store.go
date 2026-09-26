@@ -14,11 +14,11 @@ type StoreService interface {
 }
 
 type ActivityStoreService interface {
-	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]models.Activity, error)
-	GetByNameAndProject(ctx context.Context, params models.GetActivityByNameAndProjectParams) ([]models.Activity, error)
-	GetByID(ctx context.Context, id uuid.UUID) (models.Activity, error)
-	Create(ctx context.Context, params models.CreateActivityParams) (models.Activity, error)
-	Update(ctx context.Context, params models.UpdateActivityParams) (models.Activity, error)
+	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]models.StoreActivity, error)
+	GetByNameAndProject(ctx context.Context, params models.StoreGetActivityByNameAndProjectParams) ([]models.StoreActivity, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.StoreActivity, error)
+	Create(ctx context.Context, params models.StoreCreateActivityParams) (models.StoreActivity, error)
+	Update(ctx context.Context, params models.StoreUpdateActivityParams) (models.StoreActivity, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
