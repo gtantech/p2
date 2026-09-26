@@ -3,9 +3,9 @@ package store
 import "github.com/gtantech/p2/internal/db"
 
 type Store struct {
-	Activity   ActivityStore
-	Project    ProjectStore
-	Dependency DependencyStore
+	Activity   *activityDbStore
+	Project    *projectDbStore
+	Dependency *dependencyDbStore
 }
 
 func NewStoreFromDb(queries *db.Queries) *Store {
