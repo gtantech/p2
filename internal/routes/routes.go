@@ -274,5 +274,5 @@ func (rt *Routes) PostEmptyTableRow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderTemplComponent(rt.view.DisplayEmptyTableRow(view.DisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID}), w, r)
+	renderTemplComponent(rt.view.DisplayEmptyTableRow(models.DisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID}), w, r)
 }

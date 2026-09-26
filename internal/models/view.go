@@ -20,3 +20,8 @@ type ViewTableRow struct {
 	Activity     *ViewActivity
 	Dependencies []*ViewActivity
 }
+
+type DisplayEmptyTableRowParams struct {
+	ActivityId uuid.UUID
+	ProjectId  uuid.UUID
+}

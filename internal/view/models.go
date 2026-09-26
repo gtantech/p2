@@ -45,8 +45,3 @@ func toPostEmptyTableRow(t *models.ViewTableRow) models.PostEmptyTableRow {
 func NewTableRow(activity *models.ViewActivity, dependencies []*models.ViewActivity) *models.ViewTableRow {
 	return &models.ViewTableRow{Activity: activity, Dependencies: dependencies}
 }
-
-type DisplayEmptyTableRowParams struct {
-	ActivityId uuid.UUID
-	ProjectId  uuid.UUID
-}

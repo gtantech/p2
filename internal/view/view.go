@@ -23,7 +23,7 @@ func (v *View) Home(table *models.ViewTable, homeProjectId uuid.UUID) templ.Comp
 	return home(table, homeProjectId)
 }
 
-func (v *View) DisplayEmptyTableRow(params DisplayEmptyTableRowParams) templ.Component {
+func (v *View) DisplayEmptyTableRow(params models.DisplayEmptyTableRowParams) templ.Component {
 	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
 	return displayDependencyTableRow(row, params.ProjectId)
 }
