@@ -24,7 +24,7 @@ type Routes struct {
 func NewRoutes(store *store.Store) *Routes {
 	return &Routes{
 		store: store,
-		view:  view.NewView(store),
+		view:  view.NewView(),
 	}
 }
 
