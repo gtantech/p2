@@ -4,7 +4,7 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/gtantech/p2/internal/routes/models"
+	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/store"
 )
 
