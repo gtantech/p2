@@ -5,18 +5,18 @@ import (
 	"uuid"
 )
 
-type Activity struct {
+type ViewActivity struct {
 	Id          uuid.UUID
 	ProjectID   uuid.UUID
 	DisplayName string
 	Duration    time.Duration
 }
 
-type Table struct {
-	Rows []*TableRow
+type ViewTable struct {
+	Rows []*ViewTableRow
 }
 
-type TableRow struct {
-	Activity     *Activity
-	Dependencies []*Activity
+type ViewTableRow struct {
+	Activity     *ViewActivity
+	Dependencies []*ViewActivity
 }

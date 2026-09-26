@@ -7,28 +7,28 @@ import (
 	"github.com/gtantech/p2/internal/models"
 )
 
-func NewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *models.Activity {
-	return &models.Activity{Id: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
+func NewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *models.ViewActivity {
+	return &models.ViewActivity{Id: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
 }
 
-func NewTable(rows []*models.TableRow) *models.Table {
-	return &models.Table{Rows: rows}
+func NewTable(rows []*models.ViewTableRow) *models.ViewTable {
+	return &models.ViewTable{Rows: rows}
 }
 
-func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependencies map[models.StoreActivity][]models.StoreActivity) *models.Table {
-	storeActivityMap := make(map[models.StoreActivity]*models.Activity)
+func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependencies map[models.StoreActivity][]models.StoreActivity) *models.ViewTable {
+	storeActivityMap := make(map[models.StoreActivity]*models.ViewActivity)
 
 	for _, storeActivity := range storeActivities {
 		//convert activity
 		storeActivityMap[storeActivity] = NewActivity(storeActivity.ID, storeActivity.ProjectID, storeActivity.DisplayName, storeActivity.Duration)
 	}
 
-	table := models.Table{}
+	table := models.ViewTable{}
 
 	for _, storeActivity := range storeActivities {
 		viewActivity := storeActivityMap[storeActivity]
 		storeDependency := storeDependencies[storeActivity]
-		viewDependency := make([]*models.Activity, len(storeDependency))
+		viewDependency := make([]*models.ViewActivity, len(storeDependency))
 		for i, predecessorActivity := range storeDependency {
 			viewDependency[i] = storeActivityMap[predecessorActivity]
 		}
@@ -38,12 +38,12 @@ func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependenci
 	return &table
 }
 
-func toPostEmptyTableRow(t *models.TableRow) models.PostEmptyTableRow {
+func toPostEmptyTableRow(t *models.ViewTableRow) models.PostEmptyTableRow {
 	return models.PostEmptyTableRow{ProjectId: t.Activity.ProjectID}
 }
 
-func NewTableRow(activity *models.Activity, dependencies []*models.Activity) *models.TableRow {
-	return &models.TableRow{Activity: activity, Dependencies: dependencies}
+func NewTableRow(activity *models.ViewActivity, dependencies []*models.ViewActivity) *models.ViewTableRow {
+	return &models.ViewTableRow{Activity: activity, Dependencies: dependencies}
 }
 
 type DisplayEmptyTableRowParams struct {

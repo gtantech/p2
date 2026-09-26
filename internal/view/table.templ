@@ -5,7 +5,7 @@ import "uuid"
 import "fmt"
 import "github.com/gtantech/p2/internal/models"
 
-templ displayDependenciesToAdd(activities []models.Activity, successorActivityId string){
+templ displayDependenciesToAdd(activities []models.ViewActivity, successorActivityId string){
     <ul>
         for _, item := range activities {
             <li><button type="button" value={item.Id.String()}>{item.DisplayName}</button></li>
@@ -19,7 +19,7 @@ templ displayDependenciesToAddNotFound(){
     </ul>
 }
 
-templ displayDependencyTable(table *models.Table, projectId uuid.UUID){
+templ displayDependencyTable(table *models.ViewTable, projectId uuid.UUID){
     <table>
         <thead>
             <tr>
@@ -48,7 +48,7 @@ templ displayDependencyTable(table *models.Table, projectId uuid.UUID){
     </table>
 }
 
-templ displayDependencyTableRow(row *models.TableRow, projectId uuid.UUID){
+templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     <tr class="task-row">
     <!-- Task name -->
     <td>

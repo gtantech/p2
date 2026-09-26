@@ -13,7 +13,7 @@ import "uuid"
 import "fmt"
 import "github.com/gtantech/p2/internal/models"
 
-func displayDependenciesToAdd(activities []models.Activity, successorActivityId string) templ.Component {
+func displayDependenciesToAdd(activities []models.ViewActivity, successorActivityId string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -107,7 +107,7 @@ func displayDependenciesToAddNotFound() templ.Component {
 	})
 }
 
-func displayDependencyTable(table *models.Table, projectId uuid.UUID) templ.Component {
+func displayDependencyTable(table *models.ViewTable, projectId uuid.UUID) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -150,7 +150,7 @@ func displayDependencyTable(table *models.Table, projectId uuid.UUID) templ.Comp
 	})
 }
 
-func displayDependencyTableRow(row *models.TableRow, projectId uuid.UUID) templ.Component {
+func displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
