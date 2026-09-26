@@ -7,12 +7,6 @@ import (
 	"github.com/gtantech/p2/internal/store"
 )
 
-type StoreService interface {
-	Activity() ActivityStoreService
-	Project() ProjectStoreService
-	Dependency() DependencyStoreService
-}
-
 type ActivityStoreService interface {
 	GetByProjectID(ctx context.Context, projectId uuid.UUID) ([]store.Activity, error)
 	GetByNameAndProject(ctx context.Context, params store.GetActivityByNameAndProjectParams) ([]store.Activity, error)
