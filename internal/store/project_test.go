@@ -30,7 +30,7 @@ func TestToDbInsertProjectParams(t *testing.T) {
 		DisplayName: displayName,
 	}
 
-	dbParams := params.toDbInsertProjectParams(projectId)
+	dbParams := toDbInsertProjectParams(projectId, &params)
 
 	if got, want := uuid.MustParse(dbParams.ID), projectId; got != want {
 		t.Errorf("got %v, want %v", got, want)
@@ -50,7 +50,7 @@ func TestToDbUpdateProjectParams(t *testing.T) {
 		DisplayName: displayName,
 	}
 
-	dbParams := params.toDbUpdateProjectParams()
+	dbParams := toDbUpdateProjectParams(&params)
 
 	if got, want := uuid.MustParse(dbParams.ID), projectId; got != want {
 		t.Errorf("got %v, want %v", got, want)
