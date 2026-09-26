@@ -7,35 +7,27 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/db"
+	"github.com/gtantech/p2/internal/models"
 )
-
-type RelationshipType string
 
 var ErrDependencyNotFound = errors.New("dependency not found")
-
-const (
-	SS RelationshipType = "SS" // start to start relationship
-	FS RelationshipType = "FS" // finish to start relationship
-	SF RelationshipType = "SF" // start to finish relationship
-	FF RelationshipType = "FF" // finish to finish relationship
-)
 
 type Dependency struct {
 	ID                    uuid.UUID
 	ProjectID             uuid.UUID
-	Relationship          RelationshipType
+	Relationship          models.RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
 }
 
 type GetPredecessorNamesBySuccessorResult struct {
 	DependencyID            uuid.UUID
-	Relationship            RelationshipType
+	Relationship            models.RelationshipType
 	PredecessorActivityID   uuid.UUID
 	PredecessorActivityName string
 }
 
-func newDependency(id uuid.UUID, projectId uuid.UUID, relationship RelationshipType, predecessorActivityId uuid.UUID, successorActivityId uuid.UUID) Dependency {
+func newDependency(id uuid.UUID, projectId uuid.UUID, relationship models.RelationshipType, predecessorActivityId uuid.UUID, successorActivityId uuid.UUID) Dependency {
 	return Dependency{
 		ID:                    id,
 		ProjectID:             projectId,
@@ -47,7 +39,7 @@ func newDependency(id uuid.UUID, projectId uuid.UUID, relationship RelationshipT
 
 type CreateDepdencencyParams struct {
 	ProjectID             uuid.UUID
-	Relationship          RelationshipType
+	Relationship          models.RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
 }
@@ -64,7 +56,7 @@ func (c *CreateDepdencencyParams) toDbInsertDependencyParams(dependencyId uuid.U
 
 type UpdateDepdencencyParams struct {
 	ID                    uuid.UUID
-	Relationship          RelationshipType
+	Relationship          models.RelationshipType
 	PredecessorActivityID uuid.UUID
 	SuccessorActivityID   uuid.UUID
 }
@@ -93,7 +85,7 @@ func (d *dependencyDbStore) GetPredecessorNamesBySuccessor(ctx context.Context, 
 	}
 	predecessors := make([]GetPredecessorNamesBySuccessorResult, len(data))
 	for i, d := range data {
-		predecessors[i] = GetPredecessorNamesBySuccessorResult{DependencyID: uuid.MustParse(d.DependencyID), Relationship: RelationshipType(d.Relationship), PredecessorActivityID: uuid.MustParse(d.PredecessorActivityID), PredecessorActivityName: d.PredecessorActivityName}
+		predecessors[i] = GetPredecessorNamesBySuccessorResult{DependencyID: uuid.MustParse(d.DependencyID), Relationship: models.RelationshipType(d.Relationship), PredecessorActivityID: uuid.MustParse(d.PredecessorActivityID), PredecessorActivityName: d.PredecessorActivityName}
 	}
 	return predecessors, nil
 }
@@ -109,7 +101,7 @@ func (d *dependencyDbStore) GetByProjectID(ctx context.Context, projectId uuid.U
 	}
 	dependencies := make([]Dependency, len(data))
 	for i, d := range data {
-		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
+		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), models.RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
 	}
 	return dependencies, nil
 }
@@ -123,7 +115,7 @@ func (d *dependencyDbStore) GetByID(ctx context.Context, id uuid.UUID) (Dependen
 		}
 		return Dependency{}, err
 	}
-	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
+	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), models.RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
 }
 
 func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId uuid.UUID) ([]Dependency, error) {
@@ -137,7 +129,7 @@ func (d *dependencyDbStore) GetByPredecessor(ctx context.Context, predecessorId 
 	}
 	dependencies := make([]Dependency, len(data))
 	for i, d := range data {
-		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
+		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), models.RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
 	}
 	return dependencies, nil
 }
@@ -153,7 +145,7 @@ func (d *dependencyDbStore) GetBySuccessor(ctx context.Context, successorId uuid
 	}
 	dependencies := make([]Dependency, len(data))
 	for i, d := range data {
-		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
+		dependencies[i] = newDependency(uuid.MustParse(d.ID), uuid.MustParse(d.ProjectID), models.RelationshipType(d.Relationship), uuid.MustParse(d.PredecessorActivityID), uuid.MustParse(d.SuccessorActivityID))
 	}
 	return dependencies, nil
 }
@@ -163,7 +155,7 @@ func (d *dependencyDbStore) Create(ctx context.Context, params CreateDepdencency
 	if err != nil {
 		return Dependency{}, err
 	}
-	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
+	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), models.RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
 }
 
 func (d *dependencyDbStore) Delete(ctx context.Context, id uuid.UUID) error {
@@ -179,7 +171,7 @@ func (d *dependencyDbStore) Update(ctx context.Context, params UpdateDepdencency
 		}
 		return Dependency{}, err
 	}
-	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
+	return newDependency(uuid.MustParse(data.ID), uuid.MustParse(data.ProjectID), models.RelationshipType(data.Relationship), uuid.MustParse(data.PredecessorActivityID), uuid.MustParse(data.SuccessorActivityID)), nil
 }
 
 func NewDependencyStoreFromDb(queries *db.Queries) *dependencyDbStore {

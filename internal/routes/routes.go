@@ -110,7 +110,7 @@ func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWri
 			}
 			rt.store.Dependency().Create(r.Context(), store.CreateDepdencencyParams{
 				ProjectID:             storeActivity.ProjectID,
-				Relationship:          store.RelationshipType(relationship),
+				Relationship:          models.RelationshipType(relationship),
 				PredecessorActivityID: findUserSpecifiedActivity[0].ID,
 				SuccessorActivityID:   activityId,
 			})
