@@ -21,10 +21,9 @@ type Routes struct {
 	view  *view.View
 }
 
-func NewRoutes(store *store.Store) *Routes {
-	adapter := storeAdapter{store: store}
+func NewRoutes(store StoreService) *Routes {
 	return &Routes{
-		store: &adapter,
+		store: store,
 		view:  view.NewView(),
 	}
 }
