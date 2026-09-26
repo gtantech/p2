@@ -22,3 +22,7 @@ func (s *storeAdapter) Project() ProjectStoreService {
 }
 
 var _ StoreService = (*storeAdapter)(nil) //ensures ExampleStruct implements ExampleInterface at compile time
+
+func NewStoreAdapter(store *store.Store) *storeAdapter {
+	return &storeAdapter{store: store}
+}
