@@ -65,7 +65,9 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     </td>
     <!-- Dependencies -->
     <td>
-        @displayDependencyWrapper(row)
+        @displayDependencyWrapper(row){
+            @displayDependencySuggestionWrappedChildren()
+        }
     </td>
     <!-- Duration -->
     <td>
@@ -114,7 +116,7 @@ templ displayDependencyWrapper(row *models.ViewTableRow){
         <!--
             Go server will return suggestions here.
         -->
-        @displayDependencySuggestionWrappedChildren()
+        { children... }
     </div>
 }
 
