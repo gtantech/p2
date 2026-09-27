@@ -65,9 +65,7 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     </td>
     <!-- Dependencies -->
     <td>
-        @displayDependencyWrapper(row){
-            @displayDependencySuggestionWrappedChildren()
-        }
+        @displayDependencyWrapper(row)
     </td>
     <!-- Duration -->
     <td>
