@@ -14,8 +14,8 @@ func (h *httpViewAdapter) DisplayEmptyTableRow(params models.ViewDisplayEmptyTab
 	h.view.DisplayEmptyTableRow(params)
 }
 
-// Home implements [HttpView].
-func (h *httpViewAdapter) Home(params models.ViewHomeParams) {
+// DisplayHome implements [HttpView].
+func (h *httpViewAdapter) DisplayHome(params models.ViewHomeParams) {
 	h.view.Home(params)
 }
 
