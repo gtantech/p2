@@ -65,7 +65,13 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     </td>
     <!-- Dependencies -->
     <td>
-        @displayDependencyWrapper(row)
+        @displayDependencyWrapper(row.Activity.Id, func() []string {
+            names := make([]string, len(row.Dependencies))
+            for i, d := range row.Dependencies{
+                names[i] = d.DisplayName
+            }
+            return names
+            }())
     </td>
     <!-- Duration -->
     <td>
@@ -108,9 +114,9 @@ templ displayDependencySuggestionWrappedChildren(){
     </div>
 }
 
-templ displayDependencyWrapper(row *models.ViewTableRow){
+templ displayDependencyWrapper(rowSuccessorActivityId uuid.UUID, dependencyNames []string){
     <div class="dependency-wrapper">
-        @tableDependencyRowInput(row)
+        @tableDependencyRowInput(rowSuccessorActivityId, dependencyNames)
         <!--
             Go server will return suggestions here.
         -->
@@ -118,23 +124,23 @@ templ displayDependencyWrapper(row *models.ViewTableRow){
     </div>
 }
 
-templ displayDependencyWrapperWithNewActivitySuggestion(row *models.ViewTableRow, newActivityDispName string){
-    @displayDependencyWrapper(row){
+templ displayDependencyWrapperWithNewActivitySuggestion(rowSuccessorActivityId uuid.UUID, projectId uuid.UUID, dependencyNames []string, newSuggestedActivityDispName string){
+    @displayDependencyWrapper(rowSuccessorActivityId, dependencyNames){
         @displayDependencySuggestionWrappedChildren(){
             <button
                 class="suggestion"
                 hx-post="/component/table/dependency/suggestion/activity"
                 hx-target="#dependency-suggestions"
                 hx-swap="outerHTML"
-                hx-vals={ marshalParamsToJsonField(models.RoutesPostNewActivity{ProjectId: row.Activity.ProjectID, DisplayName: newActivityDispName, Duration: 0}) }
+                hx-vals={ marshalParamsToJsonField(models.RoutesPostNewActivity{ProjectId: projectId, DisplayName: newSuggestedActivityDispName, Duration: 0}) }
             >
-                { fmt.Sprintf("Create new activity: %v ...", newActivityDispName) }
+                { fmt.Sprintf("Create new activity: %v ...", newSuggestedActivityDispName) }
             </button>
         }
     }
 }
 
-templ tableDependencyRowInput(row *models.ViewTableRow){
+templ tableDependencyRowInput(rowSuccessorActivityId uuid.UUID, dependencyNames []string){
     <input
         type="text"
         name="dependency_input"
@@ -143,14 +149,10 @@ templ tableDependencyRowInput(row *models.ViewTableRow){
         autocomplete="off"
         value={
             func() string {
-                values := make([]string, len(row.Dependencies))
-                for i, dependency := range row.Dependencies {
-                    values[i] = dependency.DisplayName
-                }
-                return strings.Join(values, ", ")
+                return strings.Join(dependencyNames, ", ")
             }()
         } 
-        hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id) }
+        hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", rowSuccessorActivityId) }
         hx-trigger="input changed delay:500ms"
     >
 }
