@@ -245,7 +245,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t := view.NewTableFromStorage(storeActivities, storeDependenciesMap)
+	t := view.NewViewTableFromStorage(storeActivities, storeDependenciesMap)
 	rt.view.Home(models.ViewHomeParams{Table: t, HomeProjectId: firstProjectId, HttpResponseWriter: w, HttpRequest: r})
 }
 

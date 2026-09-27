@@ -26,7 +26,7 @@ func (v *View) Home(params models.ViewHomeParams) {
 }
 
 func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) {
-	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
+	row := NewViewTableRow(NewViewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
 	renderTemplComponent(displayDependencyTableRow(row, params.ProjectId), params.HttpResponseWriter, params.HttpRequest)
 }
 
@@ -38,20 +38,20 @@ func marshalParams(in any) string {
 	return string(out)
 }
 
-func NewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *models.ViewActivity {
+func NewViewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *models.ViewActivity {
 	return &models.ViewActivity{Id: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
 }
 
-func NewTable(rows []*models.ViewTableRow) *models.ViewTable {
+func NewViewTable(rows []*models.ViewTableRow) *models.ViewTable {
 	return &models.ViewTable{Rows: rows}
 }
 
-func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependencies map[models.StoreActivity][]models.StoreActivity) *models.ViewTable {
+func NewViewTableFromStorage(storeActivities []models.StoreActivity, storeDependencies map[models.StoreActivity][]models.StoreActivity) *models.ViewTable {
 	storeActivityMap := make(map[models.StoreActivity]*models.ViewActivity)
 
 	for _, storeActivity := range storeActivities {
 		//convert activity
-		storeActivityMap[storeActivity] = NewActivity(storeActivity.ID, storeActivity.ProjectID, storeActivity.DisplayName, storeActivity.Duration)
+		storeActivityMap[storeActivity] = NewViewActivity(storeActivity.ID, storeActivity.ProjectID, storeActivity.DisplayName, storeActivity.Duration)
 	}
 
 	table := models.ViewTable{}
@@ -63,7 +63,7 @@ func NewTableFromStorage(storeActivities []models.StoreActivity, storeDependenci
 		for i, predecessorActivity := range storeDependency {
 			viewDependency[i] = storeActivityMap[predecessorActivity]
 		}
-		table.Rows = append(table.Rows, NewTableRow(viewActivity, viewDependency))
+		table.Rows = append(table.Rows, NewViewTableRow(viewActivity, viewDependency))
 	}
 
 	return &table
@@ -73,7 +73,7 @@ func toPostEmptyTableRow(t *models.ViewTableRow) models.RoutesPostEmptyTableRow 
 	return models.RoutesPostEmptyTableRow{ProjectId: t.Activity.ProjectID}
 }
 
-func NewTableRow(activity *models.ViewActivity, dependencies []*models.ViewActivity) *models.ViewTableRow {
+func NewViewTableRow(activity *models.ViewActivity, dependencies []*models.ViewActivity) *models.ViewTableRow {
 	return &models.ViewTableRow{Activity: activity, Dependencies: dependencies}
 }
 
