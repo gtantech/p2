@@ -28,6 +28,10 @@ func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams
 	displayDependencyTableRow(row, params.ProjectId).Render(ctx, w)
 }
 
+func (v *View) DisplayDependencyWrapperWithNewActivitySuggestion(params models.ViewDisplayDependencyWrapperWithNewActivitySuggestion, ctx context.Context, w io.Writer) {
+	displayDependencyWrapperWithNewActivitySuggestion(params.RowActivityId, params.ProjectId, params.DependencyNames, params.NewActivityDispName).Render(ctx, w)
+}
+
 func marshalParams(in any) string {
 	out, err := json.Marshal(in)
 	if err != nil {
