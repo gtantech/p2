@@ -36,6 +36,11 @@ func marshalParams(in any) string {
 	return string(out)
 }
 
+func marshalParamsToJsonField(in any) string {
+	js := fmt.Sprintf("{\"json\":%s}", marshalParams(in))
+	return js
+}
+
 func toPostEmptyTableRow(t *models.ViewTableRow) models.RoutesPostEmptyTableRow {
 	return models.RoutesPostEmptyTableRow{ProjectId: t.Activity.ProjectID}
 }
