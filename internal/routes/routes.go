@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -254,13 +255,17 @@ func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rt *Routes) PostEmptyTableRow(w http.ResponseWriter, r *http.Request) {
-	projectId, err := uuid.Parse(r.FormValue("projectId"))
+	jsonStr := r.FormValue("json")
+
+	var dto models.RoutesPostEmptyTableRow
+	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
-		http.Error(w, "invalid project id parameter", http.StatusBadRequest)
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
 		return
 	}
 
-	storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: projectId, DisplayName: "", Duration: 0})
+	storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: dto.ProjectId, DisplayName: "", Duration: 0})
 
 	if err != nil {
 		//TODO check for duplicate name error
