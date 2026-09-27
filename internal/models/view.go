@@ -25,3 +25,8 @@ type ViewDisplayEmptyTableRowParams struct {
 	ActivityId uuid.UUID
 	ProjectId  uuid.UUID
 }
+
+type ViewHomeParams struct {
+	Table         *ViewTable
+	HomeProjectId uuid.UUID
+}
