@@ -153,6 +153,7 @@ templ tableDependencyRowInput(rowSuccessorActivityId uuid.UUID, dependencyNames 
             }()
         } 
         hx-post={ fmt.Sprintf("/api/table/row/activity/%v/dependency", rowSuccessorActivityId) }
+        hx-target="#dependency-wrapper"
         hx-trigger="input changed delay:500ms"
     >
 }
