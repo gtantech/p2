@@ -129,7 +129,7 @@ templ displayDependencyWrapperWithNewActivitySuggestion(rowSuccessorActivityId u
         @displayDependencySuggestionWrappedChildren(){
             <button
                 class="suggestion"
-                hx-post="/component/table/dependency/suggestion/activity"
+                hx-post={ fmt.Sprintf("/component/table/row/activity/%s/dependency", rowSuccessorActivityId) }
                 hx-target="#dependency-suggestions"
                 hx-swap="outerHTML"
                 hx-vals={ marshalParamsToJsonField(models.RoutesPostNewActivity{ProjectId: projectId, DisplayName: newSuggestedActivityDispName, Duration: 0}) }
