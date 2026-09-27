@@ -35,3 +35,38 @@ type ViewHomeParams struct {
 	HttpResponseWriter http.ResponseWriter
 	HttpRequest        *http.Request
 }
+
+func NewViewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *ViewActivity {
+	return &ViewActivity{Id: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
+}
+
+func NewViewTable(rows []*ViewTableRow) *ViewTable {
+	return &ViewTable{Rows: rows}
+}
+
+func NewViewTableFromStorage(storeActivities []StoreActivity, storeDependencies map[StoreActivity][]StoreActivity) *ViewTable {
+	storeActivityMap := make(map[StoreActivity]*ViewActivity)
+
+	for _, storeActivity := range storeActivities {
+		//convert activity
+		storeActivityMap[storeActivity] = NewViewActivity(storeActivity.ID, storeActivity.ProjectID, storeActivity.DisplayName, storeActivity.Duration)
+	}
+
+	table := ViewTable{}
+
+	for _, storeActivity := range storeActivities {
+		viewActivity := storeActivityMap[storeActivity]
+		storeDependency := storeDependencies[storeActivity]
+		viewDependency := make([]*ViewActivity, len(storeDependency))
+		for i, predecessorActivity := range storeDependency {
+			viewDependency[i] = storeActivityMap[predecessorActivity]
+		}
+		table.Rows = append(table.Rows, NewViewTableRow(viewActivity, viewDependency))
+	}
+
+	return &table
+}
+
+func NewViewTableRow(activity *ViewActivity, dependencies []*ViewActivity) *ViewTableRow {
+	return &ViewTableRow{Activity: activity, Dependencies: dependencies}
+}

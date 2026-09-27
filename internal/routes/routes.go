@@ -11,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/store"
-	"github.com/gtantech/p2/internal/view"
 	"github.com/gtantech/p2/static"
 )
 
@@ -245,7 +244,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t := view.NewViewTableFromStorage(storeActivities, storeDependenciesMap)
+	t := models.NewViewTableFromStorage(storeActivities, storeDependenciesMap)
 	rt.view.Home(models.ViewHomeParams{Table: t, HomeProjectId: firstProjectId, HttpResponseWriter: w, HttpRequest: r})
 }
 
