@@ -1,12 +1,12 @@
 package view
 
 import (
+	"context"
 	json "encoding/json/v2"
 	"errors"
 	"fmt"
-	"net/http"
+	"io"
 
-	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models"
 )
 
@@ -19,13 +19,13 @@ func NewView() *View {
 	return &View{}
 }
 
-func (v *View) Home(params models.ViewHomeParams) {
-	renderTemplComponent(home(params.Table, params.HomeProjectId), params.HttpResponseWriter, params.HttpRequest)
+func (v *View) Home(params models.ViewHomeParams, ctx context.Context, w io.Writer) {
+	home(params.Table, params.HomeProjectId).Render(ctx, w)
 }
 
-func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) {
+func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams, ctx context.Context, w io.Writer) {
 	row := models.NewViewTableRow(models.NewViewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
-	renderTemplComponent(displayDependencyTableRow(row, params.ProjectId), params.HttpResponseWriter, params.HttpRequest)
+	displayDependencyTableRow(row, params.ProjectId).Render(ctx, w)
 }
 
 func marshalParams(in any) string {
@@ -43,8 +43,4 @@ func marshalParamsToJsonField(in any) string {
 
 func toPostEmptyTableRow(t *models.ViewTableRow) models.RoutesPostEmptyTableRow {
 	return models.RoutesPostEmptyTableRow{ProjectId: t.Activity.ProjectID}
-}
-
-func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *http.Request) {
-	component.Render(r.Context(), w)
 }

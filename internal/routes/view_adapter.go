@@ -10,13 +10,13 @@ type httpViewAdapter struct {
 }
 
 // DisplayEmptyTableRow implements [HttpView].
-func (h *httpViewAdapter) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) {
-	h.view.DisplayEmptyTableRow(params)
+func (h *httpViewAdapter) DisplayEmptyTableRow(params models.HttpViewDisplayEmptyTableRowParams) {
+	h.view.DisplayEmptyTableRow(models.ViewDisplayEmptyTableRowParams{ActivityId: params.ActivityId, ProjectId: params.ProjectId}, params.HttpRequest.Context(), params.HttpResponseWriter)
 }
 
 // DisplayHome implements [HttpView].
-func (h *httpViewAdapter) DisplayHome(params models.ViewHomeParams) {
-	h.view.Home(params)
+func (h *httpViewAdapter) DisplayHome(params models.HttpViewHomeParams) {
+	h.view.Home(models.ViewHomeParams{Table: params.Table, HomeProjectId: params.HomeProjectId}, params.HttpRequest.Context(), params.HttpResponseWriter)
 }
 
 func NewViewAdapter(view *view.View) *httpViewAdapter {
