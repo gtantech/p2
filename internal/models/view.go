@@ -1,7 +1,6 @@
 package models
 
 import (
-	"net/http"
 	"time"
 	"uuid"
 )
@@ -23,17 +22,13 @@ type ViewTableRow struct {
 }
 
 type ViewDisplayEmptyTableRowParams struct {
-	ActivityId         uuid.UUID
-	ProjectId          uuid.UUID
-	HttpResponseWriter http.ResponseWriter
-	HttpRequest        *http.Request
+	ActivityId uuid.UUID
+	ProjectId  uuid.UUID
 }
 
 type ViewHomeParams struct {
-	Table              *ViewTable
-	HomeProjectId      uuid.UUID
-	HttpResponseWriter http.ResponseWriter
-	HttpRequest        *http.Request
+	Table         *ViewTable
+	HomeProjectId uuid.UUID
 }
 
 func NewViewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *ViewActivity {

@@ -246,7 +246,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := models.NewViewTableFromStorage(storeActivities, storeDependenciesMap)
-	rt.view.DisplayHome(models.ViewHomeParams{Table: t, HomeProjectId: firstProjectId, HttpResponseWriter: w, HttpRequest: r})
+	rt.view.DisplayHome(models.HttpViewHomeParams{Table: t, HomeProjectId: firstProjectId, HttpResponseWriter: w, HttpRequest: r})
 }
 
 func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
@@ -273,5 +273,5 @@ func (rt *Routes) PostEmptyTableRow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rt.view.DisplayEmptyTableRow(models.ViewDisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID, HttpResponseWriter: w, HttpRequest: r})
+	rt.view.DisplayEmptyTableRow(models.HttpViewDisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID, HttpResponseWriter: w, HttpRequest: r})
 }

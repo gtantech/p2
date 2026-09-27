@@ -5,6 +5,6 @@ import (
 )
 
 type HttpView interface {
-	DisplayHome(params models.ViewHomeParams)
-	DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams)
+	DisplayHome(params models.HttpViewHomeParams)
+	DisplayEmptyTableRow(params models.HttpViewDisplayEmptyTableRowParams)
 }
