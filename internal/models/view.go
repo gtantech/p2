@@ -1,6 +1,7 @@
 package models
 
 import (
+	"net/http"
 	"time"
 	"uuid"
 )
@@ -22,11 +23,15 @@ type ViewTableRow struct {
 }
 
 type ViewDisplayEmptyTableRowParams struct {
-	ActivityId uuid.UUID
-	ProjectId  uuid.UUID
+	ActivityId         uuid.UUID
+	ProjectId          uuid.UUID
+	HttpResponseWriter http.ResponseWriter
+	HttpRequest        *http.Request
 }
 
 type ViewHomeParams struct {
-	Table         *ViewTable
-	HomeProjectId uuid.UUID
+	Table              *ViewTable
+	HomeProjectId      uuid.UUID
+	HttpResponseWriter http.ResponseWriter
+	HttpRequest        *http.Request
 }

@@ -8,7 +8,6 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/store"
@@ -18,18 +17,14 @@ import (
 
 type Routes struct {
 	store StoreService
-	view  *view.View
+	view  HttpView
 }
 
-func NewRoutes(store StoreService) *Routes {
+func NewRoutes(store StoreService, view HttpView) *Routes {
 	return &Routes{
 		store: store,
-		view:  view.NewView(),
+		view:  view,
 	}
-}
-
-func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *http.Request) {
-	component.Render(r.Context(), w)
 }
 
 func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
@@ -251,7 +246,7 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := view.NewTableFromStorage(storeActivities, storeDependenciesMap)
-	renderTemplComponent(rt.view.Home(models.ViewHomeParams{Table: t, HomeProjectId: firstProjectId}), w, r)
+	rt.view.Home(models.ViewHomeParams{Table: t, HomeProjectId: firstProjectId, HttpResponseWriter: w, HttpRequest: r})
 }
 
 func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
@@ -274,5 +269,5 @@ func (rt *Routes) PostEmptyTableRow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderTemplComponent(rt.view.DisplayEmptyTableRow(models.ViewDisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID}), w, r)
+	rt.view.DisplayEmptyTableRow(models.ViewDisplayEmptyTableRowParams{ActivityId: storeActivity.ID, ProjectId: storeActivity.ProjectID, HttpResponseWriter: w, HttpRequest: r})
 }
