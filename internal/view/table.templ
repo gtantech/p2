@@ -152,7 +152,7 @@ templ tableDependencyRowInput(rowSuccessorActivityId uuid.UUID, dependencyNames 
                 return strings.Join(dependencyNames, ", ")
             }()
         } 
-        hx-post={ fmt.Sprintf("/api/table/row/activity/%v/dependency", rowSuccessorActivityId) }
+        hx-post={ fmt.Sprintf("/component/table/row/activity/%v/dependency", rowSuccessorActivityId) }
         hx-target="#dependency-wrapper"
         hx-swap="outerHTML"
         hx-trigger="input changed delay:500ms"
