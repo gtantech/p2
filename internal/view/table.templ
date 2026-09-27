@@ -87,7 +87,7 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
             <!--
                 Go server will return suggestions here.
             -->
-            <div class="autocomplete"></div>
+            @displayDependencySuggestionWrappedChildren()
         </div>
     </td>
     <!-- Duration -->
@@ -119,4 +119,14 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
         </div>
     </td>
 </tr>
+}
+
+templ displayDependencySuggestionWrappedChildren(){
+    <div
+        id="dependency-suggestions"
+        class="autocomplete"
+        role="listbox"
+    >
+        { children... }
+    </div>
 }
