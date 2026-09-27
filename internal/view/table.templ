@@ -120,6 +120,22 @@ templ displayDependencyWrapper(row *models.ViewTableRow){
     </div>
 }
 
+templ displayDependencyWrapperWithNewActivitySuggestion(row *models.ViewTableRow, newActivityDispName string){
+    @displayDependencyWrapper(row){
+        @displayDependencySuggestionWrappedChildren(){
+            <button
+                class="suggestion"
+                hx-post="/component/table/dependency/suggestion/activity"
+                hx-target="#dependency-suggestions"
+                hx-swap="outerHTML"
+                hx-vals={ marshalParamsToJsonField(models.RoutesPostNewActivity{ProjectId: row.Activity.ProjectID, DisplayName: newActivityDispName, Duration: 0}) }
+            >
+                { fmt.Sprintf("Create new activity: %v ...", newActivityDispName) }
+            </button>
+        }
+    }
+}
+
 templ tableDependencyRowInput(row *models.ViewTableRow){
     <input
         type="text"
