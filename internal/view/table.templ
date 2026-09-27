@@ -65,30 +65,7 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     </td>
     <!-- Dependencies -->
     <td>
-        <div class="dependency-wrapper">
-            <input
-                type="text"
-                name="dependency_input"
-                class="dependency-input"
-                placeholder="Task A, Task B..."
-                autocomplete="off"
-                value={
-                    func() string {
-                        values := make([]string, len(row.Dependencies))
-                        for i, dependency := range row.Dependencies {
-                            values[i] = dependency.DisplayName
-                        }
-                        return strings.Join(values, ", ")
-                    }()
-                } 
-                hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id) }
-                hx-trigger="input changed delay:500ms"
-            >
-            <!--
-                Go server will return suggestions here.
-            -->
-            <div class="autocomplete"></div>
-        </div>
+        @displayDependencyWrapper(row)
     </td>
     <!-- Duration -->
     <td>
@@ -119,4 +96,61 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
         </div>
     </td>
 </tr>
+}
+
+templ displayDependencySuggestionWrappedChildren(){
+    <div
+        id="dependency-suggestions"
+        class="autocomplete"
+        role="listbox"
+    >
+        { children... }
+    </div>
+}
+
+templ displayDependencyWrapper(row *models.ViewTableRow){
+    <div class="dependency-wrapper">
+        @tableDependencyRowInput(row)
+        <!--
+            Go server will return suggestions here.
+        -->
+        { children... }
+    </div>
+}
+
+templ displayDependencyWrapperWithNewActivitySuggestion(row *models.ViewTableRow, newActivityDispName string){
+    @displayDependencyWrapper(row){
+        @displayDependencySuggestionWrappedChildren(){
+            <button
+                class="suggestion"
+                hx-post="/component/table/dependency/suggestion/activity"
+                hx-target="#dependency-suggestions"
+                hx-swap="outerHTML"
+                hx-vals={ marshalParamsToJsonField(models.RoutesPostNewActivity{ProjectId: row.Activity.ProjectID, DisplayName: newActivityDispName, Duration: 0}) }
+            >
+                { fmt.Sprintf("Create new activity: %v ...", newActivityDispName) }
+            </button>
+        }
+    }
+}
+
+templ tableDependencyRowInput(row *models.ViewTableRow){
+    <input
+        type="text"
+        name="dependency_input"
+        class="dependency-input"
+        placeholder="Task A, Task B..."
+        autocomplete="off"
+        value={
+            func() string {
+                values := make([]string, len(row.Dependencies))
+                for i, dependency := range row.Dependencies {
+                    values[i] = dependency.DisplayName
+                }
+                return strings.Join(values, ", ")
+            }()
+        } 
+        hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id) }
+        hx-trigger="input changed delay:500ms"
+    >
 }

@@ -123,9 +123,25 @@ input:focus {
 }
 
 .suggestion {
-    padding: 10px 12px;
-    cursor: pointer;
-    font-size: 14px;
+    width: 100%; /*Changes suggestion width to match parent*/
+    padding: 9px 12px;
+    border: none; /*Removes button border*/
+    border-radius: 0; /*Removes border rounded corners*/
+    background: transparent; /*Sets transparent background to show parent background colour*/
+
+    color: #1f2937; /*Sets text colour*/
+
+    font: inherit; /*Sets font*/
+    font-size: 14px; /*Sets font size*/
+    line-height: 20px; /*Sets the height of each line of text*/
+
+    text-align: left; /*Aligns the text*/
+
+    cursor: pointer; /*Changes the mouse cursor to the pointing hand when the user hovers over the element.*/
+
+    transition: /*Eases in transition*/
+        background-color 0.08s ease,
+        color 0.08s ease;
 }
 
 .suggestion:hover {
