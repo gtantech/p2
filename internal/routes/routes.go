@@ -100,7 +100,11 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 				ProjectID:   storeActivity.ProjectID,
 				DisplayName: key})
 			if err != nil {
-				http.Error(w, "failed to get activity", http.StatusBadRequest)
+				if errors.Is(err, store.ErrActivityNotFound) {
+					http.Error(w, "failed to get activity", http.StatusBadRequest)
+					log.Printf("User entered new value: %s for dependency but not in store", key)
+				}
+				http.Error(w, "failed to get activity", http.StatusInternalServerError)
 				return
 			}
 			rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{
