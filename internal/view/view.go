@@ -20,8 +20,8 @@ func NewView() *View {
 	return &View{}
 }
 
-func (v *View) Home(table *models.ViewTable, homeProjectId uuid.UUID) templ.Component {
-	return home(table, homeProjectId)
+func (v *View) Home(params models.ViewHomeParams) templ.Component {
+	return home(params.Table, params.HomeProjectId)
 }
 
 func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) templ.Component {
