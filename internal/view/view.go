@@ -2,6 +2,7 @@ package view
 
 import (
 	"context"
+	jsonv1 "encoding/json"
 	json "encoding/json/v2"
 	"errors"
 	"fmt"
@@ -33,7 +34,7 @@ func (v *View) DisplayDependencyWrapperWithNewActivitySuggestion(params models.V
 }
 
 func marshalParams(in any) string {
-	out, err := json.Marshal(in)
+	out, err := json.Marshal(in, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		panic(fmt.Sprintf("failed to marshal json from params: %v", in))
 	}
