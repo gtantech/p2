@@ -65,30 +65,7 @@ templ displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID){
     </td>
     <!-- Dependencies -->
     <td>
-        <div class="dependency-wrapper">
-            <input
-                type="text"
-                name="dependency_input"
-                class="dependency-input"
-                placeholder="Task A, Task B..."
-                autocomplete="off"
-                value={
-                    func() string {
-                        values := make([]string, len(row.Dependencies))
-                        for i, dependency := range row.Dependencies {
-                            values[i] = dependency.DisplayName
-                        }
-                        return strings.Join(values, ", ")
-                    }()
-                } 
-                hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id) }
-                hx-trigger="input changed delay:500ms"
-            >
-            <!--
-                Go server will return suggestions here.
-            -->
-            @displayDependencySuggestionWrappedChildren()
-        </div>
+        @displayDependencyWrapper(row)
     </td>
     <!-- Duration -->
     <td>
@@ -128,5 +105,32 @@ templ displayDependencySuggestionWrappedChildren(){
         role="listbox"
     >
         { children... }
+    </div>
+}
+
+templ displayDependencyWrapper(row *models.ViewTableRow){
+    <div class="dependency-wrapper">
+        <input
+            type="text"
+            name="dependency_input"
+            class="dependency-input"
+            placeholder="Task A, Task B..."
+            autocomplete="off"
+            value={
+                func() string {
+                    values := make([]string, len(row.Dependencies))
+                    for i, dependency := range row.Dependencies {
+                        values[i] = dependency.DisplayName
+                    }
+                    return strings.Join(values, ", ")
+                }()
+            } 
+            hx-put={ fmt.Sprintf("/api/table/row/activity/%v/dependency", row.Activity.Id) }
+            hx-trigger="input changed delay:500ms"
+        >
+        <!--
+            Go server will return suggestions here.
+        -->
+        @displayDependencySuggestionWrappedChildren()
     </div>
 }
