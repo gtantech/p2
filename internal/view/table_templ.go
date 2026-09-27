@@ -273,9 +273,9 @@ func displayDependencyTableRow(row *models.ViewTableRow, projectId uuid.UUID) te
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(marshalParams(toPostEmptyTableRow(row)))
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(marshalParamsToJsonField(toPostEmptyTableRow(row)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 113, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 113, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
