@@ -4,6 +4,7 @@ import (
 	json "encoding/json/v2"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 	"uuid"
 
@@ -20,13 +21,13 @@ func NewView() *View {
 	return &View{}
 }
 
-func (v *View) Home(params models.ViewHomeParams) templ.Component {
-	return home(params.Table, params.HomeProjectId)
+func (v *View) Home(params models.ViewHomeParams) {
+	renderTemplComponent(home(params.Table, params.HomeProjectId), params.HttpResponseWriter, params.HttpRequest)
 }
 
-func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) templ.Component {
+func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams) {
 	row := NewTableRow(NewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
-	return displayDependencyTableRow(row, params.ProjectId)
+	renderTemplComponent(displayDependencyTableRow(row, params.ProjectId), params.HttpResponseWriter, params.HttpRequest)
 }
 
 func marshalParams(in any) string {
@@ -74,4 +75,8 @@ func toPostEmptyTableRow(t *models.ViewTableRow) models.RoutesPostEmptyTableRow 
 
 func NewTableRow(activity *models.ViewActivity, dependencies []*models.ViewActivity) *models.ViewTableRow {
 	return &models.ViewTableRow{Activity: activity, Dependencies: dependencies}
+}
+
+func renderTemplComponent(component templ.Component, w http.ResponseWriter, r *http.Request) {
+	component.Render(r.Context(), w)
 }
