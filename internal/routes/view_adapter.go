@@ -9,6 +9,18 @@ type httpViewAdapter struct {
 	view *view.View
 }
 
+// DisplayTable implements [HttpView].
+func (h *httpViewAdapter) DisplayTable(params models.HttpViewTableParams) {
+	h.view.DisplayTable(
+		models.ViewTable{
+			Rows:      params.Rows,
+			ProjectId: params.ProjectId,
+		},
+		params.HttpRequest.Context(),
+		params.HttpResponseWriter,
+	)
+}
+
 // DisplayDependencyWrapper implements [HttpView].
 func (h *httpViewAdapter) DisplayDependencyWrapper(params models.HttpViewDisplayDependencyWrapper) {
 	view.NewView().DisplayDependencyWrapper(

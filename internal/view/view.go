@@ -24,6 +24,10 @@ func (v *View) Home(params models.ViewHomeParams, ctx context.Context, w io.Writ
 	home(params.Table).Render(ctx, w)
 }
 
+func (v *View) DisplayTable(params models.ViewTable, ctx context.Context, w io.Writer) {
+	displayDependencyTable(&params).Render(ctx, w)
+}
+
 func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams, ctx context.Context, w io.Writer) {
 	row := models.NewViewTableRow(models.NewViewActivity(params.ActivityId, params.ProjectId, "", 0), []*models.ViewActivity{})
 	displayDependencyTableRow(row, params.ProjectId).Render(ctx, w)
