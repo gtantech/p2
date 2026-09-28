@@ -146,8 +146,9 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 	parts := strings.Split(dependency_input, ",")
 
 	dependencyInputMap := make(map[string]bool)
-	for _, part := range parts {
-		dependencyInputMap[strings.TrimSpace(part)] = true
+	for i, part := range parts {
+		parts[i] = strings.TrimSpace(part)
+		dependencyInputMap[parts[i]] = true
 	}
 
 	// check if user deleted value
