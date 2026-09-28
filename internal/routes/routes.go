@@ -49,20 +49,25 @@ func (rt *Routes) PostDependencyActivityCreationFromCreateActivitySuggestion(w h
 		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
 		return
 	}
-	if storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: dto.ProjectId, DisplayName: dto.DisplayName, Duration: dto.Duration}); err != nil {
-		http.Error(w, "failed to create activity", http.StatusInternalServerError)
-		log.Printf("returned http internal server error while creating activity in store\n")
-		return
-	} else {
-		if _, err := rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{
-			ProjectID:             storeActivity.ProjectID,
-			Relationship:          models.FS,
-			PredecessorActivityID: storeActivity.ID,
-			SuccessorActivityID:   activityId,
-		}); err != nil {
-			http.Error(w, "failed to create dependency", http.StatusInternalServerError)
-			log.Printf("returned http internal server error while creating dependency in store\n")
+
+	displayNames := strings.Split(dto.DisplayName, ",")
+
+	for _, displayName := range displayNames {
+		if storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: dto.ProjectId, DisplayName: strings.TrimSpace(displayName), Duration: dto.Duration}); err != nil {
+			http.Error(w, "failed to create activity", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while creating activity in store\n")
 			return
+		} else {
+			if _, err := rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{
+				ProjectID:             storeActivity.ProjectID,
+				Relationship:          models.FS,
+				PredecessorActivityID: storeActivity.ID,
+				SuccessorActivityID:   activityId,
+			}); err != nil {
+				http.Error(w, "failed to create dependency", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating dependency in store\n")
+				return
+			}
 		}
 	}
 
