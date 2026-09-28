@@ -133,7 +133,7 @@ templ displayDependencyWrapperWithNewActivitySuggestion(rowSuccessorActivityId u
             <button
                 class="suggestion"
                 hx-post={ fmt.Sprintf("/component/table/row/activity/%s/dependency/activity", rowSuccessorActivityId) }
-                hx-target="#dependency-wrapper"
+                hx-target={ fmt.Sprintf("#dependency-wrapper-%s", rowSuccessorActivityId) }
                 hx-swap="outerHTML"
                 hx-vals={ marshalParamsToJsonField(models.RoutesPostNewActivity{ProjectId: projectId, DisplayName: newSuggestedActivityDispName, Duration: 0}) }
             >
@@ -156,7 +156,7 @@ templ tableDependencyRowInput(rowSuccessorActivityId uuid.UUID, dependencyNames 
             }()
         } 
         hx-post={ fmt.Sprintf("/component/table/row/activity/%v/dependency", rowSuccessorActivityId) }
-        hx-target="#dependency-wrapper"
+        hx-target={ fmt.Sprintf("#dependency-wrapper-%s", rowSuccessorActivityId) }
         hx-swap="outerHTML"
         hx-trigger="input changed delay:500ms"
     >
