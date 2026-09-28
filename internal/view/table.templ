@@ -19,7 +19,7 @@ templ displayDependenciesToAddNotFound(){
     </ul>
 }
 
-templ displayDependencyTable(table *models.ViewTable, projectId uuid.UUID){
+templ displayDependencyTable(table *models.ViewTable){
     <table>
         <thead>
             <tr>
@@ -42,7 +42,7 @@ templ displayDependencyTable(table *models.ViewTable, projectId uuid.UUID){
                 <!--
                     Task row
                 -->
-                @displayDependencyTableRow(row, projectId)
+                @displayDependencyTableRow(row, table.ProjectId)
             }
         </tbody>
     </table>

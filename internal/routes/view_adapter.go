@@ -43,7 +43,7 @@ func (h *httpViewAdapter) DisplayEmptyTableRow(params models.HttpViewDisplayEmpt
 
 // DisplayHome implements [HttpView].
 func (h *httpViewAdapter) DisplayHome(params models.HttpViewHomeParams) {
-	h.view.Home(models.ViewHomeParams{Table: params.Table, HomeProjectId: params.HomeProjectId}, params.HttpRequest.Context(), params.HttpResponseWriter)
+	h.view.Home(models.ViewHomeParams{Table: params.Table}, params.HttpRequest.Context(), params.HttpResponseWriter)
 }
 
 func NewViewAdapter(view *view.View) *httpViewAdapter {

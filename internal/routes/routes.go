@@ -342,8 +342,8 @@ func (rt *Routes) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t := models.NewViewTableFromStorage(storeActivities, storeDependenciesMap)
-	rt.view.DisplayHome(models.HttpViewHomeParams{Table: t, HomeProjectId: firstProjectId, HttpResponseWriter: w, HttpRequest: r})
+	t := models.NewViewTableFromStorage(storeActivities, storeDependenciesMap, firstProjectId)
+	rt.view.DisplayHome(models.HttpViewHomeParams{Table: t, HttpResponseWriter: w, HttpRequest: r})
 }
 
 func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
