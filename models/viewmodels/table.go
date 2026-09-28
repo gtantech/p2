@@ -11,3 +11,8 @@ type TableRow struct {
 	PredecessorActivities []string
 	Duration              time.Duration
 }
+
+type Table struct {
+	ProjectId uuid.UUID
+	Rows      []TableRow
+}
