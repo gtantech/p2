@@ -21,7 +21,11 @@ func NewView() *View {
 }
 
 func (v *View) Home(params models.ViewHomeParams, ctx context.Context, w io.Writer) {
-	home(params.Table, params.HomeProjectId).Render(ctx, w)
+	home(params.Table).Render(ctx, w)
+}
+
+func (v *View) DisplayTable(params models.ViewTable, ctx context.Context, w io.Writer) {
+	displayDependencyTable(&params).Render(ctx, w)
 }
 
 func (v *View) DisplayEmptyTableRow(params models.ViewDisplayEmptyTableRowParams, ctx context.Context, w io.Writer) {

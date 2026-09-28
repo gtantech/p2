@@ -6,6 +6,7 @@ import (
 
 type HttpView interface {
 	DisplayHome(params models.HttpViewHomeParams)
+	DisplayTable(params models.HttpViewTableParams)
 	DisplayEmptyTableRow(params models.HttpViewDisplayEmptyTableRowParams)
 	DisplayDependencyWrapperWithNewActivitySuggestion(params models.HttpViewDisplayDependencyWrapperWithNewActivitySuggestion)
 	DisplayDependencyWrapper(params models.HttpViewDisplayDependencyWrapper)

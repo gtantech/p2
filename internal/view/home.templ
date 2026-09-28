@@ -1,8 +1,8 @@
 package view
 
-import "uuid"
 import "github.com/gtantech/p2/internal/models"
-templ home(table *models.ViewTable, projectId uuid.UUID) {
+import "fmt"
+templ home(table *models.ViewTable) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -18,8 +18,11 @@ templ home(table *models.ViewTable, projectId uuid.UUID) {
 		<body>
 			<div class="container">
 				<h1>Task Planner</h1>
-				<div class="table-wrapper">
-					@displayDependencyTable(table, projectId)
+				<div 
+					class="table-wrapper"
+					id={ fmt.Sprintf("table-wrapper-%s", table.ProjectId) }
+				>
+					@displayDependencyTable(table)
 				</div>
 			</div>
 		</body>

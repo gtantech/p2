@@ -13,7 +13,8 @@ type ViewActivity struct {
 }
 
 type ViewTable struct {
-	Rows []*ViewTableRow
+	Rows      []*ViewTableRow
+	ProjectId uuid.UUID
 }
 
 type ViewTableRow struct {
@@ -27,8 +28,7 @@ type ViewDisplayEmptyTableRowParams struct {
 }
 
 type ViewHomeParams struct {
-	Table         *ViewTable
-	HomeProjectId uuid.UUID
+	Table *ViewTable
 }
 
 type ViewDisplayDependencyWrapper struct {
@@ -50,7 +50,7 @@ func NewViewTable(rows []*ViewTableRow) *ViewTable {
 	return &ViewTable{Rows: rows}
 }
 
-func NewViewTableFromStorage(storeActivities []StoreActivity, storeDependencies map[StoreActivity][]StoreActivity) *ViewTable {
+func NewViewTableFromStorage(storeActivities []StoreActivity, storeDependencies map[StoreActivity][]StoreActivity, projectId uuid.UUID) *ViewTable {
 	storeActivityMap := make(map[StoreActivity]*ViewActivity)
 
 	for _, storeActivity := range storeActivities {
@@ -58,7 +58,7 @@ func NewViewTableFromStorage(storeActivities []StoreActivity, storeDependencies 
 		storeActivityMap[storeActivity] = NewViewActivity(storeActivity.ID, storeActivity.ProjectID, storeActivity.DisplayName, storeActivity.Duration)
 	}
 
-	table := ViewTable{}
+	table := ViewTable{ProjectId: projectId}
 
 	for _, storeActivity := range storeActivities {
 		viewActivity := storeActivityMap[storeActivity]
