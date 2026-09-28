@@ -33,6 +33,10 @@ func (v *View) DisplayDependencyWrapperWithNewActivitySuggestion(params models.V
 	displayDependencyWrapperWithNewActivitySuggestion(params.RowActivityId, params.ProjectId, params.DependencyNames, params.NewActivityDispName).Render(ctx, w)
 }
 
+func (v *View) DisplayDependencyWrapper(params models.ViewDisplayDependencyWrapper, ctx context.Context, w io.Writer) {
+	displayDependencyWrapper(params.RowActivityId, params.DependencyNames).Render(ctx, w)
+}
+
 func marshalParams(in any) string {
 	out, err := json.Marshal(in, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
