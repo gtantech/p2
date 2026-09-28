@@ -9,6 +9,20 @@ type httpViewAdapter struct {
 	view *view.View
 }
 
+// DisplayDependencyWithNewActivitySuggestion implements [HttpView].
+func (h *httpViewAdapter) DisplayDependencyWrapperWithNewActivitySuggestion(params models.HttpViewDisplayDependencyWrapperWithNewActivitySuggestion) {
+	h.view.DisplayDependencyWrapperWithNewActivitySuggestion(
+		models.ViewDisplayDependencyWrapperWithNewActivitySuggestion{
+			RowActivityId:       params.RowActivityId,
+			ProjectId:           params.ProjectId,
+			DependencyNames:     params.DependencyNames,
+			NewActivityDispName: params.NewActivityDispName,
+		},
+		params.HttpRequest.Context(),
+		params.HttpResponseWriter,
+	)
+}
+
 // DisplayEmptyTableRow implements [HttpView].
 func (h *httpViewAdapter) DisplayEmptyTableRow(params models.HttpViewDisplayEmptyTableRowParams) {
 	h.view.DisplayEmptyTableRow(models.ViewDisplayEmptyTableRowParams{ActivityId: params.ActivityId, ProjectId: params.ProjectId}, params.HttpRequest.Context(), params.HttpResponseWriter)

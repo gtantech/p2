@@ -27,7 +27,7 @@ func NewRoutes(store StoreService, view HttpView) *Routes {
 	}
 }
 
-func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if id == "" {
@@ -100,7 +100,20 @@ func (rt *Routes) PutActivityDependencyUpdateFromTableHandler(w http.ResponseWri
 				ProjectID:   storeActivity.ProjectID,
 				DisplayName: key})
 			if err != nil {
-				http.Error(w, "failed to get activity", http.StatusBadRequest)
+				if errors.Is(err, store.ErrActivityNotFound) {
+					rt.view.DisplayDependencyWrapperWithNewActivitySuggestion(
+						models.HttpViewDisplayDependencyWrapperWithNewActivitySuggestion{
+							RowActivityId:       activityId,
+							ProjectId:           storeActivity.ProjectID,
+							DependencyNames:     parts,
+							NewActivityDispName: key,
+							HttpResponseWriter:  w,
+							HttpRequest:         r,
+						},
+					)
+					return
+				}
+				http.Error(w, "failed to get activity", http.StatusInternalServerError)
 				return
 			}
 			rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{

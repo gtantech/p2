@@ -18,3 +18,8 @@ type HttpViewHomeParams struct {
 	ViewHomeParams
 	HttpParams
 }
+
+type HttpViewDisplayDependencyWrapperWithNewActivitySuggestion struct {
+	ViewDisplayDependencyWrapperWithNewActivitySuggestion
+	HttpParams
+}
