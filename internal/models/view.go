@@ -13,7 +13,8 @@ type ViewActivity struct {
 }
 
 type ViewTable struct {
-	Rows []*ViewTableRow
+	Rows      []*ViewTableRow
+	ProjectId uuid.UUID
 }
 
 type ViewTableRow struct {
