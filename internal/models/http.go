@@ -28,3 +28,8 @@ type HttpViewDisplayDependencyWrapper struct {
 	ViewDisplayDependencyWrapper
 	HttpParams
 }
+
+type HttpViewTableParams struct {
+	ViewTable
+	HttpParams
+}
