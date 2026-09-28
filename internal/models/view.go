@@ -31,6 +31,17 @@ type ViewHomeParams struct {
 	HomeProjectId uuid.UUID
 }
 
+type ViewDisplayDependencyWrapper struct {
+	RowActivityId   uuid.UUID
+	ProjectId       uuid.UUID
+	DependencyNames []string
+}
+
+type ViewDisplayDependencyWrapperWithNewActivitySuggestion struct {
+	ViewDisplayDependencyWrapper
+	NewActivityDispName string
+}
+
 func NewViewActivity(id uuid.UUID, projectId uuid.UUID, displayName string, duration time.Duration) *ViewActivity {
 	return &ViewActivity{Id: id, ProjectID: projectId, DisplayName: displayName, Duration: duration}
 }

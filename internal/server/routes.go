@@ -25,12 +25,13 @@ func (s *Server) RegisterRoutes(routes *routes.Routes) http.Handler {
 
 	r.Route("/component", func(r chi.Router) {
 		r.Post("/table/row/empty", routes.PostEmptyTableRow)
+		r.Post("/table/row/activity/{id}/dependency", routes.PostActivityDependencyUpdateFromTableHandler)
+		r.Post("/table/row/activity/{id}/dependency/activity", routes.PostDependencyActivityCreationFromCreateActivitySuggestion)
 	})
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/table", func(r chi.Router) {
 			r.Put("/row/activity/{id}/name", routes.PutActivityNameUpdateFromTableHandler)
-			r.Put("/row/activity/{id}/dependency", routes.PutActivityDependencyUpdateFromTableHandler)
 			r.Put("/row/activity/{id}/duration", routes.PutActivityDurationUpdateFromTableHandler)
 		})
 	})
