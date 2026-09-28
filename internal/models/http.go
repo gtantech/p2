@@ -23,3 +23,8 @@ type HttpViewDisplayDependencyWrapperWithNewActivitySuggestion struct {
 	ViewDisplayDependencyWrapperWithNewActivitySuggestion
 	HttpParams
 }
+
+type HttpViewDisplayDependencyWrapper struct {
+	ViewDisplayDependencyWrapper
+	HttpParams
+}
