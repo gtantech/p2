@@ -31,10 +31,14 @@ type ViewHomeParams struct {
 	HomeProjectId uuid.UUID
 }
 
+type ViewDisplayDependencyWrapper struct {
+	RowActivityId   uuid.UUID
+	ProjectId       uuid.UUID
+	DependencyNames []string
+}
+
 type ViewDisplayDependencyWrapperWithNewActivitySuggestion struct {
-	RowActivityId       uuid.UUID
-	ProjectId           uuid.UUID
-	DependencyNames     []string
+	ViewDisplayDependencyWrapper
 	NewActivityDispName string
 }
 
