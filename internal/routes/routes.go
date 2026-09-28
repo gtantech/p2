@@ -49,20 +49,25 @@ func (rt *Routes) PostDependencyActivityCreationFromCreateActivitySuggestion(w h
 		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
 		return
 	}
-	if storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: dto.ProjectId, DisplayName: dto.DisplayName, Duration: dto.Duration}); err != nil {
-		http.Error(w, "failed to create activity", http.StatusInternalServerError)
-		log.Printf("returned http internal server error while creating activity in store\n")
-		return
-	} else {
-		if _, err := rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{
-			ProjectID:             storeActivity.ProjectID,
-			Relationship:          models.FS,
-			PredecessorActivityID: storeActivity.ID,
-			SuccessorActivityID:   activityId,
-		}); err != nil {
-			http.Error(w, "failed to create dependency", http.StatusInternalServerError)
-			log.Printf("returned http internal server error while creating dependency in store\n")
+
+	displayNames := strings.Split(dto.DisplayName, ",")
+
+	for _, displayName := range displayNames {
+		if storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: dto.ProjectId, DisplayName: strings.TrimSpace(displayName), Duration: dto.Duration}); err != nil {
+			http.Error(w, "failed to create activity", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while creating activity in store\n")
 			return
+		} else {
+			if _, err := rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{
+				ProjectID:             storeActivity.ProjectID,
+				Relationship:          models.FS,
+				PredecessorActivityID: storeActivity.ID,
+				SuccessorActivityID:   activityId,
+			}); err != nil {
+				http.Error(w, "failed to create dependency", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating dependency in store\n")
+				return
+			}
 		}
 	}
 
@@ -155,6 +160,8 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 	}
 
 	// check if user added new value
+	var createNewDependencyActivity []string
+
 	for key := range dependencyInputMap {
 		//if key in dependencyInputMap is not in predecessorNameToDependencyId, user has added value
 		if _, ok := predecessorNameToDependencyId[key]; !ok {
@@ -163,20 +170,12 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 				DisplayName: key})
 			if err != nil {
 				if errors.Is(err, store.ErrActivityNotFound) {
-					rt.view.DisplayDependencyWrapperWithNewActivitySuggestion(
-						models.HttpViewDisplayDependencyWrapperWithNewActivitySuggestion{
-							RowActivityId:       activityId,
-							ProjectId:           storeActivity.ProjectID,
-							DependencyNames:     parts,
-							NewActivityDispName: key,
-							HttpResponseWriter:  w,
-							HttpRequest:         r,
-						},
-					)
+					createNewDependencyActivity = append(createNewDependencyActivity, strings.TrimSpace(key))
+					continue
+				} else {
+					http.Error(w, "failed to get activity", http.StatusInternalServerError)
 					return
 				}
-				http.Error(w, "failed to get activity", http.StatusInternalServerError)
-				return
 			}
 			rt.store.Dependency().Create(r.Context(), models.StoreCreateDepdencencyParams{
 				ProjectID:             storeActivity.ProjectID,
@@ -185,6 +184,19 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 				SuccessorActivityID:   activityId,
 			})
 		}
+	}
+
+	if len(createNewDependencyActivity) > 0 {
+		rt.view.DisplayDependencyWrapperWithNewActivitySuggestion(
+			models.HttpViewDisplayDependencyWrapperWithNewActivitySuggestion{
+				RowActivityId:       activityId,
+				ProjectId:           storeActivity.ProjectID,
+				DependencyNames:     parts,
+				NewActivityDispName: strings.Join(createNewDependencyActivity, ","),
+				HttpResponseWriter:  w,
+				HttpRequest:         r,
+			},
+		)
 	}
 }
 
