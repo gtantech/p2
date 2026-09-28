@@ -85,13 +85,59 @@ func (rt *Routes) PostDependencyActivityCreationFromCreateActivitySuggestion(w h
 		dependencyStr[i] = dependency.PredecessorActivityName
 	}
 
-	rt.view.DisplayDependencyWrapper(models.HttpViewDisplayDependencyWrapper{
-		RowActivityId:      activityId,
-		ProjectId:          dto.ProjectId,
-		DependencyNames:    dependencyStr,
-		HttpResponseWriter: w,
-		HttpRequest:        r,
-	})
+	//get all activities associated with firstProjectId
+	storeActivities, err := rt.store.Activity().GetByProjectID(r.Context(), dto.ProjectId)
+	if err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			storeActivity, err := rt.store.Activity().Create(r.Context(), models.StoreCreateActivityParams{ProjectID: dto.ProjectId, DisplayName: "", Duration: 0})
+			if err != nil {
+				http.Error(w, "failed to create new activity", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating activity. encountered error: %v\n", err)
+				return
+			}
+			storeActivities = []models.StoreActivity{storeActivity}
+		} else {
+			http.Error(w, "failed to get activities", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting activities. encountered error: %v\n", err)
+			return
+		}
+	}
+
+	//map activity id to activity
+	storeActivitiesMap := make(map[uuid.UUID]models.StoreActivity)
+	for _, storeActivity := range storeActivities {
+		storeActivitiesMap[storeActivity.ID] = storeActivity
+	}
+
+	//map a list of predecessor activities to a successor activity
+	storeDependenciesMap := make(map[models.StoreActivity][]models.StoreActivity)
+	for _, storeActivity := range storeActivities {
+		storeDependencies, err := rt.store.Dependency().GetBySuccessor(r.Context(), storeActivity.ID)
+		if err != nil {
+			if errors.Is(err, store.ErrDependencyNotFound) {
+				storeDependenciesMap[storeActivity] = []models.StoreActivity{}
+				continue
+			} else {
+				http.Error(w, "failed to get dependency", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while getting dependency. encountered error: %v\n", err)
+				return
+			}
+		}
+		for _, storeDependency := range storeDependencies {
+			predecessor := storeActivitiesMap[storeDependency.PredecessorActivityID]
+			storeDependenciesMap[storeActivity] = append(storeDependenciesMap[storeActivity], predecessor)
+		}
+	}
+
+	t := models.NewViewTableFromStorage(storeActivities, storeDependenciesMap, dto.ProjectId)
+	rt.view.DisplayTable(
+		models.HttpViewTableParams{
+			Rows:               t.Rows,
+			ProjectId:          dto.ProjectId,
+			HttpResponseWriter: w,
+			HttpRequest:        r,
+		},
+	)
 }
 
 func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
