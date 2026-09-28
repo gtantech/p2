@@ -403,9 +403,9 @@ func displayDependencyWrapperWithNewActivitySuggestion(rowSuccessorActivityId uu
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var18 string
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/component/table/row/activity/%s/dependency", rowSuccessorActivityId))
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("/component/table/row/activity/%s/dependency/activity", rowSuccessorActivityId))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 132, Col: 108}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/table.templ`, Line: 132, Col: 117}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 				if templ_7745c5c3_Err != nil {
