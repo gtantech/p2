@@ -197,7 +197,16 @@ func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWr
 				HttpRequest:         r,
 			},
 		)
+		return
 	}
+
+	rt.view.DisplayDependencyWrapper(models.HttpViewDisplayDependencyWrapper{
+		RowActivityId:      activityId,
+		ProjectId:          storeActivity.ProjectID,
+		DependencyNames:    parts,
+		HttpResponseWriter: w,
+		HttpRequest:        r,
+	})
 }
 
 func (rt *Routes) PutActivityDurationUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
