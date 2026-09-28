@@ -411,7 +411,7 @@ func displayDependencyWrapperWithNewActivitySuggestion(rowSuccessorActivityId uu
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#dependency-suggestions\" hx-swap=\"outerHTML\" hx-vals=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#dependency-wrapper\" hx-swap=\"outerHTML\" hx-vals=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
