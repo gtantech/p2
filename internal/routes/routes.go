@@ -27,6 +27,10 @@ func NewRoutes(store StoreService, view HttpView) *Routes {
 	}
 }
 
+func (rt *Routes) PostActivityCreationFromCreateActivitySuggestion(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func (rt *Routes) PostActivityDependencyUpdateFromTableHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
