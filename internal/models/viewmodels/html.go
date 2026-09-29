@@ -8,3 +8,8 @@ type HtmlInput struct {
 	Autocomplete InputAutocomplete
 	Value        string
 }
+
+type HtmlButton struct {
+	Class string
+	Title string
+}
