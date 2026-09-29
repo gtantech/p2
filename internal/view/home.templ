@@ -1,30 +1,5 @@
 package view
 
-import "github.com/gtantech/p2/internal/models"
-import "fmt"
-templ home(table *models.ViewTable) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Task Planner</title>
-			<link rel="stylesheet" href="/static/home_style.css"/>
-			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" 
-					integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
-					crossorigin="anonymous">
-		  	</script>
-		</head>
-		<body>
-			<div class="container">
-				<h1>Task Planner</h1>
-				<div 
-					class="table-wrapper"
-					id={ fmt.Sprintf("table-wrapper-%s", table.ProjectId) }
-				>
-					@displayDependencyTable(table)
-				</div>
-			</div>
-		</body>
-	</html>
+templ Home() {
+	<div>Hello World</div>
 }
