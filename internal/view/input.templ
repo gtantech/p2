@@ -1,0 +1,47 @@
+package view
+
+import "github.com/gtantech/p2/internal/models/viewmodels"
+
+import "strings"
+import "time"
+
+templ TextInput(params *viewmodels.HtmlInput){
+    <input
+        id={ params.Id }
+        type="text"
+        name={ params.Name }
+        class={ params.Class }
+        placeholder={ params.Placeholder }
+        autocomplete={ params.Autocomplete }
+        value={ params.Value }
+    >
+}
+
+templ ActivityTextInput(inputId string, activityName string){
+    @TextInput(&viewmodels.HtmlInput{
+        Id: inputId, 
+        Name: "activity_input", 
+        Class: "activity-name", 
+        Placeholder: "Activity name",
+        Autocomplete: viewmodels.Off,
+        Value: activityName,})
+}
+
+templ DependencyTextInput(dependencyActivityNames []string){
+    @TextInput(&viewmodels.HtmlInput{
+        Name: "dependency_input",
+        Class: "dependency-input",
+        Placeholder: "Task A, Task B...",
+        Autocomplete: viewmodels.Off,
+        Value: func() string {
+                return strings.Join(dependencyActivityNames, ", ")
+            }(),
+    })
+}
+
+templ DurationTextInput(duration time.Duration){
+    @TextInput(&viewmodels.HtmlInput{
+        Name: "duration_input", 
+        Placeholder: "e.g. 2h",
+        Value: duration.String(),})
+}
