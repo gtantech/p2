@@ -16,3 +16,10 @@ type Table struct {
 	ProjectId uuid.UUID
 	Rows      []TableRow
 }
+
+type InputAutocomplete string
+
+const (
+	On  InputAutocomplete = "on"
+	Off InputAutocomplete = "off"
+)
