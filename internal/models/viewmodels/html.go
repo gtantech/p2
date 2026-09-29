@@ -1,8 +1,8 @@
 package viewmodels
 
 type HtmlInput struct {
-	InputId      string
-	InputName    string
+	Id           string
+	Name         string
 	Class        string
 	Placeholder  string
 	Autocomplete InputAutocomplete
