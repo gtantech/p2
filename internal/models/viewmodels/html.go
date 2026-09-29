@@ -12,4 +12,5 @@ type HtmlInput struct {
 type HtmlButton struct {
 	Class string
 	Title string
+	Text  string
 }
