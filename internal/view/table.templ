@@ -1,0 +1,60 @@
+package view
+
+import "github.com/gtantech/p2/internal/models/viewmodels"
+
+import "fmt"
+
+templ DependencyTable(table *viewmodels.Table){
+    <table>
+        <thead>
+            <tr>
+                <th class="task-column">
+                    Task
+                </th>
+                <th class="dependency-column">
+                    Dependencies
+                </th>
+                <th class="duration-column">
+                    Duration
+                </th>
+                <th class="action-column">
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="task-table-body">
+            for _, row := range table.Rows{
+                <!--
+                    Task row
+                -->
+                @DependencyTableRow(&row)
+            }
+        </tbody>
+    </table>
+}
+
+templ DependencyTableRow(row *viewmodels.TableRow){
+    <tr class="activity-row">
+        <!-- activity name -->
+        <td>
+            @ActivityTextInput(fmt.Sprintf("activity-input-%s", row.ActivityId.String()), row.ActivityName)
+        </td>
+        
+        <!-- Dependencies -->
+        <td>
+            @DependencyTextInput(row.PredecessorActivities)
+        </td>
+        
+        <!-- Duration -->
+        <td>
+            @DurationTextInput(row.Duration)
+        </td>
+        
+        <!-- Add row -->
+        <td>
+            <div class="actions">
+                @Button(viewmodels.HtmlButton{Class: "add-button", Title: "Add task", Text: "+"})
+            </div>
+        </td>
+    </tr>
+}

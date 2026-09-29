@@ -1,0 +1,13 @@
+package view
+
+import "github.com/gtantech/p2/internal/models/viewmodels"
+
+templ Button(params viewmodels.HtmlButton){
+    <button
+        type="button"
+        class={ params.Class }
+        title={ params.Title }
+    >
+        { params.Text }
+    </button>
+}
