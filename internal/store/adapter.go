@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"time"
 	"uuid"
 
@@ -23,7 +24,7 @@ func NewStoreViewMockAdapter() *StoreViewMockAdapter {
 }
 
 // GetDependencyTableByProjectId implements [routes.StoreView].
-func (s *StoreViewMockAdapter) GetDependencyTableByProjectId(projectId uuid.UUID) (viewmodels.Table, error) {
+func (s *StoreViewMockAdapter) GetDependencyTableByProjectId(projectId uuid.UUID, ctx context.Context) (viewmodels.Table, error) {
 	return s.table[projectId], nil
 }
 
