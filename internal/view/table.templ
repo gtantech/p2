@@ -26,17 +26,21 @@ templ DependencyTable(table *viewmodels.Table){
         </thead>
 
         <tbody id="task-table-body">
-            for _, row := range table.Rows{
+            for i, row := range table.Rows{
                 <!--
                     Task row
                 -->
-                @DependencyTableRow(&row)
+                if i < len(table.Rows)-1{
+                    @DependencyTableRow(&row, &table.Rows[i+1].SortRank)
+                }else{
+                    @DependencyTableRow(&row, nil)
+                }
             }
         </tbody>
     </table>
 }
 
-templ DependencyTableRow(row *viewmodels.TableRow){
+templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
     <tr class="activity-row">
         <!-- activity name -->
         <td>
@@ -61,7 +65,7 @@ templ DependencyTableRow(row *viewmodels.TableRow){
                     Title: "Add task", 
                     Text: "+",
                     HxPost: "/component/table/row/empty",
-                    HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId}),
+                    HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
                 })
             </div>
         </td>
