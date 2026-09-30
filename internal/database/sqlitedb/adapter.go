@@ -25,7 +25,7 @@ func (s *StoreViewSqliteAdapter) CreateEmptyDependencyTableRow(projectId uuid.UU
 	if err != nil {
 		return viewmodels.TableRow{}, err
 	}
-	return viewmodels.TableRow{ActivityId: uuid.MustParse(activity.ID), ProjectId: projectId, ActivityName: activity.DispName, PredecessorActivities: []string{}, Duration: time.Duration(activity.Duration)}, nil
+	return viewmodels.TableRow{ActivityId: uuid.MustParse(activity.ID), ProjectId: projectId, ActivityName: activity.DispName, PredecessorActivities: []string{}, Duration: time.Duration(activity.Duration), SortRank: sortRank}, nil
 }
 
 // GetDependencyTableByProjectId implements [routes.StoreView].
@@ -55,7 +55,9 @@ func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UU
 			ProjectId:             projectId,
 			ActivityName:          successorActivity.DispName,
 			PredecessorActivities: make([]string, 0),
-			Duration:              time.Duration(successorActivity.Duration)}
+			Duration:              time.Duration(successorActivity.Duration),
+			SortRank:              successorActivity.SortRank,
+		}
 	}
 
 	//create a dependency map where the successor id is the key and the dependencies are the values

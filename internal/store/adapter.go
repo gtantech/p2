@@ -23,7 +23,7 @@ func NewStoreViewMockAdapter() *StoreViewMockAdapter {
 		table: make(map[uuid.UUID]viewmodels.Table),
 	}
 	projectId := uuid.Max()
-	s.table[projectId] = viewmodels.Table{ProjectId: projectId, Rows: []viewmodels.TableRow{viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId, ActivityName: "A", PredecessorActivities: []string{"B", "C"}, Duration: 5 * time.Minute}}}
+	s.table[projectId] = viewmodels.Table{ProjectId: projectId, Rows: []viewmodels.TableRow{viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId, ActivityName: "A", PredecessorActivities: []string{"B", "C"}, Duration: 5 * time.Minute, SortRank: 0}}}
 
 	return &s
 }
