@@ -11,3 +11,18 @@ templ Button(params viewmodels.HtmlButton){
         { params.Text }
     </button>
 }
+
+templ DependencyTableRowAddButton(params viewmodels.HtmlDependencyTableRowButton){
+    <button
+        type="button"
+        class={ params.Class }
+        title={ params.Title }
+        
+        hx-post={ params.HxPost }
+        hx-vals={ params.HxVals }
+        hx-target="closest tr"
+        hx-swap="afterend"
+    >
+        { params.Text }
+    </button>
+}

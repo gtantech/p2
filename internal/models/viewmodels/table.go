@@ -7,9 +7,11 @@ import (
 
 type TableRow struct {
 	ActivityId            uuid.UUID
+	ProjectId             uuid.UUID
 	ActivityName          string
 	PredecessorActivities []string
 	Duration              time.Duration
+	SortRank              int64
 }
 
 type Table struct {

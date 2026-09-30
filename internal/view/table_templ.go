@@ -5,12 +5,14 @@ package view
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
+import (
+	"fmt"
 
-import "github.com/gtantech/p2/internal/models/viewmodels"
-
-import "fmt"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
+	"github.com/gtantech/p2/internal/models/jsonmodels"
+	"github.com/gtantech/p2/internal/models/viewmodels"
+)
 
 func DependencyTable(table *viewmodels.Table) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -37,14 +39,21 @@ func DependencyTable(table *viewmodels.Table) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, row := range table.Rows {
+		for i, row := range table.Rows {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!--\r\n                    Task row\r\n                --> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = DependencyTableRow(&row).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+			if i < len(table.Rows)-1 {
+				templ_7745c5c3_Err = DependencyTableRow(&row, &table.Rows[i+1].SortRank).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = DependencyTableRow(&row, nil).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</tbody></table>")
@@ -55,7 +64,7 @@ func DependencyTable(table *viewmodels.Table) templ.Component {
 	})
 }
 
-func DependencyTableRow(row *viewmodels.TableRow) templ.Component {
+func DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -104,7 +113,13 @@ func DependencyTableRow(row *viewmodels.TableRow) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Button(viewmodels.HtmlButton{Class: "add-button", Title: "Add task", Text: "+"}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = DependencyTableRowAddButton(viewmodels.HtmlDependencyTableRowButton{
+			Class:  "add-button",
+			Title:  "Add task",
+			Text:   "+",
+			HxPost: "/component/table/row/empty",
+			HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
+		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

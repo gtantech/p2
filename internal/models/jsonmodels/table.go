@@ -1,0 +1,11 @@
+package jsonmodels
+
+import (
+	"uuid"
+)
+
+type CreateEmptyTableRow struct {
+	PreviousRowSortRank *int64    `json:"previousRowSortRank"`
+	NextRowSortRank     *int64    `json:"nextRowSortRank"`
+	ProjectId           uuid.UUID `json:"projectId"`
+}

@@ -13,17 +13,24 @@ type StoreViewSqliteAdapter struct {
 	queries *Queries
 }
 
-func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
-	s := StoreViewSqliteAdapter{
-		queries: queries,
+// CreateEmptyDependencyTableRow implements [routes.StoreView].
+func (s *StoreViewSqliteAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
+	activity, err := s.queries.InsertActivity(ctx, InsertActivityParams{
+		ID:        uuid.NewV7().String(),
+		ProjectID: projectId.String(),
+		DispName:  "",
+		Duration:  0,
+	})
+	s.queries.InsertActivityOrdering(ctx, InsertActivityOrderingParams{uuid.NewV7().String(), activity.ProjectID, activity.ID, sortRank})
+	if err != nil {
+		return viewmodels.TableRow{}, err
 	}
-
-	return &s
+	return viewmodels.TableRow{ActivityId: uuid.MustParse(activity.ID), ProjectId: projectId, ActivityName: activity.DispName, PredecessorActivities: []string{}, Duration: time.Duration(activity.Duration), SortRank: sortRank}, nil
 }
 
 // GetDependencyTableByProjectId implements [routes.StoreView].
 func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UUID, ctx context.Context) (viewmodels.Table, error) {
-	successorActivities, err := s.queries.FindAllActivitiesByProject(ctx, projectId.String())
+	successorActivities, err := s.queries.FindAllActivitiesByProjectSorted(ctx, projectId.String())
 	if err != nil {
 		return viewmodels.Table{}, err
 	}
@@ -36,7 +43,7 @@ func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UU
 		return viewmodels.Table{ProjectId: projectId, Rows: make([]viewmodels.TableRow, 0)}, nil
 	}
 
-	successorActivityMap := map[string]Activity{}
+	successorActivityMap := map[string]FindAllActivitiesByProjectSortedRow{}
 	tableRows := make([]viewmodels.TableRow, len(successorActivities))
 
 	//add viewmodels.Activities to table rows
@@ -45,9 +52,12 @@ func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UU
 		successorActivityMap[successorActivity.ID] = successorActivity
 		tableRows[i] = viewmodels.TableRow{
 			ActivityId:            uuid.MustParse(successorActivity.ID),
+			ProjectId:             projectId,
 			ActivityName:          successorActivity.DispName,
 			PredecessorActivities: make([]string, 0),
-			Duration:              time.Duration(successorActivity.Duration)}
+			Duration:              time.Duration(successorActivity.Duration),
+			SortRank:              successorActivity.SortRank,
+		}
 	}
 
 	//create a dependency map where the successor id is the key and the dependencies are the values
@@ -64,6 +74,14 @@ func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UU
 		tableRows[i].PredecessorActivities = dependencyMap[tableRows[i].ActivityId.String()]
 	}
 	return viewmodels.Table{ProjectId: projectId, Rows: tableRows}, nil
+}
+
+func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
+	s := StoreViewSqliteAdapter{
+		queries: queries,
+	}
+
+	return &s
 }
 
 var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct implements ExampleInterface at compile time
