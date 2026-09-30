@@ -10,7 +10,7 @@ type HttpViewTemplAdapter struct {
 
 // RenderDependencyTableRow implements [routes.HttpView].
 func (h *HttpViewTemplAdapter) RenderDependencyTableRow(params routemodels.HttpRenderTableRow) {
-	DependencyTableRow(&params.TableRow).Render(params.Request.Context(), params.ResponseWriter)
+	DependencyTableRow(&params.TableRow, params.NextRowSortRank).Render(params.Request.Context(), params.ResponseWriter)
 }
 
 // RenderHome implements [routes.HttpView].

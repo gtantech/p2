@@ -42,8 +42,22 @@ func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter
 		log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
 		return
 	}
+	// calculate sort rank based on previous row and next row //
+	defaultSortRankStep := int64(1000)
+	sortRankStep := defaultSortRankStep
+	sortRank := int64(0)
 
-	tableRow, err := rt.store.CreateEmptyDependencyTableRow(dto.ProjectId, r.Context())
+	if dto.PreviousRowSortRank != nil {
+		sortRank = *dto.PreviousRowSortRank
+	}
+
+	if dto.NextRowSortRank != nil {
+		sortRankStep = (*dto.NextRowSortRank - sortRank) / 2
+	}
+
+	sortRank = sortRank + sortRankStep
+	////////////////////////////////////////////////////////////
+	tableRow, err := rt.store.CreateEmptyDependencyTableRow(dto.ProjectId, sortRank, r.Context())
 	if err != nil {
 		http.Error(w, "failed to create new table row", http.StatusInternalServerError)
 		log.Printf("returned http internal server error while creating empty dependency table")

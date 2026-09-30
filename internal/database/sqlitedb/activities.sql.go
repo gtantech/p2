@@ -131,6 +131,53 @@ func (q *Queries) FindAllActivitiesByProjectAndName(ctx context.Context, arg Fin
 	return items, nil
 }
 
+const findAllActivitiesByProjectSorted = `-- name: FindAllActivitiesByProjectSorted :many
+SELECT a.id, a.project_id, a.disp_name, a.duration , ao.sort_rank
+FROM activities a
+JOIN activities_ordering ao
+    ON a.id = ao.successor_activity_id
+    AND a.project_id = ao.project_id
+WHERE a.project_id = ?
+ORDER BY ao.sort_rank
+`
+
+type FindAllActivitiesByProjectSortedRow struct {
+	ID        string
+	ProjectID string
+	DispName  string
+	Duration  int64
+	SortRank  int64
+}
+
+func (q *Queries) FindAllActivitiesByProjectSorted(ctx context.Context, projectID string) ([]FindAllActivitiesByProjectSortedRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAllActivitiesByProjectSorted, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindAllActivitiesByProjectSortedRow
+	for rows.Next() {
+		var i FindAllActivitiesByProjectSortedRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.DispName,
+			&i.Duration,
+			&i.SortRank,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertActivity = `-- name: InsertActivity :one
 INSERT INTO activities (id, project_id, disp_name, duration)
 VALUES (?, ?, ?, ?)

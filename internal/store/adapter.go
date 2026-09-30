@@ -14,8 +14,8 @@ type StoreViewMockAdapter struct {
 }
 
 // CreateEmptyDependencyTableRow implements [routes.StoreView].
-func (s *StoreViewMockAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, ctx context.Context) (viewmodels.TableRow, error) {
-	return viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId}, nil
+func (s *StoreViewMockAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
+	return viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId, SortRank: sortRank}, nil
 }
 
 func NewStoreViewMockAdapter() *StoreViewMockAdapter {
@@ -23,7 +23,7 @@ func NewStoreViewMockAdapter() *StoreViewMockAdapter {
 		table: make(map[uuid.UUID]viewmodels.Table),
 	}
 	projectId := uuid.Max()
-	s.table[projectId] = viewmodels.Table{ProjectId: projectId, Rows: []viewmodels.TableRow{viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId, ActivityName: "A", PredecessorActivities: []string{"B", "C"}, Duration: 5 * time.Minute}}}
+	s.table[projectId] = viewmodels.Table{ProjectId: projectId, Rows: []viewmodels.TableRow{viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId, ActivityName: "A", PredecessorActivities: []string{"B", "C"}, Duration: 5 * time.Minute, SortRank: 0}}}
 
 	return &s
 }

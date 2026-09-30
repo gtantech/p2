@@ -4,6 +4,13 @@
 
 package sqlitedb
 
+type ActivitiesOrdering struct {
+	ID                  string
+	ProjectID           string
+	SuccessorActivityID string
+	SortRank            int64
+}
+
 type Activity struct {
 	ID        string
 	ProjectID string
