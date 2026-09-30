@@ -14,13 +14,14 @@ type StoreViewSqliteAdapter struct {
 }
 
 // CreateEmptyDependencyTableRow implements [routes.StoreView].
-func (s *StoreViewSqliteAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, ctx context.Context) (viewmodels.TableRow, error) {
+func (s *StoreViewSqliteAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
 	activity, err := s.queries.InsertActivity(ctx, InsertActivityParams{
 		ID:        uuid.NewV7().String(),
 		ProjectID: projectId.String(),
 		DispName:  "",
 		Duration:  0,
 	})
+	s.queries.InsertActivityOrdering(ctx, InsertActivityOrderingParams{uuid.NewV7().String(), activity.ProjectID, activity.ID, sortRank})
 	if err != nil {
 		return viewmodels.TableRow{}, err
 	}

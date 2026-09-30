@@ -9,5 +9,5 @@ import (
 
 type StoreView interface {
 	GetDependencyTableByProjectId(projectId uuid.UUID, ctx context.Context) (viewmodels.Table, error)
-	CreateEmptyDependencyTableRow(projectId uuid.UUID, ctx context.Context) (viewmodels.TableRow, error)
+	CreateEmptyDependencyTableRow(projectId uuid.UUID, sortRank int64, ctx context.Context) (viewmodels.TableRow, error)
 }
