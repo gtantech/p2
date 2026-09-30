@@ -14,8 +14,8 @@ type StoreViewMockAdapter struct {
 }
 
 // CreateEmptyDependencyTableRow implements [routes.StoreView].
-func (s *StoreViewMockAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, ctx context.Context) (viewmodels.TableRow, error) {
-	return viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId}, nil
+func (s *StoreViewMockAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
+	return viewmodels.TableRow{ActivityId: uuid.New(), ProjectId: projectId, SortRank: sortRank}, nil
 }
 
 func NewStoreViewMockAdapter() *StoreViewMockAdapter {
