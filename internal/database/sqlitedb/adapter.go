@@ -13,9 +13,9 @@ type StoreViewSqliteAdapter struct {
 	queries *Queries
 }
 
-func NewStoreViewSqliteAdapter(db DBTX) *StoreViewSqliteAdapter {
+func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
 	s := StoreViewSqliteAdapter{
-		queries: New(db),
+		queries: queries,
 	}
 
 	return &s
