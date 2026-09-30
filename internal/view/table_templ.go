@@ -8,7 +8,10 @@ package view
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/gtantech/p2/internal/models/viewmodels"
+import (
+	"github.com/gtantech/p2/internal/models/jsonmodels"
+	"github.com/gtantech/p2/internal/models/viewmodels"
+)
 
 import "fmt"
 
@@ -104,7 +107,13 @@ func DependencyTableRow(row *viewmodels.TableRow) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Button(viewmodels.HtmlButton{Class: "add-button", Title: "Add task", Text: "+"}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = DependencyTableRowAddButton(viewmodels.HtmlDependencyTableRowButton{
+			Class:  "add-button",
+			Title:  "Add task",
+			Text:   "+",
+			HxPost: "/component/table/row/empty",
+			HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId}),
+		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
