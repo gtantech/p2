@@ -13,12 +13,18 @@ type StoreViewSqliteAdapter struct {
 	queries *Queries
 }
 
-func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
-	s := StoreViewSqliteAdapter{
-		queries: queries,
+// CreateEmptyDependencyTableRow implements [routes.StoreView].
+func (s *StoreViewSqliteAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, ctx context.Context) (viewmodels.TableRow, error) {
+	activity, err := s.queries.InsertActivity(ctx, InsertActivityParams{
+		ID:        uuid.NewV7().String(),
+		ProjectID: projectId.String(),
+		DispName:  "",
+		Duration:  0,
+	})
+	if err != nil {
+		return viewmodels.TableRow{}, err
 	}
-
-	return &s
+	return viewmodels.TableRow{ActivityId: uuid.MustParse(activity.ID), ActivityName: activity.DispName, PredecessorActivities: []string{}, Duration: time.Duration(activity.Duration)}, nil
 }
 
 // GetDependencyTableByProjectId implements [routes.StoreView].
@@ -64,6 +70,14 @@ func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UU
 		tableRows[i].PredecessorActivities = dependencyMap[tableRows[i].ActivityId.String()]
 	}
 	return viewmodels.Table{ProjectId: projectId, Rows: tableRows}, nil
+}
+
+func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
+	s := StoreViewSqliteAdapter{
+		queries: queries,
+	}
+
+	return &s
 }
 
 var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct implements ExampleInterface at compile time

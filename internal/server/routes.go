@@ -23,6 +23,10 @@ func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRo
 
 	r.Get("/", view.HomeHandler)
 
+	r.Route("/component", func(r chi.Router) {
+		r.Post("/table/row/empty", view.PostEmptyTableOfDependencyRowHandler)
+	})
+
 	r.Get("/static/home_style.css", static.GetHomeStyle)
 	return r
 }

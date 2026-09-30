@@ -15,3 +15,8 @@ type HttpHome struct {
 	viewmodels.Home
 	HttpParams
 }
+
+type HttpRenderTableRow struct {
+	viewmodels.TableRow
+	HttpParams
+}

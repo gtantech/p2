@@ -13,6 +13,11 @@ type StoreViewMockAdapter struct {
 	table map[uuid.UUID]viewmodels.Table
 }
 
+// CreateEmptyDependencyTableRow implements [routes.StoreView].
+func (s *StoreViewMockAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, ctx context.Context) (viewmodels.TableRow, error) {
+	return viewmodels.TableRow{ActivityId: uuid.New()}, nil
+}
+
 func NewStoreViewMockAdapter() *StoreViewMockAdapter {
 	s := StoreViewMockAdapter{
 		table: make(map[uuid.UUID]viewmodels.Table),
