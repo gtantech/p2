@@ -22,7 +22,7 @@ func NewViewRoutes(view HttpView, store StoreView) *ViewRoutes {
 
 func (rt *ViewRoutes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	mockProjectId := uuid.Max()
-	table, err := rt.store.GetDependencyTableByProjectId(mockProjectId)
+	table, err := rt.store.GetDependencyTableByProjectId(mockProjectId, r.Context())
 	if err != nil {
 		http.Error(w, "failed to get table", http.StatusInternalServerError)
 	}

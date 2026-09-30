@@ -1,0 +1,69 @@
+package sqlitedb
+
+import (
+	"context"
+	"time"
+	"uuid"
+
+	"github.com/gtantech/p2/internal/models/viewmodels"
+	"github.com/gtantech/p2/internal/routes"
+)
+
+type StoreViewSqliteAdapter struct {
+	queries *Queries
+}
+
+func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
+	s := StoreViewSqliteAdapter{
+		queries: queries,
+	}
+
+	return &s
+}
+
+// GetDependencyTableByProjectId implements [routes.StoreView].
+func (s *StoreViewSqliteAdapter) GetDependencyTableByProjectId(projectId uuid.UUID, ctx context.Context) (viewmodels.Table, error) {
+	successorActivities, err := s.queries.FindAllActivitiesByProject(ctx, projectId.String())
+	if err != nil {
+		return viewmodels.Table{}, err
+	}
+	dependencies, err := s.queries.FindAllDependenciesByProject(ctx, projectId.String())
+	if err != nil {
+		return viewmodels.Table{}, err
+	}
+	if len(successorActivities) == 0 {
+		//return early with a table with no rows
+		return viewmodels.Table{ProjectId: projectId, Rows: make([]viewmodels.TableRow, 0)}, nil
+	}
+
+	successorActivityMap := map[string]Activity{}
+	tableRows := make([]viewmodels.TableRow, len(successorActivities))
+
+	//add viewmodels.Activities to table rows
+	//add successor activites to successorActivityMap where the successor id is the key and the successor activity is the value
+	for i, successorActivity := range successorActivities {
+		successorActivityMap[successorActivity.ID] = successorActivity
+		tableRows[i] = viewmodels.TableRow{
+			ActivityId:            uuid.MustParse(successorActivity.ID),
+			ActivityName:          successorActivity.DispName,
+			PredecessorActivities: make([]string, 0),
+			Duration:              time.Duration(successorActivity.Duration)}
+	}
+
+	//create a dependency map where the successor id is the key and the dependencies are the values
+	dependencyMap := map[string][]string{}
+	for _, dependency := range dependencies {
+		//get the predecessor based on the activity map with the predecessor id as key
+		predecessor := successorActivityMap[dependency.PredecessorActivityID]
+		//append predecessor name to dependency map with successor.id as key
+		dependencyMap[dependency.SuccessorActivityID] = append(dependencyMap[dependency.SuccessorActivityID], predecessor.DispName)
+	}
+
+	//update PredecessorActivities field
+	for i := range tableRows {
+		tableRows[i].PredecessorActivities = dependencyMap[tableRows[i].ActivityId.String()]
+	}
+	return viewmodels.Table{ProjectId: projectId, Rows: tableRows}, nil
+}
+
+var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct implements ExampleInterface at compile time
