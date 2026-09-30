@@ -5,5 +5,7 @@ import (
 )
 
 type CreateEmptyTableRow struct {
-	ProjectId uuid.UUID `json:"projectId"`
+	PreviousRowSortRank *int64    `json:"previousRowSortRank"`
+	NextRowSortRank     *int64    `json:"nextRowSortRank"`
+	ProjectId           uuid.UUID `json:"projectId"`
 }
