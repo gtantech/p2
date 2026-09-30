@@ -1,6 +1,9 @@
 package view
 
-import "github.com/gtantech/p2/internal/models/viewmodels"
+import (
+    "github.com/gtantech/p2/internal/models/viewmodels"
+    "github.com/gtantech/p2/internal/models/jsonmodels"
+)
 
 import "fmt"
 
@@ -53,7 +56,13 @@ templ DependencyTableRow(row *viewmodels.TableRow){
         <!-- Add row -->
         <td>
             <div class="actions">
-                @Button(viewmodels.HtmlButton{Class: "add-button", Title: "Add task", Text: "+"})
+                @DependencyTableRowAddButton(viewmodels.HtmlDependencyTableRowButton{
+                    Class: "add-button", 
+                    Title: "Add task", 
+                    Text: "+",
+                    HxPost: "/component/table/row/empty",
+                    HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId}),
+                })
             </div>
         </td>
     </tr>

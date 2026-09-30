@@ -8,6 +8,11 @@ import (
 type HttpViewTemplAdapter struct {
 }
 
+// RenderDependencyTableRow implements [routes.HttpView].
+func (h *HttpViewTemplAdapter) RenderDependencyTableRow(params routemodels.HttpRenderTableRow) {
+	DependencyTableRow(&params.TableRow).Render(params.Request.Context(), params.ResponseWriter)
+}
+
 // RenderHome implements [routes.HttpView].
 func (h *HttpViewTemplAdapter) RenderHome(params routemodels.HttpHome) {
 	Home(params.Table).Render(params.Request.Context(), params.ResponseWriter)
