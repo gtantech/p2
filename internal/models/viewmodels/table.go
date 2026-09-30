@@ -11,6 +11,7 @@ type TableRow struct {
 	ActivityName          string
 	PredecessorActivities []string
 	Duration              time.Duration
+	SortRank              int64
 }
 
 type Table struct {
