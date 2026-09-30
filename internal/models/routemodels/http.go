@@ -18,5 +18,6 @@ type HttpHome struct {
 
 type HttpRenderTableRow struct {
 	viewmodels.TableRow
+	NextRowSortRank *int64
 	HttpParams
 }
