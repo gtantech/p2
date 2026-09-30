@@ -9,7 +9,7 @@ import (
 	"github.com/gtantech/p2/internal/routes"
 )
 
-func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRoutes) http.Handler {
+func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRoutes, form *routes.FormRoutes) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
@@ -25,6 +25,12 @@ func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRo
 
 	r.Route("/component", func(r chi.Router) {
 		r.Post("/table/row/empty", view.PostEmptyTableOfDependencyRowHandler)
+	})
+
+	r.Route("/form", func(r chi.Router) {
+		r.Route("/json", func(r chi.Router) {
+			r.Put("/table/row/activity", form.PutActivityNameHandler)
+		})
 	})
 
 	r.Get("/static/home_style.css", static.GetHomeStyle)

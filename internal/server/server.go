@@ -31,7 +31,7 @@ func NewServer(config servermodels.ServerConfig) *Server {
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
-		Handler:      NewServer.RegisterRoutes(routes.NewViewRoutes(&view.HttpViewTemplAdapter{}, sqlitedb.NewStoreViewSqliteAdapter(sqliteQueries)), &routes.StaticRoutes{}),
+		Handler:      NewServer.RegisterRoutes(routes.NewViewRoutes(&view.HttpViewTemplAdapter{}, sqlitedb.NewStoreViewSqliteAdapter(sqliteQueries)), &routes.StaticRoutes{}, routes.NewFormRoutes(sqlitedb.NewStoreFormSqliteAdapter(sqliteQueries))),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,

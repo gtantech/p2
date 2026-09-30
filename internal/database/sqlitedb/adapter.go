@@ -85,3 +85,19 @@ func NewStoreViewSqliteAdapter(queries *Queries) *StoreViewSqliteAdapter {
 }
 
 var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct implements ExampleInterface at compile time
+
+type StoreFormSqliteAdapter struct {
+	queries *Queries
+}
+
+// UpdateActivityName implements [routes.Store].
+func (s *StoreFormSqliteAdapter) UpdateActivityName(activityId uuid.UUID, activityName string, ctx context.Context) error {
+	_, err := s.queries.UpdateActivityName(ctx, UpdateActivityNameParams{DispName: activityName, ID: activityId.String()})
+	return err
+}
+
+func NewStoreFormSqliteAdapter(queries *Queries) *StoreFormSqliteAdapter {
+	return &StoreFormSqliteAdapter{queries: queries}
+}
+
+var _ routes.Store = (*StoreFormSqliteAdapter)(nil) //ensures ExampleStruct implements ExampleInterface at compile time
