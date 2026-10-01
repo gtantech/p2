@@ -29,7 +29,7 @@ func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRo
 
 	r.Route("/form", func(r chi.Router) {
 		r.Route("/json", func(r chi.Router) {
-			r.Put("/table/row/activity", form.PutActivityNameHandler)
+			r.Put("/table/row/activity/name", form.PutActivityNameHandler)
 		})
 	})
 
