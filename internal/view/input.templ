@@ -21,15 +21,16 @@ templ TextInput(params *viewmodels.HtmxInput){
 }
 
 templ ActivityTextInput(inputDOMId string, activityName string, activityId uuid.UUID){
+    {{textInputName := "activity_input"}}
     @TextInput(&viewmodels.HtmxInput{
         Id: inputDOMId, 
-        Name: "activity_input", 
+        Name: textInputName, 
         Class: "activity-name", 
         Placeholder: "Activity name",
         Autocomplete: viewmodels.Off,
         Value: activityName,
         HxPut: "/form/json/table/row/activity/name",
-        HxVals: marshalParamsToJsonField(jsonmodels.UpdateActivity{ActivityId: activityId, DisplayName: activityName}),
+        HxVals: marshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
         HxTrigger: "input changed delay:200ms",})
 }
 

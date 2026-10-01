@@ -156,15 +156,16 @@ func ActivityTextInput(inputDOMId string, activityName string, activityId uuid.U
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		textInputName := "activity_input"
 		templ_7745c5c3_Err = TextInput(&viewmodels.HtmxInput{
 			Id:           inputDOMId,
-			Name:         "activity_input",
+			Name:         textInputName,
 			Class:        "activity-name",
 			Placeholder:  "Activity name",
 			Autocomplete: viewmodels.Off,
 			Value:        activityName,
 			HxPut:        "/form/json/table/row/activity/name",
-			HxVals:       marshalParamsToJsonField(jsonmodels.UpdateActivity{ActivityId: activityId, DisplayName: activityName}),
+			HxVals:       marshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
 			HxTrigger:    "input changed delay:200ms"}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
