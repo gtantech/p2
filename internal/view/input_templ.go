@@ -211,7 +211,7 @@ func DependencyTextInput(dependencyActivityNames []string) templ.Component {
 	})
 }
 
-func DurationTextInput(duration time.Duration) templ.Component {
+func DurationTextInput(duration time.Duration, activityId uuid.UUID) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -232,10 +232,14 @@ func DurationTextInput(duration time.Duration) templ.Component {
 			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		textInputName := "duration_input"
 		templ_7745c5c3_Err = TextInput(&viewmodels.HtmxInput{
-			Name:        "duration_input",
+			Name:        textInputName,
 			Placeholder: "e.g. 2h",
-			Value:       duration.String()}).Render(ctx, templ_7745c5c3_Buffer)
+			Value:       duration.String(),
+			HxPut:       "/form/json/table/row/activity/duration",
+			HxVals:      marshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
+			HxTrigger:   "input changed delay:200ms"}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

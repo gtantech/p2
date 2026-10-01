@@ -46,9 +46,13 @@ templ DependencyTextInput(dependencyActivityNames []string){
     })
 }
 
-templ DurationTextInput(duration time.Duration){
+templ DurationTextInput(duration time.Duration, activityId uuid.UUID){
+    {{textInputName := "duration_input"}}
     @TextInput(&viewmodels.HtmxInput{
-        Name: "duration_input", 
+        Name: textInputName, 
         Placeholder: "e.g. 2h",
-        Value: duration.String(),})
+        Value: duration.String(),
+        HxPut: "/form/json/table/row/activity/duration",
+        HxVals: marshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
+        HxTrigger: "input changed delay:200ms",})
 }

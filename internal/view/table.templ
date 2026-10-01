@@ -54,7 +54,7 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
         
         <!-- Duration -->
         <td>
-            @DurationTextInput(row.Duration)
+            @DurationTextInput(row.Duration, row.ActivityId)
         </td>
         
         <!-- Add row -->
