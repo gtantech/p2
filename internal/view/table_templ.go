@@ -119,7 +119,7 @@ func DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64) templ.
 			Title:  "Add task",
 			Text:   "+",
 			HxPost: "/component/table/row/empty",
-			HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
+			HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

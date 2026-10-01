@@ -165,7 +165,7 @@ func ActivityTextInput(inputDOMId string, activityName string, activityId uuid.U
 			Autocomplete: viewmodels.Off,
 			Value:        activityName,
 			HxPut:        "/form/json/table/row/activity/name",
-			HxVals:       marshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
 			HxTrigger:    "input changed delay:200ms"}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -238,7 +238,7 @@ func DurationTextInput(duration time.Duration, activityId uuid.UUID) templ.Compo
 			Placeholder: "e.g. 2h",
 			Value:       duration.String(),
 			HxPut:       "/form/json/table/row/activity/duration",
-			HxVals:      marshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
+			HxVals:      jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
 			HxTrigger:   "input changed delay:200ms"}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

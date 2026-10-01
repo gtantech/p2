@@ -65,7 +65,7 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
                     Title: "Add task", 
                     Text: "+",
                     HxPost: "/component/table/row/empty",
-                    HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
+                    HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
                 })
             </div>
         </td>
