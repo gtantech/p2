@@ -2,8 +2,12 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gtantech/p2/internal/models/jsonmodels"
@@ -45,7 +49,7 @@ func (rt *FormRoutes) PutActivityDurationHandler(w http.ResponseWriter, r *http.
 		return
 	}
 	userInput := r.FormValue(dto.DomName)
-	parseUserInput, err := time.ParseDuration(userInput)
+	parseUserInput, err := parseDuration(userInput)
 	if err != nil {
 		http.Error(w, "failed to parse user input duration", http.StatusBadRequest)
 		log.Printf("returned http bad request error while parsing user input: <%s>", userInput)
@@ -57,4 +61,15 @@ func (rt *FormRoutes) PutActivityDurationHandler(w http.ResponseWriter, r *http.
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func parseDuration(s string) (time.Duration, error) {
+	re := regexp.MustCompile(`(\d+(?:\.\d+)?)d`)
+
+	s = re.ReplaceAllStringFunc(s, func(part string) string {
+		days, _ := strconv.ParseFloat(strings.TrimSuffix(part, "d"), 64)
+		return fmt.Sprintf("%gh", days*24)
+	})
+
+	return time.ParseDuration(s)
 }
