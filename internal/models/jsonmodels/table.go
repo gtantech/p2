@@ -1,7 +1,6 @@
 package jsonmodels
 
 import (
-	"time"
 	"uuid"
 )
 
@@ -11,8 +10,7 @@ type CreateEmptyTableRow struct {
 	ProjectId           uuid.UUID `json:"projectId"`
 }
 
-type UpdateActivity struct {
-	ActivityId  uuid.UUID     `json:"activityId"`
-	DisplayName string        `json:"displayName"`
-	Duration    time.Duration `json:"duration"`
+type UpdateActivityFromInput struct {
+	ActivityId uuid.UUID `json:"activityId"`
+	DomName    string    `json:"domName"`
 }
