@@ -6,7 +6,7 @@ import(
 
 templ HxMethodAttributes(params *viewmodels.HxMethod) {
     if params.HxGet != "" {
-        hx-put={ templ.URL(params.HxPut) }
+        hx-get={ templ.URL(params.HxGet) }
     }
     if params.HxPost != "" {
         hx-post={ templ.URL(params.HxPost) }
@@ -23,31 +23,31 @@ templ HxMethodAttributes(params *viewmodels.HxMethod) {
 }
 templ HxRequestAttributes(params *viewmodels.HxRequest) {
     if params.HxTrigger != "" {
-        hx-put={ params.HxTrigger }
+        hx-trigger={ params.HxTrigger }
     }
     if params.HxVals != "" {
-        hx-post={ params.HxVals }
+        hx-vals={ params.HxVals }
     }
     if params.HxInclude != "" {
-        hx-put={ params.HxInclude }
+        hx-include={ params.HxInclude }
     }
     if params.HxHeaders != "" {
-        hx-patch={ params.HxHeaders }
+        hx-headers={ params.HxHeaders }
     }
 }
 templ HxResponseAttributes(params *viewmodels.HxResponse) {
     if params.HxTarget != "" {
-        hx-put={ params.HxTarget }
+        hx-target={ params.HxTarget }
     }
     if params.HxSwap != "" {
-        hx-post={ params.HxSwap }
+        hx-swap={ params.HxSwap }
     }
 }
 templ HxOptionsAttributes(params *viewmodels.HxOptions) {
     if params.HxConfirm != "" {
-        hx-put={ params.HxConfirm }
+        hx-confirm={ params.HxConfirm }
     }
     if params.HxIndicator != "" {
-        hx-post={ params.HxIndicator }
+        hx-indicator={ params.HxIndicator }
     }
 }
