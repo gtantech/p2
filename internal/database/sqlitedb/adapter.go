@@ -90,6 +90,12 @@ type StoreFormSqliteAdapter struct {
 	queries *Queries
 }
 
+// UpdateActivityDuration implements [routes.Store].
+func (s *StoreFormSqliteAdapter) UpdateActivityDuration(activityId uuid.UUID, activityDuration time.Duration, ctx context.Context) error {
+	_, err := s.queries.UpdateActivityDuration(ctx, UpdateActivityDurationParams{Duration: int64(activityDuration), ID: activityId.String()})
+	return err
+}
+
 // UpdateActivityName implements [routes.Store].
 func (s *StoreFormSqliteAdapter) UpdateActivityName(activityId uuid.UUID, activityName string, ctx context.Context) error {
 	_, err := s.queries.UpdateActivityName(ctx, UpdateActivityNameParams{DispName: activityName, ID: activityId.String()})

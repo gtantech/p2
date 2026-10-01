@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gtantech/p2/internal/models/jsonmodels"
 )
@@ -27,6 +28,30 @@ func (rt *FormRoutes) PutActivityNameHandler(w http.ResponseWriter, r *http.Requ
 	}
 	userInput := r.FormValue(dto.DomName)
 	if err := rt.store.UpdateActivityName(dto.ActivityId, userInput, r.Context()); err != nil {
+		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
+		log.Printf("returned http internal server error for err: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func (rt *FormRoutes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := r.FormValue("json")
+	var dto jsonmodels.UpdateActivityFromInput
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
+		return
+	}
+	userInput := r.FormValue(dto.DomName)
+	parseUserInput, err := time.ParseDuration(userInput)
+	if err != nil {
+		http.Error(w, "failed to parse user input duration", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing user input: <%s>", userInput)
+		return
+	}
+	if err := rt.store.UpdateActivityDuration(dto.ActivityId, parseUserInput, r.Context()); err != nil {
 		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
 		log.Printf("returned http internal server error for err: %v", err)
 		return

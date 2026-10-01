@@ -30,3 +30,10 @@ SET
     disp_name = ?
 WHERE id = ?
 RETURNING *;
+
+-- name: UpdateActivityDuration :one
+UPDATE activities
+SET 
+    duration = ?
+WHERE id = ?
+RETURNING *;

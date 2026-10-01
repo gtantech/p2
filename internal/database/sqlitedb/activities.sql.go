@@ -208,6 +208,31 @@ func (q *Queries) InsertActivity(ctx context.Context, arg InsertActivityParams) 
 	return i, err
 }
 
+const updateActivityDuration = `-- name: UpdateActivityDuration :one
+UPDATE activities
+SET 
+    duration = ?
+WHERE id = ?
+RETURNING id, project_id, disp_name, duration
+`
+
+type UpdateActivityDurationParams struct {
+	Duration int64
+	ID       string
+}
+
+func (q *Queries) UpdateActivityDuration(ctx context.Context, arg UpdateActivityDurationParams) (Activity, error) {
+	row := q.db.QueryRowContext(ctx, updateActivityDuration, arg.Duration, arg.ID)
+	var i Activity
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.DispName,
+		&i.Duration,
+	)
+	return i, err
+}
+
 const updateActivityName = `-- name: UpdateActivityName :one
 UPDATE activities
 SET 
