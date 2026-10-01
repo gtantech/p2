@@ -44,7 +44,7 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
     <tr class="activity-row">
         <!-- activity name -->
         <td>
-            @ActivityTextInput(fmt.Sprintf("activity-input-%s", row.ActivityId.String()), row.ActivityName)
+            @ActivityTextInput(fmt.Sprintf("activity-input-%s", row.ActivityId.String()), row.ActivityName, row.ActivityId)
         </td>
         
         <!-- Dependencies -->

@@ -1,0 +1,53 @@
+package view
+
+import(
+    "github.com/gtantech/p2/internal/models/viewmodels"
+)
+
+templ HxMethodAttributes(params *viewmodels.HxMethod) {
+    if params.HxGet != "" {
+        hx-put={ params.HxPut }
+    }
+    if params.HxPost != "" {
+        hx-post={ params.HxPost }
+    }
+    if params.HxPut != "" {
+        hx-put={ params.HxPut }
+    }
+    if params.HxPatch != "" {
+        hx-patch={ params.HxPatch }
+    }
+    if params.HxDelete != "" {
+        hx-delete={ params.HxDelete }
+    }
+}
+templ HxRequestAttributes(params *viewmodels.HxRequest) {
+    if params.HxTrigger != "" {
+        hx-put={ params.HxTrigger }
+    }
+    if params.HxVals != "" {
+        hx-post={ params.HxVals }
+    }
+    if params.HxInclude != "" {
+        hx-put={ params.HxInclude }
+    }
+    if params.HxHeaders != "" {
+        hx-patch={ params.HxHeaders }
+    }
+}
+templ HxResponseAttributes(params *viewmodels.HxResponse) {
+    if params.HxTarget != "" {
+        hx-put={ params.HxTarget }
+    }
+    if params.HxSwap != "" {
+        hx-post={ params.HxSwap }
+    }
+}
+templ HxOptionsAttributes(params *viewmodels.HxOptions) {
+    if params.HxConfirm != "" {
+        hx-put={ params.HxConfirm }
+    }
+    if params.HxIndicator != "" {
+        hx-post={ params.HxIndicator }
+    }
+}

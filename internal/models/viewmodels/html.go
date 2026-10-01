@@ -20,3 +20,9 @@ type HtmlDependencyTableRowButton struct {
 	HxPost string
 	HxVals string
 }
+
+type HtmlDependencyTableRowActivityInput struct {
+	HtmlInput
+	HxMethod
+	HxRequest
+}
