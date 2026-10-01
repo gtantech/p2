@@ -29,7 +29,14 @@ func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRo
 
 	r.Route("/form", func(r chi.Router) {
 		r.Route("/json", func(r chi.Router) {
-			r.Put("/table/row/activity/name", form.PutActivityNameHandler)
+			r.Route("/table", func(r chi.Router) {
+				r.Route("/row", func(r chi.Router) {
+					r.Route("/activity", func(r chi.Router) {
+						r.Put("/name", form.PutActivityNameHandler)
+						r.Put("/duration", form.PutActivityDurationHandler)
+					})
+				})
+			})
 		})
 	})
 

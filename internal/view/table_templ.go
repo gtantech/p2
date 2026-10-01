@@ -106,7 +106,7 @@ func DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = DurationTextInput(row.Duration).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = DurationTextInput(row.Duration, row.ActivityId).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -119,7 +119,7 @@ func DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64) templ.
 			Title:  "Add task",
 			Text:   "+",
 			HxPost: "/component/table/row/empty",
-			HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
+			HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
