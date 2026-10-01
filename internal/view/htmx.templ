@@ -6,19 +6,19 @@ import(
 
 templ HxMethodAttributes(params *viewmodels.HxMethod) {
     if params.HxGet != "" {
-        hx-put={ params.HxPut }
+        hx-put={ templ.URL(params.HxPut) }
     }
     if params.HxPost != "" {
-        hx-post={ params.HxPost }
+        hx-post={ templ.URL(params.HxPost) }
     }
     if params.HxPut != "" {
-        hx-put={ params.HxPut }
+        hx-put={ templ.URL(params.HxPut) }
     }
     if params.HxPatch != "" {
-        hx-patch={ params.HxPatch }
+        hx-patch={ templ.URL(params.HxPatch) }
     }
     if params.HxDelete != "" {
-        hx-delete={ params.HxDelete }
+        hx-delete={ templ.URL(params.HxDelete) }
     }
 }
 templ HxRequestAttributes(params *viewmodels.HxRequest) {
