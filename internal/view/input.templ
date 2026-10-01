@@ -1,11 +1,13 @@
 package view
 
 import "github.com/gtantech/p2/internal/models/viewmodels"
+import "github.com/gtantech/p2/internal/models/jsonmodels"
 
 import "strings"
 import "time"
+import "uuid"
 
-templ TextInput(params *viewmodels.HtmlInput){
+templ TextInput(params *viewmodels.HtmxInput){
     <input
         id={ params.Id }
         type="text"
@@ -14,21 +16,25 @@ templ TextInput(params *viewmodels.HtmlInput){
         placeholder={ params.Placeholder }
         autocomplete={ params.Autocomplete }
         value={ params.Value }
+        { params.Hx... }
     >
 }
 
-templ ActivityTextInput(inputId string, activityName string){
-    @TextInput(&viewmodels.HtmlInput{
-        Id: inputId, 
+templ ActivityTextInput(inputDOMId string, activityName string, activityId uuid.UUID){
+    @TextInput(&viewmodels.HtmxInput{
+        Id: inputDOMId, 
         Name: "activity_input", 
         Class: "activity-name", 
         Placeholder: "Activity name",
         Autocomplete: viewmodels.Off,
-        Value: activityName,})
+        Value: activityName,
+        HxPut: "/form/json/table/row/activity/name",
+        HxVals: marshalParamsToJsonField(jsonmodels.UpdateActivity{ActivityId: activityId, DisplayName: activityName}),
+        HxTrigger: "input changed delay:200ms",})
 }
 
 templ DependencyTextInput(dependencyActivityNames []string){
-    @TextInput(&viewmodels.HtmlInput{
+    @TextInput(&viewmodels.HtmxInput{
         Name: "dependency_input",
         Class: "dependency-input",
         Placeholder: "Task A, Task B...",
@@ -40,7 +46,7 @@ templ DependencyTextInput(dependencyActivityNames []string){
 }
 
 templ DurationTextInput(duration time.Duration){
-    @TextInput(&viewmodels.HtmlInput{
+    @TextInput(&viewmodels.HtmxInput{
         Name: "duration_input", 
         Placeholder: "e.g. 2h",
         Value: duration.String(),})
