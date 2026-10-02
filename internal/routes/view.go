@@ -79,9 +79,10 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 			HxTarget:       fmt.Sprintf("#dependency-suggestions-%s", dto.ActivityId),
 			HxSwap:         "outerHTML",
 		})
-	} else {
-		w.WriteHeader(http.StatusOK)
 	}
+
+	//return empty response if nothing to action
+	w.WriteHeader(http.StatusOK)
 }
 
 func removeDuplicates[T comparable](userInputs []T) []T {
