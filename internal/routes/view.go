@@ -63,6 +63,11 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 	// - by returning a suggestion for creating unknown activities,
 	// - deleting activities from depenendency store where no longer in user input
 	storeActivities, err := rt.store.GetActivitiesByProjectId(dto.ProjectId, r.Context())
+	if err != nil {
+		http.Error(w, "failed to get activities from store", http.StatusInternalServerError)
+		log.Printf("returned http internal server error while getting activities from store. Encountered error: %v", err)
+		return
+	}
 	storeActivitiesMap := make(map[string]storemodels.Activity)
 	for _, storeActivity := range storeActivities {
 		storeActivitiesMap[storeActivity.DispName] = storeActivity
