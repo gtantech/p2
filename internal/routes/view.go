@@ -18,6 +18,7 @@ type HttpView interface {
 type ViewRoutes struct {
 	view      HttpView
 	storeView StoreView
+	store     Store
 }
 
 func NewViewRoutes(view HttpView, store StoreView) *ViewRoutes {
@@ -35,6 +36,33 @@ func (rt *ViewRoutes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func removeDuplicates[T comparable](userInputs []T) []T {
+	seen := make(map[T]struct{}, len(userInputs))
+	n := 0
+
+	for _, input := range userInputs {
+		if _, exists := seen[input]; exists {
+			continue
+		}
+
+		seen[input] = struct{}{}
+		userInputs[n] = input
+		n++
+	}
+
+	return userInputs[:n]
+}
+
+func valuesNotInMap[K comparable, V any](values []K, valuesMap map[K]V) []K {
+	unknownValues := []K{}
+	for _, userInput := range values {
+		if _, ok := valuesMap[userInput]; !ok {
+			unknownValues = append(unknownValues, userInput)
+		}
+	}
+	return unknownValues
 }
 
 func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter, r *http.Request) {
