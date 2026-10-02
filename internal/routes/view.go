@@ -14,7 +14,6 @@ import (
 )
 
 type HttpView interface {
-	RenderEmpty(params routemodels.HttpParams)
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
 	RenderDependencySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
@@ -81,10 +80,8 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 			HxSwap:         "outerHTML",
 		})
 	} else {
-		rt.view.RenderEmpty(routemodels.HttpParams{ResponseWriter: w, Request: r})
+		w.WriteHeader(http.StatusOK)
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func removeDuplicates[T comparable](userInputs []T) []T {
