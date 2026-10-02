@@ -97,3 +97,40 @@ func TestValuesNotInMap(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveEmptyString(t *testing.T) {
+	tests := []struct {
+		testName string
+		values   []string
+		expected []string
+	}{
+		{
+			testName: "ab_c",
+			values:   []string{"a", "b", "", "c"},
+			expected: []string{"a", "b", "c"},
+		},
+		{
+			testName: "abc_",
+			values:   []string{"a", "b", "c", ""},
+			expected: []string{"a", "b", "c"},
+		},
+		{
+			testName: "_abc",
+			values:   []string{"", "a", "b", "c"},
+			expected: []string{"a", "b", "c"},
+		},
+		{
+			testName: "_",
+			values:   []string{""},
+			expected: []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			if got, want := removeEmptyString(tt.values), tt.expected; !slices.Equal(got, want) {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}

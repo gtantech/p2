@@ -97,6 +97,23 @@ func removeDuplicates[T comparable](userInputs []T) []T {
 	return userInputs[:n]
 }
 
+func removeEmptyString(userInputs []string) []string {
+	seen := make(map[string]struct{}, len(userInputs))
+	n := 0
+
+	for _, input := range userInputs {
+		if strings.TrimSpace(input) == "" {
+			continue
+		}
+
+		seen[input] = struct{}{}
+		userInputs[n] = input
+		n++
+	}
+
+	return userInputs[:n]
+}
+
 func valuesNotInMap[K comparable, V any](values []K, valuesMap map[K]V) []K {
 	unknownValues := []K{}
 	for _, userInput := range values {
