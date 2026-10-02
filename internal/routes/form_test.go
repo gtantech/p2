@@ -13,11 +13,18 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/models/jsonmodels"
+	"github.com/gtantech/p2/internal/models/storemodels"
 )
 
 type mockStore struct {
-	UpdateActivityDurationCallback func(activityId uuid.UUID, activityDuration time.Duration, ctx context.Context) error
-	UpdateActivityNameCallback     func(activityId uuid.UUID, activityName string, ctx context.Context) error
+	UpdateActivityDurationCallback   func(activityId uuid.UUID, activityDuration time.Duration, ctx context.Context) error
+	UpdateActivityNameCallback       func(activityId uuid.UUID, activityName string, ctx context.Context) error
+	GetActivitiesByProjectIdCallback func(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error)
+}
+
+// GetActivitiesByProjectId implements [Store].
+func (m *mockStore) GetActivitiesByProjectId(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error) {
+	return m.GetActivitiesByProjectIdCallback(projectId, ctx)
 }
 
 // UpdateActivityDuration implements [Store].
