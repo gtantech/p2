@@ -58,8 +58,13 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
         
         <!-- Dependencies -->
         <td>
-            @DependencyTextInput(row.PredecessorActivities, row.ActivityId, row.ProjectId)
-            @DependencyTableRowSuggestionDiv(row.ActivityId)
+            <div
+                class="dependency-wrapper" 
+                id={ fmt.Sprintf("dependency-wrapper-%s", row.ActivityId) }
+            >
+                @DependencyTextInput(row.PredecessorActivities, row.ActivityId, row.ProjectId)
+                @DependencyTableRowSuggestionDiv(row.ActivityId)
+            </div>
         </td>
         
         <!-- Duration -->
