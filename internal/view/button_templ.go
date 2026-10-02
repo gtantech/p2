@@ -138,7 +138,7 @@ func DependencyTableRowAddButton(projectId uuid.UUID, currentRowSortRank *int64,
 	})
 }
 
-func DependencyTableRowAddActivitiesSuggestion(activityNames []string, rowActivityId uuid.UUID) templ.Component {
+func DependencyTableRowAddActivitiesSuggestion(activityNames []string, rowActivityId uuid.UUID, hxTarget string, hxSwap string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -163,8 +163,8 @@ func DependencyTableRowAddActivitiesSuggestion(activityNames []string, rowActivi
 			Class:    "suggestion",
 			Title:    "Add suggested activites",
 			Text:     fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
-			HxTarget: fmt.Sprintf("#dependency-suggestions-%s", rowActivityId),
-			HxSwap:   "outerHTML",
+			HxTarget: hxTarget,
+			HxSwap:   hxSwap,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
