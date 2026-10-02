@@ -34,6 +34,11 @@ type HtmxInput struct {
 	Hx
 }
 
+type HtmxButton struct {
+	HtmlButton
+	Hx
+}
+
 type Hx struct {
 	HxMethod
 	HxRequest

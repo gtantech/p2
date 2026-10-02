@@ -13,6 +13,7 @@ import (
 type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
+	RenderDependencySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
 }
 
 type ViewRoutes struct {
