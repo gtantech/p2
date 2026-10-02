@@ -77,6 +77,8 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 			ResponseWriter: w,
 			Request:        r,
 		})
+	} else {
+		rt.view.RenderEmpty(routemodels.HttpParams{ResponseWriter: w, Request: r})
 	}
 
 	w.WriteHeader(http.StatusOK)
