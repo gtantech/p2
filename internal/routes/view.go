@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"uuid"
 
 	"github.com/gtantech/p2/internal/models/jsonmodels"
 	"github.com/gtantech/p2/internal/models/routemodels"
+	"github.com/gtantech/p2/internal/models/storemodels"
 )
 
 type HttpView interface {
@@ -22,8 +24,8 @@ type ViewRoutes struct {
 	store     Store
 }
 
-func NewViewRoutes(view HttpView, store StoreView) *ViewRoutes {
-	return &ViewRoutes{view: view, storeView: store}
+func NewViewRoutes(view HttpView, storeView StoreView, store Store) *ViewRoutes {
+	return &ViewRoutes{view: view, storeView: storeView, store: store}
 }
 
 func (rt *ViewRoutes) HomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +38,41 @@ func (rt *ViewRoutes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := r.FormValue("json")
+	var dto jsonmodels.UpdateDependencyFromInput
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
+		return
+	}
 
+	//parse user input
+	userInputs := strings.Split(r.FormValue(dto.DomName), ",")
+
+	//clean user input
+	for i, userInput := range userInputs {
+		userInputs[i] = strings.TrimSpace(userInput)
+	}
+
+	userInputs = removeDuplicates(userInputs)
+
+	//reconcile user input with storeActivities:
+	// - by returning a suggestion for creating unknown activities,
+	// - deleting activities from depenendency store where no longer in user input
+	storeActivities, err := rt.store.GetActivitiesByProjectId(dto.ProjectId, r.Context())
+	storeActivitiesMap := make(map[string]storemodels.Activity)
+	for _, storeActivity := range storeActivities {
+		storeActivitiesMap[storeActivity.DispName] = storeActivity
+	}
+
+	//determine new values (unknown activities)
+	userInputsNewValues := valuesNotInMap(userInputs, storeActivitiesMap)
+	rt.view.RenderDependencySuggestion(routemodels.HttpRenderTableRowDependencyActivitySuggestion{
+		ActivityNames: userInputsNewValues,
+		RowActivityId: dto.ActivityId,
+	})
+	w.WriteHeader(http.StatusOK)
 }
 
 func removeDuplicates[T comparable](userInputs []T) []T {
