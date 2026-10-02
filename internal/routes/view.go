@@ -56,6 +56,7 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 	}
 
 	userInputs = removeDuplicates(userInputs)
+	userInputs = removeEmptyString(userInputs)
 
 	//reconcile user input with storeActivities:
 	// - by returning a suggestion for creating unknown activities,
