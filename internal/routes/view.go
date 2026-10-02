@@ -33,6 +33,10 @@ func (rt *ViewRoutes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	rt.view.RenderHome(routemodels.HttpHome{Table: &table, ResponseWriter: w, Request: r})
 }
 
+func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := r.FormValue("json")
 	var dto jsonmodels.CreateEmptyTableRow
