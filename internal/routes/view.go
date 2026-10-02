@@ -69,8 +69,10 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 	//determine new values (unknown activities)
 	userInputsNewValues := valuesNotInMap(userInputs, storeActivitiesMap)
 	rt.view.RenderDependencySuggestion(routemodels.HttpRenderTableRowDependencyActivitySuggestion{
-		ActivityNames: userInputsNewValues,
-		RowActivityId: dto.ActivityId,
+		ActivityNames:  userInputsNewValues,
+		RowActivityId:  dto.ActivityId,
+		ResponseWriter: w,
+		Request:        r,
 	})
 	w.WriteHeader(http.StatusOK)
 }
