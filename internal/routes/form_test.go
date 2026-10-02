@@ -278,3 +278,137 @@ func TestPutActivityDurationHandlerBadJson(t *testing.T) {
 	}
 
 }
+
+func TestPutActivityNameHandler(t *testing.T) {
+	mockActivityId := uuid.New()
+	mockActivityDispName := "test-activity-name"
+	domName := "test-dom-name"
+	tests := []struct {
+		testName                   string
+		formValueKey               string
+		jsonStr                    string
+		domKey                     string
+		userInput                  string
+		expectedHttpStatusCode     int
+		expectedBody               string
+		UpdateActivityNameCallback func(activityId uuid.UUID, activityName string, ctx context.Context) error
+	}{
+		{
+			testName:               "NoError",
+			formValueKey:           "json",
+			jsonStr:                jsonmodels.MarshalParams(jsonmodels.UpdateActivityFromInput{ActivityId: mockActivityId, DomName: domName}),
+			domKey:                 domName,
+			userInput:              mockActivityDispName,
+			expectedHttpStatusCode: http.StatusOK,
+			expectedBody:           "",
+			UpdateActivityNameCallback: func(activityId uuid.UUID, activityName string, ctx context.Context) error {
+				if got, want := activityId, mockActivityId; got != want {
+					return fmt.Errorf("got %v, want %v", got, want)
+				}
+				if got, want := activityName, mockActivityDispName; got != want {
+					return fmt.Errorf("got %v, want %v", got, want)
+				}
+
+				return nil
+			},
+		},
+		{
+			testName:               "BadJson",
+			formValueKey:           "json",
+			jsonStr:                "badjsonstr",
+			domKey:                 domName,
+			userInput:              mockActivityDispName,
+			expectedHttpStatusCode: http.StatusBadRequest,
+			expectedBody:           "failed to parse json",
+			UpdateActivityNameCallback: func(activityId uuid.UUID, activityName string, ctx context.Context) error {
+				t.Fatal("unexpected store call")
+
+				return nil
+			},
+		},
+		{
+			testName:               "StoreError",
+			formValueKey:           "json",
+			jsonStr:                jsonmodels.MarshalParams(jsonmodels.UpdateActivityFromInput{ActivityId: mockActivityId, DomName: domName}),
+			domKey:                 domName,
+			userInput:              mockActivityDispName,
+			expectedHttpStatusCode: http.StatusInternalServerError,
+			expectedBody:           "failed to update activity name",
+			UpdateActivityNameCallback: func(activityId uuid.UUID, activityName string, ctx context.Context) error {
+				if got, want := activityName, mockActivityDispName; got != want {
+					return fmt.Errorf("got %v, want %v", got, want)
+				}
+				if got, want := activityId, uuid.Max(); got != want {
+					return fmt.Errorf("got %v, want %v", got, want)
+				}
+
+				return nil
+			},
+		},
+		{
+			testName:               "BadJsonKey",
+			formValueKey:           "badjsonkey",
+			jsonStr:                jsonmodels.MarshalParams(jsonmodels.UpdateActivityFromInput{ActivityId: mockActivityId, DomName: domName}),
+			domKey:                 domName,
+			userInput:              mockActivityDispName,
+			expectedHttpStatusCode: http.StatusBadRequest,
+			expectedBody:           "failed to parse json",
+			UpdateActivityNameCallback: func(activityId uuid.UUID, activityName string, ctx context.Context) error {
+				t.Fatal("unexpected store call")
+
+				return nil
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			//setup mock store to be called by handler
+			store := mockStore{}
+			store.UpdateActivityNameCallback = tt.UpdateActivityNameCallback
+
+			//register handler
+			route := NewFormRoutes(&store)
+			server := httptest.NewServer(http.HandlerFunc(route.PutActivityNameHandler))
+
+			//mock form sent from hx-put
+			formVals := url.Values{}
+			formVals.Add(tt.formValueKey, tt.jsonStr)
+			formVals.Add(tt.domKey, tt.userInput)
+
+			//create request
+			req, err := http.NewRequest(
+				http.MethodPut,
+				server.URL+"/",
+				strings.NewReader(formVals.Encode()),
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			//set header
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+			//make request
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.expectedHttpStatusCode {
+				t.Errorf("expected status %d, got %d", tt.expectedHttpStatusCode, resp.StatusCode)
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			//check body
+			if strings.TrimSpace(string(body)) != tt.expectedBody {
+				t.Errorf("unexpected response: %s", body)
+			}
+		})
+	}
+}
