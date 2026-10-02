@@ -160,7 +160,7 @@ func DependencyTableRowAddActivitiesSuggestion(activityNames []string, rowActivi
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = Button(&viewmodels.HtmxButton{
-			Class:    "add-button",
+			Class:    "suggestion",
 			Title:    "Add suggested activites",
 			Text:     fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
 			HxTarget: fmt.Sprintf("#dependency-suggestions-%s", rowActivityId),

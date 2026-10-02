@@ -37,7 +37,7 @@ templ DependencyTableRowAddButton(projectId uuid.UUID, currentRowSortRank *int64
 
 templ DependencyTableRowAddActivitiesSuggestion(activityNames []string, rowActivityId uuid.UUID){
     @Button(&viewmodels.HtmxButton{
-        Class: "add-button", 
+        Class: "suggestion", 
         Title: "Add suggested activites", 
         Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
         HxTarget: fmt.Sprintf("#dependency-suggestions-%s", rowActivityId),
