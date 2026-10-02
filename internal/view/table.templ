@@ -2,7 +2,7 @@ package view
 
 import (
     "github.com/gtantech/p2/internal/models/viewmodels"
-    "github.com/gtantech/p2/internal/models/jsonmodels"
+	"uuid"
 )
 
 import "fmt"
@@ -40,6 +40,15 @@ templ DependencyTable(table *viewmodels.Table){
     </table>
 }
 
+templ DependencyTableRowSuggestionDiv(activityId uuid.UUID){
+    <div
+        id={ fmt.Sprintf("dependency-suggestions-%s", activityId) }
+        class="autocomplete"
+        role="listbox"
+    >
+    </div>
+}
+
 templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
     <tr class="activity-row">
         <!-- activity name -->
@@ -49,7 +58,13 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
         
         <!-- Dependencies -->
         <td>
-            @DependencyTextInput(row.PredecessorActivities)
+            <div
+                class="dependency-wrapper" 
+                id={ fmt.Sprintf("dependency-wrapper-%s", row.ActivityId) }
+            >
+                @DependencyTextInput(row.PredecessorActivities, row.ActivityId, row.ProjectId)
+                @DependencyTableRowSuggestionDiv(row.ActivityId)
+            </div>
         </td>
         
         <!-- Duration -->
@@ -60,13 +75,7 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
         <!-- Add row -->
         <td>
             <div class="actions">
-                @DependencyTableRowAddButton(viewmodels.HtmlDependencyTableRowButton{
-                    Class: "add-button", 
-                    Title: "Add task", 
-                    Text: "+",
-                    HxPost: "/component/table/row/empty",
-                    HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
-                })
+                @DependencyTableRowAddButton(row.ProjectId, &row.SortRank, nextRowSortRank)
             </div>
         </td>
     </tr>

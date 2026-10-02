@@ -5,6 +5,7 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/gtantech/p2/internal/models/storemodels"
 	"github.com/gtantech/p2/internal/models/viewmodels"
 	"github.com/gtantech/p2/internal/routes"
 )
@@ -88,6 +89,19 @@ var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct 
 
 type StoreFormSqliteAdapter struct {
 	queries *Queries
+}
+
+// GetActivitiesByProjectId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) GetActivitiesByProjectId(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error) {
+	activities, err := s.queries.FindAllActivitiesByProject(ctx, projectId.String())
+	if err != nil {
+		return []storemodels.Activity{}, err
+	}
+	dto := make([]storemodels.Activity, len(activities))
+	for i, activity := range activities {
+		dto[i] = storemodels.Activity{ID: activity.ID, ProjectID: activity.ProjectID, DispName: activity.DispName, Duration: activity.Duration}
+	}
+	return dto, nil
 }
 
 // UpdateActivityDuration implements [routes.Store].
