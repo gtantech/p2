@@ -8,8 +8,8 @@ import (
 type HttpViewTemplAdapter struct {
 }
 
-// RenderDependencySuggestion implements [routes.HttpView].
-func (h *HttpViewTemplAdapter) RenderDependencySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion) {
+// RenderDependencyAddActivitySuggestion implements [routes.HttpView].
+func (h *HttpViewTemplAdapter) RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion) {
 	DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.RowActivityId, params.HxTarget, params.HxSwap).Render(params.Request.Context(), params.ResponseWriter)
 }
 

@@ -16,7 +16,7 @@ import (
 type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
-	RenderDependencySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
+	RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
 }
 
 type ViewRoutes struct {
@@ -76,7 +76,7 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 	//determine new values (unknown activities)
 	userInputsNewValues := valuesNotInMap(userInputs, storeActivitiesMap)
 	if len(userInputsNewValues) > 0 {
-		rt.view.RenderDependencySuggestion(routemodels.HttpRenderTableRowDependencyActivitySuggestion{
+		rt.view.RenderDependencyAddActivitySuggestion(routemodels.HttpRenderTableRowDependencyActivitySuggestion{
 			ActivityNames:  userInputsNewValues,
 			RowActivityId:  dto.ActivityId,
 			ResponseWriter: w,
