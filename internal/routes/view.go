@@ -16,17 +16,17 @@ type HttpView interface {
 }
 
 type ViewRoutes struct {
-	view  HttpView
-	store StoreView
+	view      HttpView
+	storeView StoreView
 }
 
 func NewViewRoutes(view HttpView, store StoreView) *ViewRoutes {
-	return &ViewRoutes{view: view, store: store}
+	return &ViewRoutes{view: view, storeView: store}
 }
 
 func (rt *ViewRoutes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	mockProjectId := uuid.Max()
-	table, err := rt.store.GetDependencyTableByProjectId(mockProjectId, r.Context())
+	table, err := rt.storeView.GetDependencyTableByProjectId(mockProjectId, r.Context())
 	if err != nil {
 		http.Error(w, "failed to get table", http.StatusInternalServerError)
 	}
@@ -61,7 +61,7 @@ func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter
 
 	sortRank = sortRank + sortRankStep
 	////////////////////////////////////////////////////////////
-	tableRow, err := rt.store.CreateEmptyDependencyTableRow(dto.ProjectId, sortRank, r.Context())
+	tableRow, err := rt.storeView.CreateEmptyDependencyTableRow(dto.ProjectId, sortRank, r.Context())
 	if err != nil {
 		http.Error(w, "failed to create new table row", http.StatusInternalServerError)
 		log.Printf("returned http internal server error while creating empty dependency table")
