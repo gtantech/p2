@@ -174,7 +174,7 @@ func ActivityTextInput(inputDOMId string, activityName string, activityId uuid.U
 	})
 }
 
-func DependencyTextInput(dependencyActivityNames []string) templ.Component {
+func DependencyTextInput(dependencyActivityNames []string, activityId uuid.UUID, projectId uuid.UUID) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -195,15 +195,18 @@ func DependencyTextInput(dependencyActivityNames []string) templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		textInputName := "activity_input"
 		templ_7745c5c3_Err = TextInput(&viewmodels.HtmxInput{
-			Name:         "dependency_input",
+			Name:         textInputName,
 			Class:        "dependency-input",
 			Placeholder:  "Task A, Task B...",
 			Autocomplete: viewmodels.Off,
 			Value: func() string {
 				return strings.Join(dependencyActivityNames, ", ")
 			}(),
-		}).Render(ctx, templ_7745c5c3_Buffer)
+			HxPost:    "/form/json/table/row/activity/dependency/suggestion/component",
+			HxVals:    jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateDependencyFromInput{ActivityId: activityId, ProjectId: projectId, DomName: textInputName}),
+			HxTrigger: "input changed delay:200ms"}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -58,7 +58,7 @@ templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
         
         <!-- Dependencies -->
         <td>
-            @DependencyTextInput(row.PredecessorActivities)
+            @DependencyTextInput(row.PredecessorActivities, row.ActivityId, row.ProjectId)
             @DependencyTableRowSuggestionDiv(row.ActivityId)
         </td>
         
