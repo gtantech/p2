@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -76,6 +77,8 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 			RowActivityId:  dto.ActivityId,
 			ResponseWriter: w,
 			Request:        r,
+			HxTarget:       fmt.Sprintf("#dependency-suggestions-%s", dto.ActivityId),
+			HxSwap:         "outerHTML",
 		})
 	} else {
 		rt.view.RenderEmpty(routemodels.HttpParams{ResponseWriter: w, Request: r})

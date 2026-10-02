@@ -1,8 +1,6 @@
 package view
 
 import (
-	"fmt"
-
 	"github.com/gtantech/p2/internal/models/routemodels"
 	"github.com/gtantech/p2/internal/routes"
 )
@@ -17,7 +15,7 @@ func (h *HttpViewTemplAdapter) RenderEmpty(params routemodels.HttpParams) {
 
 // RenderDependencySuggestion implements [routes.HttpView].
 func (h *HttpViewTemplAdapter) RenderDependencySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion) {
-	DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.RowActivityId, fmt.Sprintf("#dependency-suggestions-%s", params.RowActivityId), "outerHTML").Render(params.Request.Context(), params.ResponseWriter)
+	DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.RowActivityId, params.HxTarget, params.HxSwap).Render(params.Request.Context(), params.ResponseWriter)
 }
 
 // RenderDependencyTableRow implements [routes.HttpView].
