@@ -6,6 +6,7 @@ import "github.com/gtantech/p2/internal/models/jsonmodels"
 import "strings"
 import "time"
 import "uuid"
+import "fmt"
 
 templ TextInput(params *viewmodels.HtmxInput){
     <input
@@ -46,7 +47,8 @@ templ DependencyTextInput(dependencyActivityNames []string, activityId uuid.UUID
             }(),
         HxPost: "/form/json/table/row/activity/dependency/suggestion/component",
         HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateDependencyFromInput{ActivityId: activityId, ProjectId: projectId, DomName: textInputName}),
-        HxTrigger: "input changed delay:200ms",})
+        HxTrigger: "input changed delay:200ms",
+        HxTarget: fmt.Sprintf("#dependency-suggestions-%s", activityId),})
 }
 
 templ DurationTextInput(duration time.Duration, activityId uuid.UUID){
