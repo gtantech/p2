@@ -6,3 +6,8 @@ type Activity struct {
 	DispName  string
 	Duration  int64
 }
+
+type ActivityNameWithId struct {
+	ID       string
+	DispName string
+}
