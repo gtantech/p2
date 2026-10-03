@@ -17,6 +17,7 @@ type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
 	RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
+	RenderDependencyEmptySuggestion(params routemodels.HttpRenderTableRowDependencyEmptySuggestion)
 }
 
 type ViewRoutes struct {
@@ -83,6 +84,12 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 			Request:        r,
 			HxTarget:       fmt.Sprintf("#dependency-suggestions-%s", dto.ActivityId),
 			HxSwap:         "outerHTML",
+		})
+	} else {
+		rt.view.RenderDependencyEmptySuggestion(routemodels.HttpRenderTableRowDependencyEmptySuggestion{
+			RowActivityId:  dto.ActivityId,
+			ResponseWriter: w,
+			Request:        r,
 		})
 	}
 

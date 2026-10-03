@@ -30,3 +30,9 @@ type HttpRenderTableRowDependencyActivitySuggestion struct {
 	HttpParams
 	htmxmodels.HxResponse
 }
+
+type HttpRenderTableRowDependencyEmptySuggestion struct {
+	RowActivityId uuid.UUID
+	HttpParams
+	htmxmodels.HxResponse
+}
