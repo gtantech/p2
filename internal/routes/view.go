@@ -16,8 +16,7 @@ import (
 type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
-	RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
-	RenderDependencyEmptySuggestion(params routemodels.HttpRenderTableRowDependencyEmptySuggestion)
+	RenderDependencyInputResp(params routemodels.HttpRenderTableRowDependencyInputResp)
 }
 
 type ViewRoutes struct {
@@ -76,25 +75,13 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 
 	//determine new values (unknown activities)
 	userInputsNewValues := valuesNotInMap(userInputs, storeActivitiesMap)
-	if len(userInputsNewValues) > 0 {
-		rt.view.RenderDependencyAddActivitySuggestion(routemodels.HttpRenderTableRowDependencyActivitySuggestion{
-			ActivityNames:   userInputsNewValues,
-			ResponseWriter:  w,
-			Request:         r,
-			DivTargetSwapId: fmt.Sprintf("dependency-suggestions-%s", dto.ActivityId),
-			DivHxSwapOob:    "innerHTML",
-		})
-	} else {
-		rt.view.RenderDependencyEmptySuggestion(routemodels.HttpRenderTableRowDependencyEmptySuggestion{
-			ResponseWriter:  w,
-			Request:         r,
-			DivTargetSwapId: fmt.Sprintf("dependency-suggestions-%s", dto.ActivityId),
-			DivHxSwapOob:    "innerHTML",
-		})
-	}
-
-	//return empty response if nothing to action
-	w.WriteHeader(http.StatusOK)
+	rt.view.RenderDependencyInputResp(routemodels.HttpRenderTableRowDependencyInputResp{
+		ActivityNames:   userInputsNewValues,
+		ResponseWriter:  w,
+		Request:         r,
+		DivTargetSwapId: fmt.Sprintf("dependency-suggestions-%s", dto.ActivityId),
+		DivHxSwapOob:    "innerHTML",
+	})
 }
 
 func removeDuplicates[T comparable](userInputs []T) []T {

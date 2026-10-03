@@ -42,3 +42,13 @@ templ DependencyTableRowAddActivitiesSuggestion(activityNames []string){
         Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
     })
 }
+
+templ DependencyTableRowInputResp(newActivitiesFromUserInput []string, targetDivId string, divHxSwapOob string){
+    if len(newActivitiesFromUserInput) > 0 {
+        @HxSwapDivWrapChildren(targetDivId, divHxSwapOob){
+            @DependencyTableRowAddActivitiesSuggestion(newActivitiesFromUserInput)
+        }
+    }else{
+        @HxSwapDivWrapChildren(targetDivId, divHxSwapOob)
+    }
+}
