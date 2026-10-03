@@ -93,7 +93,11 @@ type StoreFormSqliteAdapter struct {
 
 // DeleteDependencyByProjectPredecessorSuccessorId implements [routes.Store].
 func (s *StoreFormSqliteAdapter) DeleteDependencyByProjectPredecessorSuccessorId(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error {
-
+	return s.queries.DeleteDependencyByProjectPredecessorSuccessor(ctx, DeleteDependencyByProjectPredecessorSuccessorParams{
+		ProjectID:             projectId.String(),
+		PredecessorActivityID: predecessorId.String(),
+		SuccessorActivityID:   successorId.String(),
+	})
 }
 
 // GetActivitiesByProjectId implements [routes.Store].
