@@ -10,12 +10,12 @@ type HttpViewTemplAdapter struct {
 
 // RenderDependencyEmptySuggestion implements [routes.HttpView].
 func (h *HttpViewTemplAdapter) RenderDependencyEmptySuggestion(params routemodels.HttpRenderTableRowDependencyEmptySuggestion) {
-	DependencyTableRowEmptySuggestion(params.RowActivityId).Render(params.Request.Context(), params.ResponseWriter)
+	DependencyTableRowEmptySuggestion(params.DivTargetSwapId, params.DivHxSwapOob).Render(params.Request.Context(), params.ResponseWriter)
 }
 
 // RenderDependencyAddActivitySuggestion implements [routes.HttpView].
 func (h *HttpViewTemplAdapter) RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion) {
-	DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.RowActivityId, params.HxTarget, params.HxSwap).Render(params.Request.Context(), params.ResponseWriter)
+	DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.DivTargetSwapId, params.DivHxSwapOob).Render(params.Request.Context(), params.ResponseWriter)
 }
 
 // RenderDependencyTableRow implements [routes.HttpView].
