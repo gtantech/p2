@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models/routemodels"
 	"github.com/gtantech/p2/internal/routes"
 )
@@ -8,9 +9,16 @@ import (
 type HttpViewTemplAdapter struct {
 }
 
+// RenderDependencyEmptySuggestion implements [routes.HttpView].
+func (h *HttpViewTemplAdapter) RenderDependencyEmptySuggestion(params routemodels.HttpRenderTableRowDependencyEmptySuggestion) {
+	HxSwapDivWrapChildren(params.DivTargetSwapId, params.DivHxSwapOob).Render(params.Request.Context(), params.ResponseWriter)
+}
+
 // RenderDependencyAddActivitySuggestion implements [routes.HttpView].
 func (h *HttpViewTemplAdapter) RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion) {
-	DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.RowActivityId, params.HxTarget, params.HxSwap).Render(params.Request.Context(), params.ResponseWriter)
+	contents := DependencyTableRowAddActivitiesSuggestion(params.ActivityNames) //.Render(params.Request.Context(), params.ResponseWriter)
+	ctx := templ.WithChildren(params.Request.Context(), contents)
+	HxSwapDivWrapChildren(params.DivTargetSwapId, params.DivHxSwapOob).Render(ctx, params.ResponseWriter)
 }
 
 // RenderDependencyTableRow implements [routes.HttpView].

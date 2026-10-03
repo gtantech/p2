@@ -2,9 +2,7 @@ package routemodels
 
 import (
 	"net/http"
-	"uuid"
 
-	"github.com/gtantech/p2/internal/models/htmxmodels"
 	"github.com/gtantech/p2/internal/models/viewmodels"
 )
 
@@ -25,8 +23,14 @@ type HttpRenderTableRow struct {
 }
 
 type HttpRenderTableRowDependencyActivitySuggestion struct {
-	RowActivityId uuid.UUID
 	ActivityNames []string
 	HttpParams
-	htmxmodels.HxResponse
+	DivTargetSwapId string
+	DivHxSwapOob    string
+}
+
+type HttpRenderTableRowDependencyEmptySuggestion struct {
+	HttpParams
+	DivTargetSwapId string
+	DivHxSwapOob    string
 }

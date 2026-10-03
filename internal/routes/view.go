@@ -17,6 +17,7 @@ type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
 	RenderDependencyAddActivitySuggestion(params routemodels.HttpRenderTableRowDependencyActivitySuggestion)
+	RenderDependencyEmptySuggestion(params routemodels.HttpRenderTableRowDependencyEmptySuggestion)
 }
 
 type ViewRoutes struct {
@@ -77,12 +78,18 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 	userInputsNewValues := valuesNotInMap(userInputs, storeActivitiesMap)
 	if len(userInputsNewValues) > 0 {
 		rt.view.RenderDependencyAddActivitySuggestion(routemodels.HttpRenderTableRowDependencyActivitySuggestion{
-			ActivityNames:  userInputsNewValues,
-			RowActivityId:  dto.ActivityId,
-			ResponseWriter: w,
-			Request:        r,
-			HxTarget:       fmt.Sprintf("#dependency-suggestions-%s", dto.ActivityId),
-			HxSwap:         "outerHTML",
+			ActivityNames:   userInputsNewValues,
+			ResponseWriter:  w,
+			Request:         r,
+			DivTargetSwapId: fmt.Sprintf("dependency-suggestions-%s", dto.ActivityId),
+			DivHxSwapOob:    "innerHTML",
+		})
+	} else {
+		rt.view.RenderDependencyEmptySuggestion(routemodels.HttpRenderTableRowDependencyEmptySuggestion{
+			ResponseWriter:  w,
+			Request:         r,
+			DivTargetSwapId: fmt.Sprintf("dependency-suggestions-%s", dto.ActivityId),
+			DivHxSwapOob:    "innerHTML",
 		})
 	}
 
