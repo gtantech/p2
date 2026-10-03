@@ -91,6 +91,19 @@ type StoreFormSqliteAdapter struct {
 	queries *Queries
 }
 
+// GetPredecessorActivityNamesBySuccessorId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) GetPredecessorActivityNamesBySuccessorId(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error) {
+	predecessorActivitiesResp, err := s.queries.FindAllPredecessorNamesBySuccessor(ctx, successorId.String())
+	if err != nil {
+		return []storemodels.ActivityNameWithId{}, err
+	}
+	predecessorActivity := make([]storemodels.ActivityNameWithId, len(predecessorActivitiesResp))
+	for i, activity := range predecessorActivitiesResp {
+		predecessorActivity[i] = storemodels.ActivityNameWithId{ID: activity.PredecessorActivityID, DispName: activity.PredecessorActivityName}
+	}
+	return predecessorActivity, nil
+}
+
 // DeleteDependencyByProjectPredecessorSuccessorId implements [routes.Store].
 func (s *StoreFormSqliteAdapter) DeleteDependencyByProjectPredecessorSuccessorId(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error {
 	return s.queries.DeleteDependencyByProjectPredecessorSuccessor(ctx, DeleteDependencyByProjectPredecessorSuccessorParams{

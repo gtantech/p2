@@ -21,6 +21,12 @@ type mockStore struct {
 	UpdateActivityNameCallback                              func(activityId uuid.UUID, activityName string, ctx context.Context) error
 	GetActivitiesByProjectIdCallback                        func(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error)
 	DeleteDependencyByProjectPredecessorSuccessorIdCallback func(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error
+	GetPredecessorActivityNamesBySuccessorIdCallback        func(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error)
+}
+
+// GetPredecessorActivityNamesBySuccessorId implements [Store].
+func (m *mockStore) GetPredecessorActivityNamesBySuccessorId(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error) {
+	return m.GetPredecessorActivityNamesBySuccessorIdCallback(successorId, ctx)
 }
 
 // DeleteDependencyByProjectPredecessorSuccessorId implements [Store].
