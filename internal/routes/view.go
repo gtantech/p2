@@ -75,6 +75,32 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 
 	//determine new values (unknown activities)
 	userInputsNewValues := valuesNotInMap(userInputs, storeActivitiesMap)
+
+	//delete activities from depenendency store where no longer in user input
+	// -by getting activities in store
+	// -by checking activities in store that are missing from user input
+	// -by deleteing these activities
+	storePredecessorActivities, err := rt.store.GetPredecessorActivityNamesBySuccessorId(dto.ActivityId, r.Context())
+	storePredecessorActivitiesStr := make([]string, len(storePredecessorActivities))
+	for i, activity := range storePredecessorActivities {
+		storePredecessorActivitiesStr[i] = activity.DispName
+	}
+
+	userActivitiesMap := make(map[string]struct{})
+	for _, userActivity := range userInputs {
+		userActivitiesMap[userActivity] = struct{}{}
+	}
+	userDeletedValues := valuesNotInMap(storePredecessorActivitiesStr, userActivitiesMap)
+	for _, userDeletedValue := range userDeletedValues {
+		predecessorActivity := storeActivitiesMap[userDeletedValue]
+		if err := rt.store.DeleteDependencyByProjectPredecessorSuccessorId(dto.ProjectId, uuid.MustParse(predecessorActivity.ID), dto.ActivityId, r.Context()); err != nil {
+			http.Error(w, "failed to delete activities from store", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while deleting activities from store. Encountered error: %v", err)
+			return
+		}
+	}
+
+	//display result
 	rt.view.RenderDependencyInputResp(routemodels.HttpRenderTableRowDependencyInputResp{
 		ActivityNames:   userInputsNewValues,
 		ResponseWriter:  w,
