@@ -22,14 +22,8 @@ type HttpRenderTableRow struct {
 	HttpParams
 }
 
-type HttpRenderTableRowDependencyActivitySuggestion struct {
+type HttpRenderTableRowDependencyInputResp struct {
 	ActivityNames []string
-	HttpParams
-	DivTargetSwapId string
-	DivHxSwapOob    string
-}
-
-type HttpRenderTableRowDependencyEmptySuggestion struct {
 	HttpParams
 	DivTargetSwapId string
 	DivHxSwapOob    string
