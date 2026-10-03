@@ -18,4 +18,5 @@ type Store interface {
 	UpdateActivityName(activityId uuid.UUID, activityName string, ctx context.Context) error
 	UpdateActivityDuration(activityId uuid.UUID, activityDuration time.Duration, ctx context.Context) error
 	GetActivitiesByProjectId(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error)
+	DeleteDependencyByProjectPredecessorSuccessorId(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error
 }
