@@ -9,6 +9,22 @@ import (
 	"context"
 )
 
+const deleteDependencyByProjectPredecessorSuccessor = `-- name: DeleteDependencyByProjectPredecessorSuccessor :exec
+DELETE FROM dependencies
+WHERE project_id = ? AND predecessor_activity_id = ? AND successor_activity_id = ?
+`
+
+type DeleteDependencyByProjectPredecessorSuccessorParams struct {
+	ProjectID             string
+	PredecessorActivityID string
+	SuccessorActivityID   string
+}
+
+func (q *Queries) DeleteDependencyByProjectPredecessorSuccessor(ctx context.Context, arg DeleteDependencyByProjectPredecessorSuccessorParams) error {
+	_, err := q.db.ExecContext(ctx, deleteDependencyByProjectPredecessorSuccessor, arg.ProjectID, arg.PredecessorActivityID, arg.SuccessorActivityID)
+	return err
+}
+
 const findAllDependenciesByPredecessor = `-- name: FindAllDependenciesByPredecessor :many
 SELECT id, project_id, relationship, predecessor_activity_id, successor_activity_id FROM dependencies WHERE predecessor_activity_id = ?
 `
