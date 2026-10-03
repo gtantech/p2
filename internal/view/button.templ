@@ -35,17 +35,12 @@ templ DependencyTableRowAddButton(projectId uuid.UUID, currentRowSortRank *int64
     })
 }
 
-templ DependencyTableRowAddActivitiesSuggestion(activityNames []string, targetDivId string, divHxSwapOob string){
-    <div 
-        id={ targetDivId }
-        hx-swap-oob={ divHxSwapOob }
-    >
-        @Button(&viewmodels.HtmxButton{
-            Class: "suggestion", 
-            Title: "Add suggested activites", 
-            Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
-        })
-    </div>
+templ DependencyTableRowAddActivitiesSuggestion(activityNames []string){
+    @Button(&viewmodels.HtmxButton{
+        Class: "suggestion", 
+        Title: "Add suggested activites", 
+        Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
+    })
 }
 
 templ DependencyTableRowEmptySuggestion(targetDivId string, divHxSwapOob string){
