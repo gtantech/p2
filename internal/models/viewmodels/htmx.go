@@ -47,6 +47,7 @@ func (h Hx) Items() []templ.KeyValue[string, any] {
 	// Response
 	add("hx-target", h.HxTarget)
 	add("hx-swap", h.HxSwap)
+	add("hx-swap-oob", h.HxSwapOob)
 
 	// Options
 	add("hx-confirm", h.HxConfirm)

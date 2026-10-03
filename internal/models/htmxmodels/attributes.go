@@ -16,8 +16,9 @@ type HxRequest struct {
 }
 
 type HxResponse struct {
-	HxTarget string
-	HxSwap   string
+	HxTarget  string
+	HxSwap    string
+	HxSwapOob string
 }
 
 type HxOptions struct {
