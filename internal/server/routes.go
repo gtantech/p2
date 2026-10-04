@@ -34,8 +34,9 @@ func (s *Server) RegisterRoutes(view *routes.ViewRoutes, static *routes.StaticRo
 					r.Route("/activity", func(r chi.Router) {
 						r.Put("/name", form.PutActivityNameHandler)
 						r.Put("/duration", form.PutActivityDurationHandler)
-						r.Route("/dependency", func(r chi.Router) {
-							r.Post("/suggestion/component", view.PostTableOfDependencyRowDependencyHandler)
+						r.Route("/suggestion", func(r chi.Router) {
+							r.Post("/component", view.PostTableOfDependencyRowDependencyHandler)
+							r.Post("/selected", view.PostTableOfDependencyRowDependencySuggestionSelectedHandler)
 						})
 					})
 				})
