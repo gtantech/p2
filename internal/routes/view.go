@@ -191,3 +191,7 @@ func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter
 		Request:        r,
 	})
 }
+
+func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandler(w http.ResponseWriter, r *http.Request) {
+	panic("unimplemented")
+}
