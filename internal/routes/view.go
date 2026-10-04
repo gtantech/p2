@@ -219,7 +219,7 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 			log.Printf("returned http internal server error while getting last table row. encountered error: %v", err)
 			return
 		}
-
+		newTableRows := []viewmodels.TableRow{}
 		for i, activityName := range dto.ActivityNamesToAdd {
 			sortRank := lastRow.SortRank + (viewmodels.TableRowSortRankStep * (int64(i) + 1))
 			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, sortRank, r.Context())
@@ -228,13 +228,14 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 				log.Printf("returned http internal server error while creating dependency table row")
 				return
 			}
-			rt.view.RenderDependencyInputSelectedAddActivityResp(routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp{
-				FromRowActivityId: dto.FromRowActivityId,
-				TableRow:          &newTableRow,
-				ResponseWriter:    w,
-				Request:           r,
-			})
+			newTableRows = append(newTableRows, newTableRow)
 		}
+		rt.view.RenderDependencyInputSelectedAddActivityResp(routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp{
+			FromRowActivityId: dto.FromRowActivityId,
+			TableRow:          &newTableRow,
+			ResponseWriter:    w,
+			Request:           r,
+		})
 	default:
 		http.Error(w, "unknown option specified", http.StatusBadRequest)
 		return
