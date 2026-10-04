@@ -57,6 +57,12 @@ templ LastDependencyTableRow(row *viewmodels.TableRow){
     </div>
 }
 
+
+templ AppendToLastDependencyTableRow(previousRow *viewmodels.TableRow, row *viewmodels.TableRow){
+    @DependencyTableRow(previousRow, &row.SortRank)
+    @LastDependencyTableRow(row)
+}
+
 templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
     <tr class="activity-row">
         <!-- activity name -->
