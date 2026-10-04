@@ -193,5 +193,9 @@ func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter
 }
 
 func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandler(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	option := strings.TrimSpace(r.URL.Query().Get(string(routemodels.UrlQueryKeyOption)))
+	if option == "" {
+		http.Error(w, "option parameter missing from url", http.StatusBadRequest)
+		return
+	}
 }
