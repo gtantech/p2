@@ -5,6 +5,10 @@ import (
 	"uuid"
 )
 
+const (
+	TableRowSortRankStep = int64(1000)
+)
+
 type TableRow struct {
 	ActivityId            uuid.UUID
 	ProjectId             uuid.UUID
