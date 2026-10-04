@@ -34,6 +34,6 @@ type HttpRenderTableRowDependencyInputResp struct {
 
 type HttpRenderTableRowDependencyAddActivitySelectedResp struct {
 	FromRowActivityId uuid.UUID
-	TableRow          *viewmodels.TableRow
+	TableRowsToAppend []viewmodels.TableRow
 	HttpParams
 }
