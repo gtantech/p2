@@ -25,7 +25,7 @@ func (h *HttpViewTemplAdapter) RenderDependencyInputResp(params routemodels.Http
 	components := []templ.Component{}
 
 	if len(params.ActivityNames) > 0 {
-		components = append(components, DependencyTableRowAddActivitiesSuggestion(params.ActivityNames, params.DivTargetSwapId, params.DivHxSwapOob))
+		components = append(components, DependencyTableRowAddActivitiesSuggestion(params.ProjectId, params.RowActivityId, params.ActivityNames, params.DivTargetSwapId, params.DivHxSwapOob))
 	} else {
 		components = append(components, HxSwapDivWrapChildren(params.DivTargetSwapId, params.DivHxSwapOob))
 	}
