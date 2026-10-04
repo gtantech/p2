@@ -112,7 +112,7 @@ func (s *StoreFormSqliteAdapter) GetLastDependencyTableRowByProjectId(projectId 
 	if err != nil {
 		return storemodels.TableRow{}, nil
 	}
-	return storemodels.TableRow{ID: resp.ID, ProjectID: resp.ProjectID, DispName: resp.DispName, Duration: resp.Duration}, nil
+	return storemodels.TableRow{ID: resp.ID, ProjectID: resp.ProjectID, DispName: resp.DispName, Duration: resp.Duration, SortRank: resp.SortRank}, nil
 }
 
 // GetPredecessorActivityNamesBySuccessorId implements [routes.Store].
