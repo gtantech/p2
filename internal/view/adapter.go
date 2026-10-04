@@ -1,12 +1,23 @@
 package view
 
 import (
+	"fmt"
+
 	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models/routemodels"
 	"github.com/gtantech/p2/internal/routes"
 )
 
 type HttpViewTemplAdapter struct {
+}
+
+// RenderDependencyInputSelectedAddActivityResp implements [routes.HttpView].
+func (h *HttpViewTemplAdapter) RenderDependencyInputSelectedAddActivityResp(params routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp) {
+	components := []templ.Component{}
+
+	components = append(components, HxSwapDivWrapChildren(fmt.Sprintf("dependency-suggestions-%s", params.FromRowActivityId), "innerHTML"))
+
+	MultiComponent(components).Render(params.Request.Context(), params.ResponseWriter)
 }
 
 // RenderDependencyAddActivitySuggestion implements [routes.HttpView].
