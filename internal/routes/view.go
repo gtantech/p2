@@ -17,6 +17,7 @@ type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
 	RenderDependencyInputResp(params routemodels.HttpRenderTableRowDependencyInputResp)
+	RenderDependencyInputSelectedAddActivityResp(params routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp)
 }
 
 type ViewRoutes struct {
@@ -207,6 +208,27 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 			http.Error(w, "failed to parse json", http.StatusBadRequest)
 			log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
 			return
+		}
+
+		sortRankStep := 1000
+		for _, activityName := range dto.ActivityNamesToAdd {
+			lastRow, err := rt.store.GetLastDependencyTableRowByProjectId(dto.IntoProjectId, r.Context())
+			if err != nil {
+				http.Error(w, "failed to get last row of table", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while getting last table row. encountered error: %v", err)
+				return
+			}
+			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, lastRow.SortRank+int64(sortRankStep), r.Context())
+			if err != nil {
+				http.Error(w, "failed to create new table row", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating dependency table row")
+				return
+			}
+			rt.view.RenderDependencyInputSelectedAddActivityResp(routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp{
+				TableRow:       &newTableRow,
+				ResponseWriter: w,
+				Request:        r,
+			})
 		}
 	default:
 		http.Error(w, "unknown option specified", http.StatusBadRequest)
