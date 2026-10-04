@@ -232,7 +232,7 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 		}
 		rt.view.RenderDependencyInputSelectedAddActivityResp(routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp{
 			FromRowActivityId: dto.FromRowActivityId,
-			TableRow:          &newTableRow,
+			TableRowsToAppend: newTableRows,
 			ResponseWriter:    w,
 			Request:           r,
 		})
