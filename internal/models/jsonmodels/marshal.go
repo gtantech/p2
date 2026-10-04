@@ -6,6 +6,10 @@ import (
 	"fmt"
 )
 
+const (
+	JsonMarshalField string = "json" // {\"json\":%s}
+)
+
 func MarshalParams(in any) string {
 	out, err := json.Marshal(in, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
@@ -15,6 +19,6 @@ func MarshalParams(in any) string {
 }
 
 func MarshalParamsToJsonField(in any) string {
-	js := fmt.Sprintf("{\"json\":%s}", MarshalParams(in))
+	js := fmt.Sprintf("{\"%s\":%s}", JsonMarshalField, MarshalParams(in))
 	return js
 }
