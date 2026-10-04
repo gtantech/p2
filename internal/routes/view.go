@@ -213,14 +213,16 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 			return
 		}
 
-		for _, activityName := range dto.ActivityNamesToAdd {
-			lastRow, err := rt.store.GetLastDependencyTableRowByProjectId(dto.IntoProjectId, r.Context())
-			if err != nil {
-				http.Error(w, "failed to get last row of table", http.StatusInternalServerError)
-				log.Printf("returned http internal server error while getting last table row. encountered error: %v", err)
-				return
-			}
-			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, lastRow.SortRank+viewmodels.TableRowSortRankStep, r.Context())
+		lastRow, err := rt.store.GetLastDependencyTableRowByProjectId(dto.IntoProjectId, r.Context())
+		if err != nil {
+			http.Error(w, "failed to get last row of table", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting last table row. encountered error: %v", err)
+			return
+		}
+
+		for i, activityName := range dto.ActivityNamesToAdd {
+			sortRank := lastRow.SortRank + (viewmodels.TableRowSortRankStep * (int64(i) + 1))
+			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, sortRank, r.Context())
 			if err != nil {
 				http.Error(w, "failed to create new table row", http.StatusInternalServerError)
 				log.Printf("returned http internal server error while creating dependency table row")
