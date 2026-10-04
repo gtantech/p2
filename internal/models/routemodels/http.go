@@ -24,6 +24,8 @@ type HttpRenderTableRow struct {
 }
 
 type HttpRenderTableRowDependencyInputResp struct {
+	ProjectId     uuid.UUID
+	RowActivityId uuid.UUID
 	ActivityNames []string
 	HttpParams
 	DivTargetSwapId string
