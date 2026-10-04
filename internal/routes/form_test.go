@@ -22,6 +22,12 @@ type mockStore struct {
 	GetActivitiesByProjectIdCallback                        func(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error)
 	DeleteDependencyByProjectPredecessorSuccessorIdCallback func(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error
 	GetPredecessorActivityNamesBySuccessorIdCallback        func(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error)
+	GetLastDependencyTableRowByProjectIdCallback            func(projectId uuid.UUID, ctx context.Context) (storemodels.TableRow, error)
+}
+
+// GetLastDependencyTableRowByProjectId implements [Store].
+func (m *mockStore) GetLastDependencyTableRowByProjectId(projectId uuid.UUID, ctx context.Context) (storemodels.TableRow, error) {
+	return m.GetLastDependencyTableRowByProjectIdCallback(projectId, ctx)
 }
 
 // GetPredecessorActivityNamesBySuccessorId implements [Store].
