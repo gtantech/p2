@@ -14,6 +14,21 @@ type StoreViewSqliteAdapter struct {
 	queries *Queries
 }
 
+// CreateDependencyTableRow implements [routes.StoreView].
+func (s *StoreViewSqliteAdapter) CreateDependencyTableRow(projectId uuid.UUID, activityName string, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
+	activity, err := s.queries.InsertActivity(ctx, InsertActivityParams{
+		ID:        uuid.NewV7().String(),
+		ProjectID: projectId.String(),
+		DispName:  activityName,
+		Duration:  0,
+	})
+	s.queries.InsertActivityOrdering(ctx, InsertActivityOrderingParams{uuid.NewV7().String(), activity.ProjectID, activity.ID, sortRank})
+	if err != nil {
+		return viewmodels.TableRow{}, err
+	}
+	return viewmodels.TableRow{ActivityId: uuid.MustParse(activity.ID), ProjectId: projectId, ActivityName: activity.DispName, PredecessorActivities: []string{}, Duration: time.Duration(activity.Duration), SortRank: sortRank}, nil
+}
+
 // CreateEmptyDependencyTableRow implements [routes.StoreView].
 func (s *StoreViewSqliteAdapter) CreateEmptyDependencyTableRow(projectId uuid.UUID, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
 	activity, err := s.queries.InsertActivity(ctx, InsertActivityParams{
@@ -89,6 +104,15 @@ var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct 
 
 type StoreFormSqliteAdapter struct {
 	queries *Queries
+}
+
+// GetLastDependencyTableRowByProjectId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) GetLastDependencyTableRowByProjectId(projectId uuid.UUID, ctx context.Context) (storemodels.TableRow, error) {
+	resp, err := s.queries.FindLastActivityByProject(ctx, projectId.String())
+	if err != nil {
+		return storemodels.TableRow{}, nil
+	}
+	return storemodels.TableRow{ID: resp.ID, ProjectID: resp.ProjectID, DispName: resp.DispName, Duration: resp.Duration}, nil
 }
 
 // GetPredecessorActivityNamesBySuccessorId implements [routes.Store].
