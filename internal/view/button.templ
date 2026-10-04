@@ -6,6 +6,7 @@ import (
     "fmt"
 	"uuid"
 	"strings"
+	"github.com/gtantech/p2/internal/models/routemodels"
 )
 
 templ Button(params *viewmodels.HtmxButton){
@@ -41,6 +42,7 @@ templ DependencyTableRowAddActivitiesSuggestion(activityNames []string, targetDi
             Class: "suggestion", 
             Title: "Add suggested activites", 
             Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
+            HxPost: fmt.Sprintf("/form/json/table/row/activity/dependency/suggestion/selected?%v=%v", routemodels.UrlQueryKeyOption, routemodels.AddActivity),
         })
     }
 }
