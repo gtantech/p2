@@ -11,6 +11,7 @@ import (
 	"github.com/gtantech/p2/internal/models/jsonmodels"
 	"github.com/gtantech/p2/internal/models/routemodels"
 	"github.com/gtantech/p2/internal/models/storemodels"
+	"github.com/gtantech/p2/internal/models/viewmodels"
 )
 
 type HttpView interface {
@@ -212,7 +213,6 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 			return
 		}
 
-		sortRankStep := 1000
 		for _, activityName := range dto.ActivityNamesToAdd {
 			lastRow, err := rt.store.GetLastDependencyTableRowByProjectId(dto.IntoProjectId, r.Context())
 			if err != nil {
@@ -220,7 +220,7 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 				log.Printf("returned http internal server error while getting last table row. encountered error: %v", err)
 				return
 			}
-			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, lastRow.SortRank+int64(sortRankStep), r.Context())
+			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, lastRow.SortRank+viewmodels.TableRowSortRankStep, r.Context())
 			if err != nil {
 				http.Error(w, "failed to create new table row", http.StatusInternalServerError)
 				log.Printf("returned http internal server error while creating dependency table row")
