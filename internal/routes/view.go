@@ -103,6 +103,8 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 
 	//display result
 	rt.view.RenderDependencyInputResp(routemodels.HttpRenderTableRowDependencyInputResp{
+		ProjectId:       dto.ProjectId,
+		RowActivityId:   dto.ActivityId,
 		ActivityNames:   userInputsNewValues,
 		ResponseWriter:  w,
 		Request:         r,
@@ -225,9 +227,10 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 				return
 			}
 			rt.view.RenderDependencyInputSelectedAddActivityResp(routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp{
-				TableRow:       &newTableRow,
-				ResponseWriter: w,
-				Request:        r,
+				FromRowActivityId: dto.FromRowActivityId,
+				TableRow:          &newTableRow,
+				ResponseWriter:    w,
+				Request:           r,
 			})
 		}
 	default:
