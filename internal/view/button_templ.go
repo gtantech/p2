@@ -139,7 +139,7 @@ func DependencyTableRowAddButton(projectId uuid.UUID, currentRowSortRank *int64,
 	})
 }
 
-func DependencyTableRowAddActivitiesSuggestion(activityNames []string, targetDivId string, divHxSwapOob string) templ.Component {
+func DependencyTableRowAddActivitiesSuggestion(projectId uuid.UUID, rowActivityId uuid.UUID, activityNames []string, targetDivId string, divHxSwapOob string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -177,6 +177,10 @@ func DependencyTableRowAddActivitiesSuggestion(activityNames []string, targetDiv
 				Title:  "Add suggested activites",
 				Text:   fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
 				HxPost: fmt.Sprintf("/form/json/table/row/activity/dependency/suggestion/selected?%v=%v", routemodels.UrlQueryKeyOption, routemodels.AddActivity),
+				HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.AddActivitiesFromRow{
+					IntoProjectId:      projectId,
+					FromRowActivityId:  rowActivityId,
+					ActivityNamesToAdd: activityNames}),
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
