@@ -198,10 +198,16 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 		http.Error(w, "option parameter missing from url", http.StatusBadRequest)
 		return
 	}
-
+	jsonStr := r.FormValue(jsonmodels.JsonMarshalField)
 	switch routemodels.DependencySuggestionType(option) {
 	case routemodels.AddActivity:
-
+		var dto jsonmodels.AddActivitiesFromRow
+		err := json.Unmarshal([]byte(jsonStr), &dto)
+		if err != nil {
+			http.Error(w, "failed to parse json", http.StatusBadRequest)
+			log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
+			return
+		}
 	default:
 		http.Error(w, "unknown option specified", http.StatusBadRequest)
 		return
