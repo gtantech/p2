@@ -198,4 +198,12 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandle
 		http.Error(w, "option parameter missing from url", http.StatusBadRequest)
 		return
 	}
+
+	switch routemodels.DependencySuggestionType(option) {
+	case routemodels.AddActivity:
+
+	default:
+		http.Error(w, "unknown option specified", http.StatusBadRequest)
+		return
+	}
 }
