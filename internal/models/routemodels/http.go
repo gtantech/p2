@@ -28,3 +28,8 @@ type HttpRenderTableRowDependencyInputResp struct {
 	DivTargetSwapId string
 	DivHxSwapOob    string
 }
+
+type HttpRenderTableRowDependencyAddActivitySelectedResp struct {
+	TableRow *viewmodels.TableRow
+	HttpParams
+}
