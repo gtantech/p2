@@ -23,3 +23,27 @@ JOIN activities_ordering ao
     AND a.project_id = ao.project_id
 WHERE a.project_id = ?
 ORDER BY ao.sort_rank;
+
+-- name: UpdateActivityName :one
+UPDATE activities
+SET 
+    disp_name = ?
+WHERE id = ?
+RETURNING *;
+
+-- name: UpdateActivityDuration :one
+UPDATE activities
+SET 
+    duration = ?
+WHERE id = ?
+RETURNING *;
+
+-- name: FindLastActivityByProject :one
+SELECT a.* , ao.sort_rank
+FROM activities a
+JOIN activities_ordering ao
+    ON a.id = ao.successor_activity_id
+    AND a.project_id = ao.project_id
+WHERE a.project_id = ?
+ORDER BY ao.sort_rank DESC
+LIMIT 1;

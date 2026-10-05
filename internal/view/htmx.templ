@@ -1,0 +1,53 @@
+package view
+
+import(
+    "github.com/gtantech/p2/internal/models/htmxmodels"
+)
+
+templ HxMethodAttributes(params *htmxmodels.HxMethod) {
+    if params.HxGet != "" {
+        hx-get={ templ.URL(params.HxGet) }
+    }
+    if params.HxPost != "" {
+        hx-post={ templ.URL(params.HxPost) }
+    }
+    if params.HxPut != "" {
+        hx-put={ templ.URL(params.HxPut) }
+    }
+    if params.HxPatch != "" {
+        hx-patch={ templ.URL(params.HxPatch) }
+    }
+    if params.HxDelete != "" {
+        hx-delete={ templ.URL(params.HxDelete) }
+    }
+}
+templ HxRequestAttributes(params *htmxmodels.HxRequest) {
+    if params.HxTrigger != "" {
+        hx-trigger={ params.HxTrigger }
+    }
+    if params.HxVals != "" {
+        hx-vals={ params.HxVals }
+    }
+    if params.HxInclude != "" {
+        hx-include={ params.HxInclude }
+    }
+    if params.HxHeaders != "" {
+        hx-headers={ params.HxHeaders }
+    }
+}
+templ HxResponseAttributes(params *htmxmodels.HxResponse) {
+    if params.HxTarget != "" {
+        hx-target={ params.HxTarget }
+    }
+    if params.HxSwap != "" {
+        hx-swap={ params.HxSwap }
+    }
+}
+templ HxOptionsAttributes(params *htmxmodels.HxOptions) {
+    if params.HxConfirm != "" {
+        hx-confirm={ params.HxConfirm }
+    }
+    if params.HxIndicator != "" {
+        hx-indicator={ params.HxIndicator }
+    }
+}

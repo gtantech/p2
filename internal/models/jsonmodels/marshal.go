@@ -1,4 +1,4 @@
-package view
+package jsonmodels
 
 import (
 	jsonv1 "encoding/json"
@@ -6,7 +6,11 @@ import (
 	"fmt"
 )
 
-func marshalParams(in any) string {
+const (
+	JsonMarshalField string = "json" // {\"json\":%s}
+)
+
+func MarshalParams(in any) string {
 	out, err := json.Marshal(in, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		panic(fmt.Sprintf("failed to marshal json from params: %v", in))
@@ -14,7 +18,7 @@ func marshalParams(in any) string {
 	return string(out)
 }
 
-func marshalParamsToJsonField(in any) string {
-	js := fmt.Sprintf("{\"json\":%s}", marshalParams(in))
+func MarshalParamsToJsonField(in any) string {
+	js := fmt.Sprintf("{\"%s\":%s}", JsonMarshalField, MarshalParams(in))
 	return js
 }
