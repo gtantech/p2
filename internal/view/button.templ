@@ -1,28 +1,52 @@
 package view
 
-import "github.com/gtantech/p2/internal/models/viewmodels"
+import (
+    "github.com/gtantech/p2/internal/models/viewmodels"
+    "github.com/gtantech/p2/internal/models/jsonmodels"
+    "fmt"
+	"uuid"
+	"strings"
+	"github.com/gtantech/p2/internal/models/routemodels"
+)
 
-templ Button(params viewmodels.HtmlButton){
+templ Button(params *viewmodels.HtmxButton){
     <button
         type="button"
         class={ params.Class }
         title={ params.Title }
+        { params.Hx... }
     >
         { params.Text }
     </button>
 }
 
-templ DependencyTableRowAddButton(params viewmodels.HtmlDependencyTableRowButton){
-    <button
-        type="button"
-        class={ params.Class }
-        title={ params.Title }
-        
-        hx-post={ params.HxPost }
-        hx-vals={ params.HxVals }
-        hx-target="closest tr"
-        hx-swap="afterend"
-    >
-        { params.Text }
-    </button>
+templ DependencyTableRowAddButton(projectId uuid.UUID, currentRowSortRank *int64, nextRowSortRank *int64){
+    @Button(&viewmodels.HtmxButton{
+        Class: "add-button", 
+                    Title: "Add task", 
+                    Text: "+",
+                    HxPost: "/component/table/row/empty",
+                    HxVals: jsonmodels.MarshalParamsToJsonField(
+                        jsonmodels.CreateEmptyTableRow{
+                            ProjectId: projectId, 
+                            PreviousRowSortRank: currentRowSortRank, 
+                            NextRowSortRank: nextRowSortRank}),
+                    HxTarget: "closest tr",
+                    HxSwap: "afterend",
+    })
+}
+
+templ DependencyTableRowAddActivitiesSuggestion(projectId uuid.UUID, rowActivityId uuid.UUID, activityNames []string, targetDivId string, divHxSwapOob string){
+    @HxSwapDivWrapChildren(targetDivId, divHxSwapOob){
+        @Button(&viewmodels.HtmxButton{
+            Class: "suggestion", 
+            Title: "Add suggested activites", 
+            Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
+            HxPost: fmt.Sprintf("/form/json/table/row/activity/dependency/suggestion/selected?%v=%v", routemodels.UrlQueryKeyOption, routemodels.AddActivity),
+            HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.AddActivitiesFromRow{
+                IntoProjectId: projectId,
+                FromRowActivityId: rowActivityId,
+                ActivityNamesToAdd: activityNames,}),
+        })
+    }
 }

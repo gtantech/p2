@@ -2,7 +2,7 @@ package view
 
 import (
     "github.com/gtantech/p2/internal/models/viewmodels"
-    "github.com/gtantech/p2/internal/models/jsonmodels"
+	"uuid"
 )
 
 import "fmt"
@@ -33,40 +33,63 @@ templ DependencyTable(table *viewmodels.Table){
                 if i < len(table.Rows)-1{
                     @DependencyTableRow(&row, &table.Rows[i+1].SortRank)
                 }else{
-                    @DependencyTableRow(&row, nil)
+                    @LastDependencyTableRow(&row)
                 }
             }
         </tbody>
     </table>
 }
 
+templ DependencyTableRowSuggestionDiv(activityId uuid.UUID){
+    <div
+        id={ fmt.Sprintf("dependency-suggestions-%s", activityId) }
+        class="autocomplete"
+        role="listbox"
+    >
+    </div>
+}
+
+templ LastDependencyTableRow(row *viewmodels.TableRow){
+    <div
+        id={ fmt.Sprintf("dependency-last-row-id-%s", row.ActivityId) }
+    >
+        @DependencyTableRow(row, nil)
+    </div>
+}
+
+
+templ AppendToLastDependencyTableRow(previousRow *viewmodels.TableRow, row *viewmodels.TableRow){
+    @DependencyTableRow(previousRow, &row.SortRank)
+    @LastDependencyTableRow(row)
+}
+
 templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){
     <tr class="activity-row">
         <!-- activity name -->
         <td>
-            @ActivityTextInput(fmt.Sprintf("activity-input-%s", row.ActivityId.String()), row.ActivityName)
+            @ActivityTextInput(fmt.Sprintf("activity-input-%s", row.ActivityId.String()), row.ActivityName, row.ActivityId)
         </td>
         
         <!-- Dependencies -->
         <td>
-            @DependencyTextInput(row.PredecessorActivities)
+            <div
+                class="dependency-wrapper" 
+                id={ fmt.Sprintf("dependency-wrapper-%s", row.ActivityId) }
+            >
+                @DependencyTextInput(row.PredecessorActivities, row.ActivityId, row.ProjectId)
+                @DependencyTableRowSuggestionDiv(row.ActivityId)
+            </div>
         </td>
         
         <!-- Duration -->
         <td>
-            @DurationTextInput(row.Duration)
+            @DurationTextInput(row.Duration, row.ActivityId)
         </td>
         
         <!-- Add row -->
         <td>
             <div class="actions">
-                @DependencyTableRowAddButton(viewmodels.HtmlDependencyTableRowButton{
-                    Class: "add-button", 
-                    Title: "Add task", 
-                    Text: "+",
-                    HxPost: "/component/table/row/empty",
-                    HxVals: marshalParamsToJsonField(jsonmodels.CreateEmptyTableRow{ProjectId: row.ProjectId, PreviousRowSortRank: &row.SortRank, NextRowSortRank: nextRowSortRank}),
-                })
+                @DependencyTableRowAddButton(row.ProjectId, &row.SortRank, nextRowSortRank)
             </div>
         </td>
     </tr>

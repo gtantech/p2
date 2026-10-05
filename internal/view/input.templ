@@ -1,11 +1,13 @@
 package view
 
 import "github.com/gtantech/p2/internal/models/viewmodels"
+import "github.com/gtantech/p2/internal/models/jsonmodels"
 
 import "strings"
 import "time"
+import "uuid"
 
-templ TextInput(params *viewmodels.HtmlInput){
+templ TextInput(params *viewmodels.HtmxInput){
     <input
         id={ params.Id }
         type="text"
@@ -14,34 +16,46 @@ templ TextInput(params *viewmodels.HtmlInput){
         placeholder={ params.Placeholder }
         autocomplete={ params.Autocomplete }
         value={ params.Value }
+        { params.Hx... }
     >
 }
 
-templ ActivityTextInput(inputId string, activityName string){
-    @TextInput(&viewmodels.HtmlInput{
-        Id: inputId, 
-        Name: "activity_input", 
+templ ActivityTextInput(inputDOMId string, activityName string, activityId uuid.UUID){
+    {{textInputName := "activity_input"}}
+    @TextInput(&viewmodels.HtmxInput{
+        Id: inputDOMId, 
+        Name: textInputName, 
         Class: "activity-name", 
         Placeholder: "Activity name",
         Autocomplete: viewmodels.Off,
-        Value: activityName,})
+        Value: activityName,
+        HxPut: "/form/json/table/row/activity/name",
+        HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
+        HxTrigger: "input changed delay:200ms",})
 }
 
-templ DependencyTextInput(dependencyActivityNames []string){
-    @TextInput(&viewmodels.HtmlInput{
-        Name: "dependency_input",
+templ DependencyTextInput(dependencyActivityNames []string, activityId uuid.UUID, projectId uuid.UUID){
+    {{textInputName := "activity_input"}}
+    @TextInput(&viewmodels.HtmxInput{
+        Name: textInputName,
         Class: "dependency-input",
         Placeholder: "Task A, Task B...",
         Autocomplete: viewmodels.Off,
         Value: func() string {
                 return strings.Join(dependencyActivityNames, ", ")
             }(),
-    })
+        HxPost: "/form/json/table/row/activity/dependency/suggestion/component",
+        HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateDependencyFromInput{ActivityId: activityId, ProjectId: projectId, DomName: textInputName}),
+        HxTrigger: "input changed delay:200ms",})
 }
 
-templ DurationTextInput(duration time.Duration){
-    @TextInput(&viewmodels.HtmlInput{
-        Name: "duration_input", 
+templ DurationTextInput(duration time.Duration, activityId uuid.UUID){
+    {{textInputName := "duration_input"}}
+    @TextInput(&viewmodels.HtmxInput{
+        Name: textInputName, 
         Placeholder: "e.g. 2h",
-        Value: duration.String(),})
+        Value: duration.String(),
+        HxPut: "/form/json/table/row/activity/duration",
+        HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.UpdateActivityFromInput{ActivityId: activityId, DomName: textInputName}),
+        HxTrigger: "input changed delay:200ms",})
 }

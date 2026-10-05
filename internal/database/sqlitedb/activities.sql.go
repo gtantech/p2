@@ -178,6 +178,38 @@ func (q *Queries) FindAllActivitiesByProjectSorted(ctx context.Context, projectI
 	return items, nil
 }
 
+const findLastActivityByProject = `-- name: FindLastActivityByProject :one
+SELECT a.id, a.project_id, a.disp_name, a.duration , ao.sort_rank
+FROM activities a
+JOIN activities_ordering ao
+    ON a.id = ao.successor_activity_id
+    AND a.project_id = ao.project_id
+WHERE a.project_id = ?
+ORDER BY ao.sort_rank DESC
+LIMIT 1
+`
+
+type FindLastActivityByProjectRow struct {
+	ID        string
+	ProjectID string
+	DispName  string
+	Duration  int64
+	SortRank  int64
+}
+
+func (q *Queries) FindLastActivityByProject(ctx context.Context, projectID string) (FindLastActivityByProjectRow, error) {
+	row := q.db.QueryRowContext(ctx, findLastActivityByProject, projectID)
+	var i FindLastActivityByProjectRow
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.DispName,
+		&i.Duration,
+		&i.SortRank,
+	)
+	return i, err
+}
+
 const insertActivity = `-- name: InsertActivity :one
 INSERT INTO activities (id, project_id, disp_name, duration)
 VALUES (?, ?, ?, ?)
@@ -198,6 +230,56 @@ func (q *Queries) InsertActivity(ctx context.Context, arg InsertActivityParams) 
 		arg.DispName,
 		arg.Duration,
 	)
+	var i Activity
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.DispName,
+		&i.Duration,
+	)
+	return i, err
+}
+
+const updateActivityDuration = `-- name: UpdateActivityDuration :one
+UPDATE activities
+SET 
+    duration = ?
+WHERE id = ?
+RETURNING id, project_id, disp_name, duration
+`
+
+type UpdateActivityDurationParams struct {
+	Duration int64
+	ID       string
+}
+
+func (q *Queries) UpdateActivityDuration(ctx context.Context, arg UpdateActivityDurationParams) (Activity, error) {
+	row := q.db.QueryRowContext(ctx, updateActivityDuration, arg.Duration, arg.ID)
+	var i Activity
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.DispName,
+		&i.Duration,
+	)
+	return i, err
+}
+
+const updateActivityName = `-- name: UpdateActivityName :one
+UPDATE activities
+SET 
+    disp_name = ?
+WHERE id = ?
+RETURNING id, project_id, disp_name, duration
+`
+
+type UpdateActivityNameParams struct {
+	DispName string
+	ID       string
+}
+
+func (q *Queries) UpdateActivityName(ctx context.Context, arg UpdateActivityNameParams) (Activity, error) {
+	row := q.db.QueryRowContext(ctx, updateActivityName, arg.DispName, arg.ID)
 	var i Activity
 	err := row.Scan(
 		&i.ID,

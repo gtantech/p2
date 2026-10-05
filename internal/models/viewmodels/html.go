@@ -14,9 +14,3 @@ type HtmlButton struct {
 	Title string
 	Text  string
 }
-
-type HtmlDependencyTableRowButton struct {
-	HtmlButton
-	HxPost string
-	HxVals string
-}
