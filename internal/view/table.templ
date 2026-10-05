@@ -33,7 +33,7 @@ templ DependencyTable(table *viewmodels.Table){
                 if i < len(table.Rows)-1{
                     @DependencyTableRow(&row, &table.Rows[i+1].SortRank)
                 }else{
-                    @DependencyTableRow(&row, nil)
+                    @LastDependencyTableRow(&row)
                 }
             }
         </tbody>
@@ -47,6 +47,20 @@ templ DependencyTableRowSuggestionDiv(activityId uuid.UUID){
         role="listbox"
     >
     </div>
+}
+
+templ LastDependencyTableRow(row *viewmodels.TableRow){
+    <div
+        id={ fmt.Sprintf("dependency-last-row-id-%s", row.ActivityId) }
+    >
+        @DependencyTableRow(row, nil)
+    </div>
+}
+
+
+templ AppendToLastDependencyTableRow(previousRow *viewmodels.TableRow, row *viewmodels.TableRow){
+    @DependencyTableRow(previousRow, &row.SortRank)
+    @LastDependencyTableRow(row)
 }
 
 templ DependencyTableRow(row *viewmodels.TableRow, nextRowSortRank *int64){

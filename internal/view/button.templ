@@ -6,6 +6,7 @@ import (
     "fmt"
 	"uuid"
 	"strings"
+	"github.com/gtantech/p2/internal/models/routemodels"
 )
 
 templ Button(params *viewmodels.HtmxButton){
@@ -35,12 +36,17 @@ templ DependencyTableRowAddButton(projectId uuid.UUID, currentRowSortRank *int64
     })
 }
 
-templ DependencyTableRowAddActivitiesSuggestion(activityNames []string, targetDivId string, divHxSwapOob string){
+templ DependencyTableRowAddActivitiesSuggestion(projectId uuid.UUID, rowActivityId uuid.UUID, activityNames []string, targetDivId string, divHxSwapOob string){
     @HxSwapDivWrapChildren(targetDivId, divHxSwapOob){
         @Button(&viewmodels.HtmxButton{
             Class: "suggestion", 
             Title: "Add suggested activites", 
             Text: fmt.Sprintf("Add new activity: %v", strings.Join(activityNames, ", ")),
+            HxPost: fmt.Sprintf("/form/json/table/row/activity/dependency/suggestion/selected?%v=%v", routemodels.UrlQueryKeyOption, routemodels.AddActivity),
+            HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.AddActivitiesFromRow{
+                IntoProjectId: projectId,
+                FromRowActivityId: rowActivityId,
+                ActivityNamesToAdd: activityNames,}),
         })
     }
 }

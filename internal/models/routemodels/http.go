@@ -2,6 +2,7 @@ package routemodels
 
 import (
 	"net/http"
+	"uuid"
 
 	"github.com/gtantech/p2/internal/models/viewmodels"
 )
@@ -23,8 +24,16 @@ type HttpRenderTableRow struct {
 }
 
 type HttpRenderTableRowDependencyInputResp struct {
+	ProjectId     uuid.UUID
+	RowActivityId uuid.UUID
 	ActivityNames []string
 	HttpParams
 	DivTargetSwapId string
 	DivHxSwapOob    string
+}
+
+type HttpRenderTableRowDependencyAddActivitySelectedResp struct {
+	FromRowActivityId uuid.UUID
+	TableRowsToAppend []viewmodels.TableRow
+	HttpParams
 }

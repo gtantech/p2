@@ -20,3 +20,9 @@ type UpdateDependencyFromInput struct {
 	ProjectId  uuid.UUID `json:"projectId"`
 	DomName    string    `json:"domName"`
 }
+
+type AddActivitiesFromRow struct {
+	IntoProjectId      uuid.UUID `json:"intoProjectId"`
+	FromRowActivityId  uuid.UUID `json:"fromRowActivityId"`
+	ActivityNamesToAdd []string  `json:"activityNamesToAdd"`
+}

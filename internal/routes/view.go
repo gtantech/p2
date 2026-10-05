@@ -11,12 +11,14 @@ import (
 	"github.com/gtantech/p2/internal/models/jsonmodels"
 	"github.com/gtantech/p2/internal/models/routemodels"
 	"github.com/gtantech/p2/internal/models/storemodels"
+	"github.com/gtantech/p2/internal/models/viewmodels"
 )
 
 type HttpView interface {
 	RenderHome(params routemodels.HttpHome)
 	RenderDependencyTableRow(params routemodels.HttpRenderTableRow)
 	RenderDependencyInputResp(params routemodels.HttpRenderTableRowDependencyInputResp)
+	RenderDependencyInputSelectedAddActivityResp(params routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp)
 }
 
 type ViewRoutes struct {
@@ -102,6 +104,8 @@ func (rt *ViewRoutes) PostTableOfDependencyRowDependencyHandler(w http.ResponseW
 
 	//display result
 	rt.view.RenderDependencyInputResp(routemodels.HttpRenderTableRowDependencyInputResp{
+		ProjectId:       dto.ProjectId,
+		RowActivityId:   dto.ActivityId,
 		ActivityNames:   userInputsNewValues,
 		ResponseWriter:  w,
 		Request:         r,
@@ -190,4 +194,50 @@ func (rt *ViewRoutes) PostEmptyTableOfDependencyRowHandler(w http.ResponseWriter
 		ResponseWriter: w,
 		Request:        r,
 	})
+}
+
+func (rt *ViewRoutes) PostTableOfDependencyRowDependencySuggestionSelectedHandler(w http.ResponseWriter, r *http.Request) {
+	option := strings.TrimSpace(r.URL.Query().Get(string(routemodels.UrlQueryKeyOption)))
+	if option == "" {
+		http.Error(w, "option parameter missing from url", http.StatusBadRequest)
+		return
+	}
+	jsonStr := r.FormValue(jsonmodels.JsonMarshalField)
+	switch routemodels.DependencySuggestionType(option) {
+	case routemodels.AddActivity:
+		var dto jsonmodels.AddActivitiesFromRow
+		err := json.Unmarshal([]byte(jsonStr), &dto)
+		if err != nil {
+			http.Error(w, "failed to parse json", http.StatusBadRequest)
+			log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
+			return
+		}
+
+		lastRow, err := rt.store.GetLastDependencyTableRowByProjectId(dto.IntoProjectId, r.Context())
+		if err != nil {
+			http.Error(w, "failed to get last row of table", http.StatusInternalServerError)
+			log.Printf("returned http internal server error while getting last table row. encountered error: %v", err)
+			return
+		}
+		newTableRows := []viewmodels.TableRow{}
+		for i, activityName := range dto.ActivityNamesToAdd {
+			sortRank := lastRow.SortRank + (viewmodels.TableRowSortRankStep * (int64(i) + 1))
+			newTableRow, err := rt.storeView.CreateDependencyTableRow(dto.IntoProjectId, activityName, sortRank, r.Context())
+			if err != nil {
+				http.Error(w, "failed to create new table row", http.StatusInternalServerError)
+				log.Printf("returned http internal server error while creating dependency table row")
+				return
+			}
+			newTableRows = append(newTableRows, newTableRow)
+		}
+		rt.view.RenderDependencyInputSelectedAddActivityResp(routemodels.HttpRenderTableRowDependencyAddActivitySelectedResp{
+			FromRowActivityId: dto.FromRowActivityId,
+			TableRowsToAppend: newTableRows,
+			ResponseWriter:    w,
+			Request:           r,
+		})
+	default:
+		http.Error(w, "unknown option specified", http.StatusBadRequest)
+		return
+	}
 }
