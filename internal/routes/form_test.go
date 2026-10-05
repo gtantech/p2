@@ -13,11 +13,36 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/models/jsonmodels"
+	"github.com/gtantech/p2/internal/models/storemodels"
 )
 
 type mockStore struct {
-	UpdateActivityDurationCallback func(activityId uuid.UUID, activityDuration time.Duration, ctx context.Context) error
-	UpdateActivityNameCallback     func(activityId uuid.UUID, activityName string, ctx context.Context) error
+	UpdateActivityDurationCallback                          func(activityId uuid.UUID, activityDuration time.Duration, ctx context.Context) error
+	UpdateActivityNameCallback                              func(activityId uuid.UUID, activityName string, ctx context.Context) error
+	GetActivitiesByProjectIdCallback                        func(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error)
+	DeleteDependencyByProjectPredecessorSuccessorIdCallback func(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error
+	GetPredecessorActivityNamesBySuccessorIdCallback        func(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error)
+	GetLastDependencyTableRowByProjectIdCallback            func(projectId uuid.UUID, ctx context.Context) (storemodels.TableRow, error)
+}
+
+// GetLastDependencyTableRowByProjectId implements [Store].
+func (m *mockStore) GetLastDependencyTableRowByProjectId(projectId uuid.UUID, ctx context.Context) (storemodels.TableRow, error) {
+	return m.GetLastDependencyTableRowByProjectIdCallback(projectId, ctx)
+}
+
+// GetPredecessorActivityNamesBySuccessorId implements [Store].
+func (m *mockStore) GetPredecessorActivityNamesBySuccessorId(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error) {
+	return m.GetPredecessorActivityNamesBySuccessorIdCallback(successorId, ctx)
+}
+
+// DeleteDependencyByProjectPredecessorSuccessorId implements [Store].
+func (m *mockStore) DeleteDependencyByProjectPredecessorSuccessorId(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error {
+	return m.DeleteDependencyByProjectPredecessorSuccessorId(projectId, predecessorId, successorId, ctx)
+}
+
+// GetActivitiesByProjectId implements [Store].
+func (m *mockStore) GetActivitiesByProjectId(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error) {
+	return m.GetActivitiesByProjectIdCallback(projectId, ctx)
 }
 
 // UpdateActivityDuration implements [Store].

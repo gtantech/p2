@@ -2,43 +2,24 @@ package viewmodels
 
 import (
 	"github.com/a-h/templ"
+	"github.com/gtantech/p2/internal/models/htmxmodels"
 )
-
-type HxMethod struct {
-	HxGet    string
-	HxPost   string
-	HxPut    string
-	HxPatch  string
-	HxDelete string
-}
-
-type HxRequest struct {
-	HxTrigger string
-	HxVals    string
-	HxInclude string
-	HxHeaders string
-}
-
-type HxResponse struct {
-	HxTarget string
-	HxSwap   string
-}
-
-type HxOptions struct {
-	HxConfirm   string
-	HxIndicator string
-}
 
 type HtmxInput struct {
 	HtmlInput
 	Hx
 }
 
+type HtmxButton struct {
+	HtmlButton
+	Hx
+}
+
 type Hx struct {
-	HxMethod
-	HxRequest
-	HxResponse
-	HxOptions
+	htmxmodels.HxMethod
+	htmxmodels.HxRequest
+	htmxmodels.HxResponse
+	htmxmodels.HxOptions
 }
 
 func (h Hx) Items() []templ.KeyValue[string, any] {
@@ -66,6 +47,7 @@ func (h Hx) Items() []templ.KeyValue[string, any] {
 	// Response
 	add("hx-target", h.HxTarget)
 	add("hx-swap", h.HxSwap)
+	add("hx-swap-oob", h.HxSwapOob)
 
 	// Options
 	add("hx-confirm", h.HxConfirm)

@@ -9,10 +9,10 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/gtantech/p2/internal/models/viewmodels"
+	"github.com/gtantech/p2/internal/models/htmxmodels"
 )
 
-func HxMethodAttributes(params *viewmodels.HxMethod) templ.Component {
+func HxMethodAttributes(params *htmxmodels.HxMethod) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -128,7 +128,7 @@ func HxMethodAttributes(params *viewmodels.HxMethod) templ.Component {
 	})
 }
 
-func HxRequestAttributes(params *viewmodels.HxRequest) templ.Component {
+func HxRequestAttributes(params *htmxmodels.HxRequest) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -225,7 +225,7 @@ func HxRequestAttributes(params *viewmodels.HxRequest) templ.Component {
 	})
 }
 
-func HxResponseAttributes(params *viewmodels.HxResponse) templ.Component {
+func HxResponseAttributes(params *htmxmodels.HxResponse) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -284,7 +284,7 @@ func HxResponseAttributes(params *viewmodels.HxResponse) templ.Component {
 	})
 }
 
-func HxOptionsAttributes(params *viewmodels.HxOptions) templ.Component {
+func HxOptionsAttributes(params *htmxmodels.HxOptions) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {

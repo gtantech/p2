@@ -26,3 +26,7 @@ SELECT * FROM dependencies WHERE id = ?;
 INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) 
 VALUES (?, ?, ?, ?, ?)
 RETURNING *;
+
+-- name: DeleteDependencyByProjectPredecessorSuccessor :exec
+DELETE FROM dependencies
+WHERE project_id = ? AND predecessor_activity_id = ? AND successor_activity_id = ?;

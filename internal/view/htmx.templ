@@ -1,10 +1,10 @@
 package view
 
 import(
-    "github.com/gtantech/p2/internal/models/viewmodels"
+    "github.com/gtantech/p2/internal/models/htmxmodels"
 )
 
-templ HxMethodAttributes(params *viewmodels.HxMethod) {
+templ HxMethodAttributes(params *htmxmodels.HxMethod) {
     if params.HxGet != "" {
         hx-get={ templ.URL(params.HxGet) }
     }
@@ -21,7 +21,7 @@ templ HxMethodAttributes(params *viewmodels.HxMethod) {
         hx-delete={ templ.URL(params.HxDelete) }
     }
 }
-templ HxRequestAttributes(params *viewmodels.HxRequest) {
+templ HxRequestAttributes(params *htmxmodels.HxRequest) {
     if params.HxTrigger != "" {
         hx-trigger={ params.HxTrigger }
     }
@@ -35,7 +35,7 @@ templ HxRequestAttributes(params *viewmodels.HxRequest) {
         hx-headers={ params.HxHeaders }
     }
 }
-templ HxResponseAttributes(params *viewmodels.HxResponse) {
+templ HxResponseAttributes(params *htmxmodels.HxResponse) {
     if params.HxTarget != "" {
         hx-target={ params.HxTarget }
     }
@@ -43,7 +43,7 @@ templ HxResponseAttributes(params *viewmodels.HxResponse) {
         hx-swap={ params.HxSwap }
     }
 }
-templ HxOptionsAttributes(params *viewmodels.HxOptions) {
+templ HxOptionsAttributes(params *htmxmodels.HxOptions) {
     if params.HxConfirm != "" {
         hx-confirm={ params.HxConfirm }
     }

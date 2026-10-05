@@ -1,0 +1,10 @@
+package view
+
+templ HxSwapDivWrapChildren(targetDivId string, divHxSwapOob string){
+    <div 
+        id={ targetDivId }
+        hx-swap-oob={ divHxSwapOob }
+    >
+    { children...}
+    </div>
+}

@@ -5,12 +5,28 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/gtantech/p2/internal/models/storemodels"
 	"github.com/gtantech/p2/internal/models/viewmodels"
 	"github.com/gtantech/p2/internal/routes"
 )
 
 type StoreViewSqliteAdapter struct {
 	queries *Queries
+}
+
+// CreateDependencyTableRow implements [routes.StoreView].
+func (s *StoreViewSqliteAdapter) CreateDependencyTableRow(projectId uuid.UUID, activityName string, sortRank int64, ctx context.Context) (viewmodels.TableRow, error) {
+	activity, err := s.queries.InsertActivity(ctx, InsertActivityParams{
+		ID:        uuid.NewV7().String(),
+		ProjectID: projectId.String(),
+		DispName:  activityName,
+		Duration:  0,
+	})
+	s.queries.InsertActivityOrdering(ctx, InsertActivityOrderingParams{uuid.NewV7().String(), activity.ProjectID, activity.ID, sortRank})
+	if err != nil {
+		return viewmodels.TableRow{}, err
+	}
+	return viewmodels.TableRow{ActivityId: uuid.MustParse(activity.ID), ProjectId: projectId, ActivityName: activity.DispName, PredecessorActivities: []string{}, Duration: time.Duration(activity.Duration), SortRank: sortRank}, nil
 }
 
 // CreateEmptyDependencyTableRow implements [routes.StoreView].
@@ -88,6 +104,50 @@ var _ routes.StoreView = (*StoreViewSqliteAdapter)(nil) //ensures ExampleStruct 
 
 type StoreFormSqliteAdapter struct {
 	queries *Queries
+}
+
+// GetLastDependencyTableRowByProjectId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) GetLastDependencyTableRowByProjectId(projectId uuid.UUID, ctx context.Context) (storemodels.TableRow, error) {
+	resp, err := s.queries.FindLastActivityByProject(ctx, projectId.String())
+	if err != nil {
+		return storemodels.TableRow{}, nil
+	}
+	return storemodels.TableRow{ID: resp.ID, ProjectID: resp.ProjectID, DispName: resp.DispName, Duration: resp.Duration, SortRank: resp.SortRank}, nil
+}
+
+// GetPredecessorActivityNamesBySuccessorId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) GetPredecessorActivityNamesBySuccessorId(successorId uuid.UUID, ctx context.Context) ([]storemodels.ActivityNameWithId, error) {
+	predecessorActivitiesResp, err := s.queries.FindAllPredecessorNamesBySuccessor(ctx, successorId.String())
+	if err != nil {
+		return []storemodels.ActivityNameWithId{}, err
+	}
+	predecessorActivity := make([]storemodels.ActivityNameWithId, len(predecessorActivitiesResp))
+	for i, activity := range predecessorActivitiesResp {
+		predecessorActivity[i] = storemodels.ActivityNameWithId{ID: activity.PredecessorActivityID, DispName: activity.PredecessorActivityName}
+	}
+	return predecessorActivity, nil
+}
+
+// DeleteDependencyByProjectPredecessorSuccessorId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) DeleteDependencyByProjectPredecessorSuccessorId(projectId uuid.UUID, predecessorId uuid.UUID, successorId uuid.UUID, ctx context.Context) error {
+	return s.queries.DeleteDependencyByProjectPredecessorSuccessor(ctx, DeleteDependencyByProjectPredecessorSuccessorParams{
+		ProjectID:             projectId.String(),
+		PredecessorActivityID: predecessorId.String(),
+		SuccessorActivityID:   successorId.String(),
+	})
+}
+
+// GetActivitiesByProjectId implements [routes.Store].
+func (s *StoreFormSqliteAdapter) GetActivitiesByProjectId(projectId uuid.UUID, ctx context.Context) ([]storemodels.Activity, error) {
+	activities, err := s.queries.FindAllActivitiesByProject(ctx, projectId.String())
+	if err != nil {
+		return []storemodels.Activity{}, err
+	}
+	dto := make([]storemodels.Activity, len(activities))
+	for i, activity := range activities {
+		dto[i] = storemodels.Activity{ID: activity.ID, ProjectID: activity.ProjectID, DispName: activity.DispName, Duration: activity.Duration}
+	}
+	return dto, nil
 }
 
 // UpdateActivityDuration implements [routes.Store].
