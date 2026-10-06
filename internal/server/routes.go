@@ -6,9 +6,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/routes"
 )
 
-func (s *Server) RegisterRoutes() http.Handler {
+func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) http.Handler {
+	rts := routes.NewRoutes(presenter, store)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
@@ -19,6 +23,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
+
+	r.Get("/", rts.HomeHandler)
 
 	return r
 }
