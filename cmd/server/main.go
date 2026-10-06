@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/a-h/templ"
+	"github.com/gtantech/p2/internal/routes"
+	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/template"
 )
 
 func main() {
-	component := template.Hello("World")
-
-	http.Handle("/", templ.Handler(component))
+	t := template.NewTemplPresenter()
+	store := &store.MockStore{}
+	r := routes.NewRoutes(t, store)
+	http.HandleFunc("/", r.HomeHandler)
 
 	fmt.Println("Listening on :8080")
 	http.ListenAndServe(":8080", nil)
