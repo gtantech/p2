@@ -9,3 +9,5 @@ type MockStore struct {
 func (ms *MockStore) GetHome() models.Home {
 	return models.Home{Name: "World"}
 }
+
+var _ models.Model = (*MockStore)(nil) //ensures MockStore implements models.Model at compile time
