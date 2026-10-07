@@ -25,9 +25,8 @@ func (t *TemplPresenter) RegisterModel(model models.Model) {
 }
 
 // DisplayHomeHandler implements [models.Presenter].
-func (t *TemplPresenter) DisplayHomeHandler() http.Handler {
+func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
 	// MOCK VALUES //
-	projectId := uuid.Max()
 	activities := []models.Activity{models.Activity{ActivityId: uuid.New(), DisplayName: "A", Duration: 5 * time.Minute}}
 	////////////////
 	dependencies := map[uuid.UUID][]string{}
