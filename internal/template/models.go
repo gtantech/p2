@@ -44,3 +44,10 @@ type dependencyTable struct {
 	ProjectId uuid.UUID
 	Rows      []dependencyTableRow
 }
+
+type homeParams struct {
+	Table                 dependencyTable
+	TableWrapperDivParams *htmlDiv
+	ContainerDivParams    *htmlDiv
+	PageTitle             string
+}
