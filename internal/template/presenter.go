@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 	"uuid"
 
 	"github.com/a-h/templ"
@@ -26,12 +25,17 @@ func (t *TemplPresenter) RegisterModel(model models.Model) {
 
 // DisplayHomeHandler implements [models.Presenter].
 func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
-	// MOCK VALUES //
-	activities := []models.Activity{models.Activity{ActivityId: uuid.New(), DisplayName: "A", Duration: 5 * time.Minute}}
-	////////////////
-	dependencies := map[uuid.UUID][]string{}
+	activities, _ := t.model.GetActivities(projectId)
+	dependenciesMap := map[uuid.UUID][]string{}
 	for _, activity := range activities {
-		dependencies[activity.ActivityId] = []string{}
+		dependencies, _ := t.model.GetDependencies(activity.ActivityId)
+		dependenciesMap[activity.ActivityId] = func() []string {
+			dependencyStrSlice := make([]string, len(dependencies))
+			for i, dependency := range dependencies {
+				dependencyStrSlice[i] = dependency.DisplayName
+			}
+			return dependencyStrSlice
+		}()
 	}
 
 	h := homeParams{
@@ -61,7 +65,7 @@ func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
 							Name:         "dependency_input",
 							Placeholder:  "Activity A, Activity B...",
 							Autocomplete: Off,
-							Value:        strings.Join(dependencies[activity.ActivityId], ", "),
+							Value:        strings.Join(dependenciesMap[activity.ActivityId], ", "),
 						},
 						DurationTextInputParams: &htmlInput{
 							Id:           fmt.Sprintf("duration-input-id-%s", activity.ActivityId),
