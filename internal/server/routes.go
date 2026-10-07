@@ -25,6 +25,6 @@ func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) 
 	}))
 
 	r.Get("/", rts.HomeHandler)
-
+	r.Get("/static/home_style.css", rts.GetHomeStyleHandler)
 	return r
 }

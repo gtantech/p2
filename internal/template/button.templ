@@ -1,0 +1,20 @@
+package template
+
+
+templ Button(params *htmlButton){
+    <button
+        type="button"
+        class={ params.Class }
+        title={ params.Title }
+    >
+        { params.Text }
+    </button>
+}
+
+templ DependencyTableRowAddButton(){
+    @Button(&htmlButton{
+        Class: "add-button", 
+                    Title: "Add task", 
+                    Text: "+",
+    })
+}

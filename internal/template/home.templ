@@ -1,0 +1,28 @@
+package template
+
+templ Home(params homeParams) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>{params.PageTitle}</title>
+			<link rel="stylesheet" href="/static/home_style.css"/>
+			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" 
+					integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+					crossorigin="anonymous">
+		  	</script>
+		</head>
+		<body>
+			<div class={params.ContainerDivParams.Class}>
+				<h1>{params.PageTitle}</h1>
+				<div 
+					class={params.TableWrapperDivParams.Class}
+					id={params.TableWrapperDivParams.Id}
+				>
+					@DependencyTable(params.Table)
+				</div>
+			</div>
+		</body>
+	</html>
+}
