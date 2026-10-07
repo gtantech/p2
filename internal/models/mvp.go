@@ -11,6 +11,5 @@ type Presenter interface {
 }
 
 type Model interface {
-	GetHome() Home
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
 }
