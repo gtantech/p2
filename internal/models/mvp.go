@@ -12,4 +12,5 @@ type Presenter interface {
 
 type Model interface {
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
+	GetDependencies(activityId uuid.UUID) ([]Activity, error)
 }
