@@ -1,0 +1,13 @@
+package template
+
+templ TextInput(params *htmlInput){
+    <input
+        id={ params.Id }
+        type="text"
+        name={ params.Name }
+        class={ params.Class }
+        placeholder={ params.Placeholder }
+        autocomplete={ params.Autocomplete }
+        value={ params.Value }
+    >
+}

@@ -1,0 +1,60 @@
+package template
+
+import "fmt"
+
+templ DependencyTable(params dependencyTable){
+    <table>
+        <thead>
+            <tr>
+                <th class="activity-column">
+                    Activity
+                </th>
+                <th class="dependency-column">
+                    Dependencies
+                </th>
+                <th class="duration-column">
+                    Duration
+                </th>
+                <th class="action-column">
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id={fmt.Sprintf("activity-table-body-%s", params.ProjectId)}>
+            for _, row := range params.Rows{
+                @DependencyTableRow(row)
+            }
+        </tbody>
+    </table>
+}
+
+templ DependencyTableRow(params dependencyTableRow){
+    <tr class={params.Class} id={params.Id}>
+           <!-- activity name -->
+        <td>
+            @TextInput(params.ActivityTextInputParams)
+        </td>
+        
+        <!-- Dependencies -->
+        <td>
+            <div
+                class={params.DependencyWrapperDivParams.Class}
+                id={params.DependencyWrapperDivParams.Id}
+            >
+                @TextInput(params.DurationTextInputParams)
+            </div>
+        </td>
+        
+        <!-- Duration -->
+        <td>
+            @TextInput(params.DurationTextInputParams)
+        </td>
+        
+        <!-- Add row -->
+        <td>
+            <div class="actions">
+                @DependencyTableRowAddButton()
+            </div>
+        </td>
+    </tr>
+}
