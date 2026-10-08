@@ -14,5 +14,6 @@ type Presenter interface {
 type Model interface {
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
 	CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (Activity, error)
+	CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
 	GetDependencies(activityId uuid.UUID) ([]Activity, error)
 }
