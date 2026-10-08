@@ -12,6 +12,13 @@ type MockStore struct {
 	dependencies map[uuid.UUID][]models.Activity
 }
 
+// CreateActivity implements [models.Model].
+func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (models.Activity, error) {
+	a := models.Activity{ActivityId: uuid.NewV7(), DisplayName: activityName, Duration: duration}
+	ms.activities = append(ms.activities, a)
+	return a, nil
+}
+
 func NewMockStore() *MockStore {
 	ms := &MockStore{}
 	ms.activities = []models.Activity{
