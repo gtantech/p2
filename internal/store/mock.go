@@ -1,6 +1,8 @@
 package store
 
 import (
+	"cmp"
+	"slices"
 	"time"
 	"uuid"
 
@@ -12,6 +14,18 @@ type MockStore struct {
 	activitiesLookup map[uuid.UUID]models.Activity
 	dependencies     map[uuid.UUID][]models.Activity
 	tableRows        []models.TableRow
+}
+
+// GetTableRows implements [models.Model].
+func (ms *MockStore) GetTableRows(projectId uuid.UUID) ([]models.TableRow, error) {
+	trs := ms.tableRows
+	slices.SortFunc(trs, func(a, b models.TableRow) int {
+		if c := cmp.Compare(a.SortRank, b.SortRank); c != 0 {
+			return c
+		}
+		return cmp.Compare(a.SortRank, b.SortRank)
+	})
+	return trs, nil
 }
 
 // CreateTableRow implements [models.Model].
