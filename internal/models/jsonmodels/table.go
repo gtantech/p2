@@ -12,6 +12,11 @@ type PutFromRowActivityNameChange struct {
 	DomName    string    `json:"domName"`
 }
 
+type PutFromRowActivityDependencyChange struct {
+	ActivityId uuid.UUID `json:"activityId"`
+	DomName    string    `json:"domName"`
+}
+
 type PutFromRowActivityDurationChange struct {
 	ActivityId uuid.UUID `json:"activityId"`
 	DomName    string    `json:"domName"`
