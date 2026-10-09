@@ -27,5 +27,6 @@ func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) 
 	r.Get("/", rts.HomeHandler)
 	r.Get("/static/home_style.css", rts.GetHomeStyleHandler)
 	r.Post("/form/json/table/row/empty/component", rts.PostFromRowPlusBtnReturnsEmptyTableRowHandler)
+	r.Put("/form/json/table/row/activity/name", rts.PutActivityNameHandler)
 	return r
 }

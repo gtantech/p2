@@ -8,7 +8,7 @@ type Table struct {
 }
 
 type TableRow struct {
-	Activity
+	*Activity
 	ProjectId    uuid.UUID
 	Dependencies []string
 	SortRank     int64

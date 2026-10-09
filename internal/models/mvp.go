@@ -18,4 +18,5 @@ type Model interface {
 	CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
 	GetDependencies(activityId uuid.UUID) ([]Activity, error)
 	GetTableRows(projectId uuid.UUID) ([]TableRow, error)
+	UpdateActivityName(activityId uuid.UUID, activityName string) (Activity, error)
 }
