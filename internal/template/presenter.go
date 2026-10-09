@@ -71,8 +71,8 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 	return dr
 }
 
-// DisplayTableRow implements [models.Presenter].
-func (t *TemplPresenter) DisplayTableRow(tr models.TableRow) http.Handler {
+// HtmlTableRow implements [models.Presenter].
+func (t *TemplPresenter) HtmlTableRow(tr models.TableRow) http.Handler {
 	dr := todependencyTableRow(tr)
 	return templ.Handler(DependencyTableRow(dr))
 }
@@ -86,8 +86,8 @@ func (t *TemplPresenter) RegisterModel(model models.Model) {
 	t.model = model
 }
 
-// DisplayHomeHandler implements [models.Presenter].
-func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
+// HtmlHomeHandler implements [models.Presenter].
+func (t *TemplPresenter) HtmlHomeHandler(projectId uuid.UUID) http.Handler {
 	tableRows, _ := t.model.GetTableRowsSortedByRank(projectId)
 
 	h := homeParams{

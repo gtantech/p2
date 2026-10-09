@@ -29,7 +29,7 @@ func NewRoutes(presenter models.Presenter, store models.Model) *Routes {
 
 func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	homeProjectId := uuid.Max() //mock home project id
-	rt.presenter.DisplayHomeHandler(homeProjectId).ServeHTTP(w, r)
+	rt.presenter.HtmlHomeHandler(homeProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) GetHomeStyleHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +85,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating new table row in store", err)
 		return
 	}
-	rt.presenter.DisplayTableRow(newTr).ServeHTTP(w, r)
+	rt.presenter.HtmlTableRow(newTr).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request) {

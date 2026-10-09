@@ -8,8 +8,8 @@ import (
 
 type Presenter interface {
 	RegisterModel(model Model)
-	DisplayHomeHandler(projectId uuid.UUID) http.Handler
-	DisplayTableRow(tr TableRow) http.Handler
+	HtmlHomeHandler(projectId uuid.UUID) http.Handler
+	HtmlTableRow(tr TableRow) http.Handler
 }
 
 type Model interface {
