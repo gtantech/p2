@@ -16,6 +16,12 @@ type MockStore struct {
 	tableRows        []models.TableRow
 }
 
+// UpdateActivityDuration implements [models.Model].
+func (ms *MockStore) UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (models.Activity, error) {
+	ms.activitiesLookup[activityId].Duration = duration
+	return *ms.activitiesLookup[activityId], nil
+}
+
 // UpdateActivityName implements [models.Model].
 func (ms *MockStore) UpdateActivityName(activityId uuid.UUID, activityName string) (models.Activity, error) {
 	ms.activitiesLookup[activityId].DisplayName = activityName
