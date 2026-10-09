@@ -1,11 +1,12 @@
 package template
 
 
-templ Button(params *htmlButton){
+templ Button(params *htmxButton){
     <button
         type="button"
         class={ params.Class }
         title={ params.Title }
+        { params.hx... }
     >
         { params.Text }
     </button>
