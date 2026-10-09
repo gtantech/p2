@@ -16,6 +16,32 @@ type MockStore struct {
 	tableRows        []models.TableRow
 }
 
+// UpdateActivityDependencies implements [models.Model].
+func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, activityDependencyNames []string) ([]models.Activity, error) {
+	dependenciesAddr := []*models.Activity{}
+	dependencies := []models.Activity{}
+
+	for _, d := range activityDependencyNames {
+		//find in activities
+		for j, a := range ms.activities {
+			if a.DisplayName == d {
+				dependencies = append(dependencies, ms.activities[j])
+				dependenciesAddr = append(dependenciesAddr, &ms.activities[j])
+				break
+			}
+		}
+	}
+
+	for i, tr := range ms.tableRows {
+		if tr.ActivityId == activityId {
+			ms.tableRows[i].Dependencies = activityDependencyNames
+			break
+		}
+	}
+	ms.dependencies[activityId] = dependenciesAddr
+	return dependencies, nil
+}
+
 // UpdateActivityDuration implements [models.Model].
 func (ms *MockStore) UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (models.Activity, error) {
 	ms.activitiesLookup[activityId].Duration = duration
