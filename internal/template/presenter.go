@@ -16,16 +16,20 @@ type TemplPresenter struct {
 }
 
 func todependencyTableRow(tr models.TableRow) dependencyTableRow {
+	activityDomName := "activity_input"
 	dr := dependencyTableRow{
 		Id:    fmt.Sprintf("activity-row-id-%s", tr.ActivityId),
 		Class: "activity-row",
 		ActivityTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("activity-input-id-%s", tr.ActivityId),
 			Class:        "activity-name",
-			Name:         "activity_input",
+			Name:         activityDomName,
 			Placeholder:  "Activity name",
 			Autocomplete: Off,
 			Value:        tr.DisplayName,
+			HxPut:        "/form/json/table/row/activity/name",
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityNameChange{ActivityId: tr.ActivityId, DomName: activityDomName}),
+			HxTrigger:    "input changed delay:200ms",
 		},
 		DependencyWrapperDivParams: &htmlDiv{
 			Id:    fmt.Sprintf("dependency-wrapper-id-%s", tr.ActivityId),
