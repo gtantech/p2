@@ -59,7 +59,13 @@ func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, activityDe
 
 	for i, tr := range ms.tableRows {
 		if tr.ActivityId == activityId {
-			ms.tableRows[i].Dependencies = activityDependencyNames
+			ms.tableRows[i].Dependencies = func() []string {
+				dependencyStrSlice := make([]string, len(dependencies))
+				for i := range dependencies {
+					dependencyStrSlice[i] = dependencies[i].DisplayName
+				}
+				return dependencyStrSlice
+			}()
 			break
 		}
 	}
