@@ -52,27 +52,17 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
 		return
 	}
-	trs, err := rt.store.GetTableRowsSortedByRank(dto.ProjectId)
-	if err != nil {
-		http.Error(w, "failed to get table rows", http.StatusInternalServerError)
-		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table rows from store", err)
-		return
-	}
-	var rowAfter *models.TableRow = nil
 	rowCurrent, err := rt.store.GetTableRowByActivityId(dto.RelativeToActivityId)
 	if err != nil {
 		http.Error(w, "failed to get requesting table row", http.StatusInternalServerError)
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table row from store", err)
 		return
 	}
-	for i := range trs {
-		if i == 0 {
-			continue
-		}
-		if trs[i-1].ActivityId == dto.RelativeToActivityId {
-			rowAfter = &trs[i]
-			break
-		}
+	rowAfter, err := rt.store.GetNextTableRowByActivityId(dto.ProjectId, dto.RelativeToActivityId)
+	if err != nil {
+		http.Error(w, "failed to get next table row", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting next table row from store", err)
+		return
 	}
 	insertRowRank := rowCurrent.SortRank
 	if rowAfter == nil {

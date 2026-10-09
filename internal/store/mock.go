@@ -17,6 +17,25 @@ type MockStore struct {
 	tableRowsLookup  map[uuid.UUID]*models.TableRow
 }
 
+// GetNextTableRowByActivityId implements [models.Model].
+func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (*models.TableRow, error) {
+	var rowAfter *models.TableRow = nil
+	trs, err := ms.GetTableRowsSortedByRank(projectId)
+	if err != nil {
+		return nil, err
+	}
+	for i := range trs {
+		if i == 0 {
+			continue
+		}
+		if trs[i-1].ActivityId == activityId {
+			rowAfter = &trs[i]
+			break
+		}
+	}
+	return rowAfter, nil
+}
+
 // GetTableRowByActivityId implements [models.Model].
 func (ms *MockStore) GetTableRowByActivityId(activityId uuid.UUID) (models.TableRow, error) {
 	return *ms.tableRowsLookup[activityId], nil
