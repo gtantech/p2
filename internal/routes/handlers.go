@@ -82,3 +82,21 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 	}
 	rt.presenter.DisplayTableRow(newTr).ServeHTTP(w, r)
 }
+
+func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := r.FormValue("json")
+	var dto jsonmodels.PutFromRowActivityNameChange
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
+		return
+	}
+	userInput := r.FormValue(dto.DomName)
+	if _, err := rt.store.UpdateActivityName(dto.ActivityId, userInput); err != nil {
+		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
+		log.Printf("returned http internal server error for err: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
