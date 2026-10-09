@@ -19,7 +19,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 	dr := dependencyTableRow{
 		Id:    fmt.Sprintf("activity-row-id-%s", tr.ActivityId),
 		Class: "activity-row",
-		ActivityTextInputParams: &htmlInput{
+		ActivityTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("activity-input-id-%s", tr.ActivityId),
 			Class:        "activity-name",
 			Name:         "activity_input",
@@ -31,7 +31,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Id:    fmt.Sprintf("dependency-wrapper-id-%s", tr.ActivityId),
 			Class: "dependency-wrapper",
 		},
-		DependencyTextInputParams: &htmlInput{
+		DependencyTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("dependency-input-id-%s", tr.ActivityId),
 			Class:        "dependency-input",
 			Name:         "dependency_input",
@@ -39,7 +39,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Autocomplete: Off,
 			Value:        strings.Join(tr.Dependencies, ", "),
 		},
-		DurationTextInputParams: &htmlInput{
+		DurationTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("duration-input-id-%s", tr.ActivityId),
 			Name:         "duration_input",
 			Placeholder:  "e.g. 2h",
