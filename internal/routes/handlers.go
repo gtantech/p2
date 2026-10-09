@@ -38,7 +38,7 @@ func (rt *Routes) GetHomeStyleHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue(jsonmodels.JsonMarshalField)
+	jsonStr := getJson(r)
 	dto := jsonmodels.PostFromRowPlusBtn{}
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -89,7 +89,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 }
 
 func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue(jsonmodels.JsonMarshalField)
+	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityNameChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -107,7 +107,7 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue(jsonmodels.JsonMarshalField)
+	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDependencyChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -129,7 +129,7 @@ func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue(jsonmodels.JsonMarshalField)
+	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDurationChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -150,6 +150,10 @@ func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func getJson(r *http.Request) string {
+	return r.FormValue(jsonmodels.JsonMarshalField)
 }
 
 func parseDuration(s string) (time.Duration, error) {
