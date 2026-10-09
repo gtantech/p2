@@ -106,6 +106,28 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
+func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := r.FormValue("json")
+	var dto jsonmodels.PutFromRowActivityDependencyChange
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
+		return
+	}
+	userInput := strings.Split(r.FormValue(dto.DomName), ",")
+	for i := range userInput {
+		userInput[i] = strings.TrimSpace(userInput[i])
+	}
+
+	if _, err := rt.store.UpdateActivityDependencies(dto.ActivityId, userInput); err != nil {
+		http.Error(w, "failed to update activity dependencies", http.StatusInternalServerError)
+		log.Printf("returned http internal server error for err: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := r.FormValue("json")
 	var dto jsonmodels.PutFromRowActivityDurationChange
