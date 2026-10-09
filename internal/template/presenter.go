@@ -89,17 +89,6 @@ func (t *TemplPresenter) RegisterModel(model models.Model) {
 // DisplayHomeHandler implements [models.Presenter].
 func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
 	tableRows, _ := t.model.GetTableRowsSortedByRank(projectId)
-	dependenciesMap := map[uuid.UUID][]string{}
-	for _, tr := range tableRows {
-		dependencies, _ := t.model.GetDependencies(tr.ActivityId)
-		dependenciesMap[tr.ActivityId] = func() []string {
-			dependencyStrSlice := make([]string, len(dependencies))
-			for i, dependency := range dependencies {
-				dependencyStrSlice[i] = dependency.DisplayName
-			}
-			return dependencyStrSlice
-		}()
-	}
 
 	h := homeParams{
 		Table: dependencyTable{
