@@ -16,7 +16,6 @@ type Model interface {
 	CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (Activity, error)
 	CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
-	GetDependencies(activityId uuid.UUID) ([]Activity, error)
 	GetTableRowsSortedByRank(projectId uuid.UUID) ([]TableRow, error)
 	UpdateActivityName(activityId uuid.UUID, activityName string) (Activity, error)
 	UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (Activity, error)

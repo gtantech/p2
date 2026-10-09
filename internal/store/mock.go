@@ -108,16 +108,6 @@ func NewMockStore() *MockStore {
 	return ms
 }
 
-// GetDependencies implements [models.Model].
-func (ms *MockStore) GetDependencies(activityId uuid.UUID) ([]models.Activity, error) {
-	resp := make([]models.Activity, len(ms.dependencies[activityId]))
-	for i := range ms.dependencies[activityId] {
-		resp[i] = *ms.dependencies[activityId][i]
-	}
-
-	return resp, nil
-}
-
 // GetActivities implements [models.Model].
 func (ms *MockStore) GetActivities(projectId uuid.UUID) ([]models.Activity, error) {
 	return ms.activities, nil
