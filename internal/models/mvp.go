@@ -19,4 +19,5 @@ type Model interface {
 	GetDependencies(activityId uuid.UUID) ([]Activity, error)
 	GetTableRows(projectId uuid.UUID) ([]TableRow, error)
 	UpdateActivityName(activityId uuid.UUID, activityName string) (Activity, error)
+	UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (Activity, error)
 }
