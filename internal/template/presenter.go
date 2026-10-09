@@ -16,19 +16,20 @@ type TemplPresenter struct {
 }
 
 func todependencyTableRow(tr models.TableRow) dependencyTableRow {
-	activityDomName := "activity_input"
+	activityNameDomName := "activity_input"
+	activityDurationDomName := "duration_input"
 	dr := dependencyTableRow{
 		Id:    fmt.Sprintf("activity-row-id-%s", tr.ActivityId),
 		Class: "activity-row",
 		ActivityTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("activity-input-id-%s", tr.ActivityId),
 			Class:        "activity-name",
-			Name:         activityDomName,
+			Name:         activityNameDomName,
 			Placeholder:  "Activity name",
 			Autocomplete: Off,
 			Value:        tr.DisplayName,
 			HxPut:        "/form/json/table/row/activity/name",
-			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityNameChange{ActivityId: tr.ActivityId, DomName: activityDomName}),
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityNameChange{ActivityId: tr.ActivityId, DomName: activityNameDomName}),
 			HxTrigger:    "input changed delay:200ms",
 		},
 		DependencyWrapperDivParams: &htmlDiv{
@@ -45,10 +46,13 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 		},
 		DurationTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("duration-input-id-%s", tr.ActivityId),
-			Name:         "duration_input",
+			Name:         activityDurationDomName,
 			Placeholder:  "e.g. 2h",
 			Autocomplete: Off,
 			Value:        tr.Duration.String(),
+			HxPut:        "/form/json/table/row/activity/duration",
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityDurationChange{ActivityId: tr.ActivityId, DomName: activityDurationDomName}),
+			HxTrigger:    "input changed delay:200ms",
 		},
 		TableRowAddBtnParams: &htmxButton{
 			Class:    "add-button",
