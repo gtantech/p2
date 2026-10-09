@@ -38,6 +38,7 @@ type dependencyTableRow struct {
 	DependencyWrapperDivParams *htmlDiv
 	DependencyTextInputParams  *htmlInput
 	DurationTextInputParams    *htmlInput
+	TableRowAddBtnParams       *htmlButton
 }
 
 type dependencyTable struct {
