@@ -20,7 +20,7 @@ func NewServer(config models.ServerConfig) *Server {
 		port: config.Port,
 	}
 	t := template.NewTemplPresenter()
-	store := &store.MockStore{}
+	store := store.NewMockStore()
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", newServer.port),

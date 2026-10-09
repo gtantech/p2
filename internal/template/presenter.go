@@ -8,10 +8,61 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/models/jsonmodels"
 )
 
 type TemplPresenter struct {
 	model models.Model
+}
+
+func todependencyTableRow(tr models.TableRow) dependencyTableRow {
+	dr := dependencyTableRow{
+		Id:    fmt.Sprintf("activity-row-id-%s", tr.ActivityId),
+		Class: "activity-row",
+		ActivityTextInputParams: &htmlInput{
+			Id:           fmt.Sprintf("activity-input-id-%s", tr.ActivityId),
+			Class:        "activity-name",
+			Name:         "activity_input",
+			Placeholder:  "Activity name",
+			Autocomplete: Off,
+			Value:        tr.DisplayName,
+		},
+		DependencyWrapperDivParams: &htmlDiv{
+			Id:    fmt.Sprintf("dependency-wrapper-id-%s", tr.ActivityId),
+			Class: "dependency-wrapper",
+		},
+		DependencyTextInputParams: &htmlInput{
+			Id:           fmt.Sprintf("dependency-input-id-%s", tr.ActivityId),
+			Class:        "dependency-input",
+			Name:         "dependency_input",
+			Placeholder:  "Activity A, Activity B...",
+			Autocomplete: Off,
+			Value:        strings.Join(tr.Dependencies, ", "),
+		},
+		DurationTextInputParams: &htmlInput{
+			Id:           fmt.Sprintf("duration-input-id-%s", tr.ActivityId),
+			Name:         "duration_input",
+			Placeholder:  "e.g. 2h",
+			Autocomplete: Off,
+			Value:        tr.Duration.String(),
+		},
+		TableRowAddBtnParams: &htmxButton{
+			Class:    "add-button",
+			Title:    "Add activity",
+			Text:     "+",
+			HxPost:   "/form/json/table/row/empty/component",
+			HxVals:   jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromRowPlusBtn{ProjectId: tr.ProjectId, RelativeToActivityId: tr.ActivityId}),
+			HxTarget: "closest tr",
+			HxSwap:   "afterend",
+		},
+	}
+	return dr
+}
+
+// DisplayTableRow implements [models.Presenter].
+func (t *TemplPresenter) DisplayTableRow(tr models.TableRow) http.Handler {
+	dr := todependencyTableRow(tr)
+	return templ.Handler(DependencyTableRow(dr))
 }
 
 func NewTemplPresenter() *TemplPresenter {
@@ -25,11 +76,11 @@ func (t *TemplPresenter) RegisterModel(model models.Model) {
 
 // DisplayHomeHandler implements [models.Presenter].
 func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
-	activities, _ := t.model.GetActivities(projectId)
+	tableRows, _ := t.model.GetTableRows(projectId)
 	dependenciesMap := map[uuid.UUID][]string{}
-	for _, activity := range activities {
-		dependencies, _ := t.model.GetDependencies(activity.ActivityId)
-		dependenciesMap[activity.ActivityId] = func() []string {
+	for _, tr := range tableRows {
+		dependencies, _ := t.model.GetDependencies(tr.ActivityId)
+		dependenciesMap[tr.ActivityId] = func() []string {
 			dependencyStrSlice := make([]string, len(dependencies))
 			for i, dependency := range dependencies {
 				dependencyStrSlice[i] = dependency.DisplayName
@@ -42,39 +93,9 @@ func (t *TemplPresenter) DisplayHomeHandler(projectId uuid.UUID) http.Handler {
 		Table: dependencyTable{
 			ProjectId: projectId,
 			Rows: func() []dependencyTableRow {
-				dtr := make([]dependencyTableRow, len(activities))
-				for i, activity := range activities {
-					dtr[i] = dependencyTableRow{
-						Id:    fmt.Sprintf("activity-row-id-%s", activity.ActivityId),
-						Class: "activity-row",
-						ActivityTextInputParams: &htmlInput{
-							Id:           fmt.Sprintf("activity-input-id-%s", activity.ActivityId),
-							Class:        "activity-name",
-							Name:         "activity_input",
-							Placeholder:  "Activity name",
-							Autocomplete: Off,
-							Value:        activity.DisplayName,
-						},
-						DependencyWrapperDivParams: &htmlDiv{
-							Id:    fmt.Sprintf("dependency-wrapper-id-%s", activity.ActivityId),
-							Class: "dependency-wrapper",
-						},
-						DependencyTextInputParams: &htmlInput{
-							Id:           fmt.Sprintf("dependency-input-id-%s", activity.ActivityId),
-							Class:        "dependency-input",
-							Name:         "dependency_input",
-							Placeholder:  "Activity A, Activity B...",
-							Autocomplete: Off,
-							Value:        strings.Join(dependenciesMap[activity.ActivityId], ", "),
-						},
-						DurationTextInputParams: &htmlInput{
-							Id:           fmt.Sprintf("duration-input-id-%s", activity.ActivityId),
-							Name:         "duration_input",
-							Placeholder:  "e.g. 2h",
-							Autocomplete: Off,
-							Value:        activity.Duration.String(),
-						},
-					}
+				dtr := make([]dependencyTableRow, len(tableRows))
+				for i, tr := range tableRows {
+					dtr[i] = todependencyTableRow(tr)
 				}
 				return dtr
 			}(),

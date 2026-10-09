@@ -1,6 +1,8 @@
 package store
 
 import (
+	"cmp"
+	"slices"
 	"time"
 	"uuid"
 
@@ -8,31 +10,74 @@ import (
 )
 
 type MockStore struct {
+	activities       []models.Activity
+	activitiesLookup map[uuid.UUID]models.Activity
+	dependencies     map[uuid.UUID][]models.Activity
+	tableRows        []models.TableRow
+}
+
+// GetTableRows implements [models.Model].
+func (ms *MockStore) GetTableRows(projectId uuid.UUID) ([]models.TableRow, error) {
+	trs := ms.tableRows
+	slices.SortFunc(trs, func(a, b models.TableRow) int {
+		if c := cmp.Compare(a.SortRank, b.SortRank); c != 0 {
+			return c
+		}
+		return cmp.Compare(a.SortRank, b.SortRank)
+	})
+	return trs, nil
+}
+
+// CreateTableRow implements [models.Model].
+func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (models.TableRow, error) {
+	dependenciesStr := []string{}
+	dependencies := ms.dependencies[activityId]
+	for _, d := range dependencies {
+		dependenciesStr = append(dependenciesStr, d.DisplayName)
+	}
+	tr := models.TableRow{Activity: ms.activitiesLookup[activityId], ProjectId: projectId, Dependencies: dependenciesStr, SortRank: rowSortRank}
+	ms.tableRows = append(ms.tableRows, tr)
+	return tr, nil
+}
+
+// CreateActivity implements [models.Model].
+func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (models.Activity, error) {
+	a := models.Activity{ActivityId: uuid.NewV7(), DisplayName: activityName, Duration: duration}
+	ms.activitiesLookup[a.ActivityId] = a
+	ms.activities = append(ms.activities, a)
+	return a, nil
+}
+
+func NewMockStore() *MockStore {
+	ms := &MockStore{}
+	ms.activitiesLookup = map[uuid.UUID]models.Activity{}
+	ms.activities = []models.Activity{
+		{ActivityId: uuid.MustParse("dcce6c98-b31b-4ed6-a2ed-15d24ae96b41"), DisplayName: "A", Duration: 5 * time.Minute},
+		{ActivityId: uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b"), DisplayName: "B", Duration: 4 * time.Minute},
+		{ActivityId: uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52"), DisplayName: "C", Duration: 3 * time.Minute},
+	}
+
+	ms.dependencies = map[uuid.UUID][]models.Activity{}
+	ms.dependencies[uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b")] = []models.Activity{ms.activities[0]}
+	ms.dependencies[uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52")] = []models.Activity{ms.activities[0], ms.activities[1]}
+
+	ms.tableRows = []models.TableRow{}
+
+	for i, a := range ms.activities {
+		ms.activitiesLookup[a.ActivityId] = a
+		ms.CreateTableRow(uuid.Max(), a.ActivityId, int64(i)*1000)
+	}
+	return ms
 }
 
 // GetDependencies implements [models.Model].
 func (ms *MockStore) GetDependencies(activityId uuid.UUID) ([]models.Activity, error) {
-
-	activities := []models.Activity{
-		{ActivityId: uuid.MustParse("dcce6c98-b31b-4ed6-a2ed-15d24ae96b41"), DisplayName: "A", Duration: 5 * time.Minute},
-		{ActivityId: uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b"), DisplayName: "B", Duration: 4 * time.Minute},
-		{ActivityId: uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52"), DisplayName: "C", Duration: 3 * time.Minute},
-	}
-
-	dependencies := map[uuid.UUID][]models.Activity{}
-	dependencies[uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b")] = []models.Activity{activities[0]}
-	dependencies[uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52")] = []models.Activity{activities[0], activities[1]}
-	return dependencies[activityId], nil
+	return ms.dependencies[activityId], nil
 }
 
 // GetActivities implements [models.Model].
 func (ms *MockStore) GetActivities(projectId uuid.UUID) ([]models.Activity, error) {
-	activities := []models.Activity{
-		{ActivityId: uuid.MustParse("dcce6c98-b31b-4ed6-a2ed-15d24ae96b41"), DisplayName: "A", Duration: 5 * time.Minute},
-		{ActivityId: uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b"), DisplayName: "B", Duration: 4 * time.Minute},
-		{ActivityId: uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52"), DisplayName: "C", Duration: 3 * time.Minute},
-	}
-	return activities, nil
+	return ms.activities, nil
 }
 
 // GetHome implements [models.Model].

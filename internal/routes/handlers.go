@@ -1,10 +1,13 @@
 package routes
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"uuid"
 
 	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/models/jsonmodels"
 	"github.com/gtantech/p2/static"
 )
 
@@ -27,4 +30,55 @@ func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 func (rt *Routes) GetHomeStyleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/css; charset=utf-8")
 	w.Write(static.StaticHomeCss)
+}
+
+func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := r.FormValue("json")
+	dto := jsonmodels.PostFromRowPlusBtn{}
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
+		return
+	}
+	activity, err := rt.store.CreateActivity(dto.ProjectId, "", 0)
+	if err != nil {
+		http.Error(w, "failed to create new activity", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
+		return
+	}
+	trs, err := rt.store.GetTableRows(dto.ProjectId)
+	if err != nil {
+		http.Error(w, "failed to get table rows", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table rows from store", err)
+		return
+	}
+	var rowAfter *models.TableRow = nil
+	var rowCurrent models.TableRow
+	for i := range trs {
+		if trs[i].ActivityId == dto.RelativeToActivityId {
+			rowCurrent = trs[i]
+		}
+		if i == 0 {
+			continue
+		}
+		if trs[i-1].ActivityId == dto.RelativeToActivityId {
+			rowAfter = &trs[i]
+			break
+		}
+	}
+	insertRowRank := rowCurrent.SortRank
+	if rowAfter == nil {
+		insertRowRank += 1000
+	} else {
+		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
+	}
+
+	newTr, err := rt.store.CreateTableRow(dto.ProjectId, activity.ActivityId, insertRowRank)
+	if err != nil {
+		http.Error(w, "failed to create new table row", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating new table row in store", err)
+		return
+	}
+	rt.presenter.DisplayTableRow(newTr).ServeHTTP(w, r)
 }
