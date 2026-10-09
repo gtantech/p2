@@ -74,7 +74,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 	}
 	insertRowRank := rowCurrent.SortRank
 	if rowAfter == nil {
-		insertRowRank += 1000
+		insertRowRank += models.TableRowSortRankStep
 	} else {
 		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
 	}

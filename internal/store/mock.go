@@ -103,7 +103,7 @@ func NewMockStore() *MockStore {
 
 	for i, a := range ms.activities {
 		ms.activitiesLookup[a.ActivityId] = &ms.activities[i]
-		ms.CreateTableRow(uuid.Max(), a.ActivityId, int64(i)*1000)
+		ms.CreateTableRow(uuid.Max(), a.ActivityId, int64(i)*models.TableRowSortRankStep)
 	}
 	return ms
 }
