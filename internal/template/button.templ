@@ -10,11 +10,3 @@ templ Button(params *htmlButton){
         { params.Text }
     </button>
 }
-
-templ DependencyTableRowAddButton(){
-    @Button(&htmlButton{
-        Class: "add-button", 
-                    Title: "Add task", 
-                    Text: "+",
-    })
-}
