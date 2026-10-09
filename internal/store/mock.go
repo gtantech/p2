@@ -96,8 +96,8 @@ func NewMockStore() *MockStore {
 	}
 
 	ms.dependencies = map[uuid.UUID][]*models.Activity{}
-	ms.dependencies[uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b")] = []*models.Activity{&ms.activities[0]}
-	ms.dependencies[uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52")] = []*models.Activity{&ms.activities[0], &ms.activities[1]}
+	ms.dependencies[ms.activities[1].ActivityId] = []*models.Activity{&ms.activities[0]}
+	ms.dependencies[ms.activities[2].ActivityId] = []*models.Activity{&ms.activities[0], &ms.activities[1]}
 
 	ms.tableRows = []models.TableRow{}
 
