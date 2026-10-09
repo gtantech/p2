@@ -1,6 +1,6 @@
 package template
 
-templ TextInput(params *htmlInput){
+templ TextInput(params *htmxInput){
     <input
         id={ params.Id }
         type="text"
@@ -9,5 +9,6 @@ templ TextInput(params *htmlInput){
         placeholder={ params.Placeholder }
         autocomplete={ params.Autocomplete }
         value={ params.Value }
+        { params.hx... }
     >
 }
