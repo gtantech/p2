@@ -18,28 +18,24 @@ type MockStore struct {
 }
 
 // GetNextTableRowByActivityId implements [models.Model].
-func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (*models.TableRow, error) {
+func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
 	if _, ok := ms.activitiesLookup[activityId]; !ok {
-		return &models.TableRow{}, ErrActivityNotFound
+		return models.TableRow{}, ErrActivityNotFound
 	}
-	var rowAfter *models.TableRow = nil
+
 	trs, err := ms.GetTableRowsSortedByRank(projectId)
 	if err != nil {
-		return nil, err
+		return models.TableRow{}, err
 	}
 	for i := range trs {
 		if i == 0 {
 			continue
 		}
 		if trs[i-1].ActivityId == activityId {
-			rowAfter = &trs[i]
-			break
+			return trs[i], nil
 		}
 	}
-	if rowAfter == nil {
-		return &models.TableRow{}, ErrEndOfTable
-	}
-	return rowAfter, nil
+	return models.TableRow{}, ErrEndOfTable
 }
 
 // GetTableRowByActivityId implements [models.Model].

@@ -31,7 +31,7 @@ type Model interface {
 
 	// GetNextTableRowByActivityId returns ErrEndOfTable if the row specified by activityId is the last row,
 	// ErrProjectNotFound if projectId does not exist, and ErrActivityNotFound if activityId does not exist.
-	GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (*TableRow, error)
+	GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (TableRow, error)
 
 	// UpdateActivityName returns ErrActivityNotFound if activityId does not exist.
 	UpdateActivityName(activityId uuid.UUID, activityName string) (Activity, error)
