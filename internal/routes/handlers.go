@@ -59,11 +59,13 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		return
 	}
 	var rowAfter *models.TableRow = nil
-	var rowCurrent models.TableRow
+	rowCurrent, err := rt.store.GetTableRowByActivityId(dto.RelativeToActivityId)
+	if err != nil {
+		http.Error(w, "failed to get requesting table row", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table row from store", err)
+		return
+	}
 	for i := range trs {
-		if trs[i].ActivityId == dto.RelativeToActivityId {
-			rowCurrent = trs[i]
-		}
 		if i == 0 {
 			continue
 		}

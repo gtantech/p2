@@ -14,6 +14,12 @@ type MockStore struct {
 	activitiesLookup map[uuid.UUID]*models.Activity
 	dependencies     map[uuid.UUID][]*models.Activity
 	tableRows        []models.TableRow
+	tableRowsLookup  map[uuid.UUID]*models.TableRow
+}
+
+// GetTableRowByActivityId implements [models.Model].
+func (ms *MockStore) GetTableRowByActivityId(activityId uuid.UUID) (models.TableRow, error) {
+	return *ms.tableRowsLookup[activityId], nil
 }
 
 // UpdateActivityDependencies implements [models.Model].
@@ -75,6 +81,7 @@ func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, r
 	}
 	tr := models.TableRow{Activity: ms.activitiesLookup[activityId], ProjectId: projectId, Dependencies: dependenciesStr, SortRank: rowSortRank}
 	ms.tableRows = append(ms.tableRows, tr)
+	ms.tableRowsLookup[activityId] = &ms.tableRows[len(ms.tableRows)-1]
 	return tr, nil
 }
 
@@ -89,6 +96,7 @@ func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, du
 func NewMockStore() *MockStore {
 	ms := &MockStore{}
 	ms.activitiesLookup = map[uuid.UUID]*models.Activity{}
+	ms.tableRowsLookup = map[uuid.UUID]*models.TableRow{}
 	ms.activities = []models.Activity{
 		{ActivityId: uuid.MustParse("dcce6c98-b31b-4ed6-a2ed-15d24ae96b41"), DisplayName: "A", Duration: 5 * time.Minute},
 		{ActivityId: uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b"), DisplayName: "B", Duration: 4 * time.Minute},
