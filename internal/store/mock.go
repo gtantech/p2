@@ -43,6 +43,7 @@ func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, r
 // CreateActivity implements [models.Model].
 func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (models.Activity, error) {
 	a := models.Activity{ActivityId: uuid.NewV7(), DisplayName: activityName, Duration: duration}
+	ms.activitiesLookup[a.ActivityId] = a
 	ms.activities = append(ms.activities, a)
 	return a, nil
 }
