@@ -29,5 +29,6 @@ func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) 
 	r.Post("/form/json/table/row/empty/component", rts.PostFromRowPlusBtnReturnsEmptyTableRowHandler)
 	r.Put("/form/json/table/row/activity/name", rts.PutActivityNameHandler)
 	r.Put("/form/json/table/row/activity/duration", rts.PutActivityDurationHandler)
+	r.Put("/form/json/table/row/activity/dependency", rts.PutActivityDependencyHandler)
 	return r
 }
