@@ -16,35 +16,47 @@ type TemplPresenter struct {
 }
 
 func todependencyTableRow(tr models.TableRow) dependencyTableRow {
+	activityNameDomName := "activity_input"
+	activityDurationDomName := "duration_input"
+	activityDependencyDomName := "dependency_input"
 	dr := dependencyTableRow{
 		Id:    fmt.Sprintf("activity-row-id-%s", tr.ActivityId),
 		Class: "activity-row",
-		ActivityTextInputParams: &htmlInput{
+		ActivityTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("activity-input-id-%s", tr.ActivityId),
 			Class:        "activity-name",
-			Name:         "activity_input",
+			Name:         activityNameDomName,
 			Placeholder:  "Activity name",
 			Autocomplete: Off,
 			Value:        tr.DisplayName,
+			HxPut:        "/form/json/table/row/activity/name",
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityNameChange{ActivityId: tr.ActivityId, DomName: activityNameDomName}),
+			HxTrigger:    "input changed delay:200ms",
 		},
 		DependencyWrapperDivParams: &htmlDiv{
 			Id:    fmt.Sprintf("dependency-wrapper-id-%s", tr.ActivityId),
 			Class: "dependency-wrapper",
 		},
-		DependencyTextInputParams: &htmlInput{
+		DependencyTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("dependency-input-id-%s", tr.ActivityId),
 			Class:        "dependency-input",
-			Name:         "dependency_input",
+			Name:         activityDependencyDomName,
 			Placeholder:  "Activity A, Activity B...",
 			Autocomplete: Off,
 			Value:        strings.Join(tr.Dependencies, ", "),
+			HxPut:        "/form/json/table/row/activity/dependency",
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, DomName: activityDependencyDomName}),
+			HxTrigger:    "input changed delay:200ms",
 		},
-		DurationTextInputParams: &htmlInput{
+		DurationTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("duration-input-id-%s", tr.ActivityId),
-			Name:         "duration_input",
+			Name:         activityDurationDomName,
 			Placeholder:  "e.g. 2h",
 			Autocomplete: Off,
 			Value:        tr.Duration.String(),
+			HxPut:        "/form/json/table/row/activity/duration",
+			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityDurationChange{ActivityId: tr.ActivityId, DomName: activityDurationDomName}),
+			HxTrigger:    "input changed delay:200ms",
 		},
 		TableRowAddBtnParams: &htmxButton{
 			Class:    "add-button",

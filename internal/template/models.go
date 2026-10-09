@@ -22,6 +22,11 @@ type htmlInput struct {
 	Value        string
 }
 
+type htmxInput struct {
+	htmlInput
+	hx
+}
+
 type htmlDiv struct {
 	Id    string
 	Class string
@@ -41,10 +46,10 @@ type htmxButton struct {
 type dependencyTableRow struct {
 	Id                         string
 	Class                      string
-	ActivityTextInputParams    *htmlInput
+	ActivityTextInputParams    *htmxInput
 	DependencyWrapperDivParams *htmlDiv
-	DependencyTextInputParams  *htmlInput
-	DurationTextInputParams    *htmlInput
+	DependencyTextInputParams  *htmxInput
+	DurationTextInputParams    *htmxInput
 	TableRowAddBtnParams       *htmxButton
 }
 
