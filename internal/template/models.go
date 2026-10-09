@@ -22,6 +22,11 @@ type htmlInput struct {
 	Value        string
 }
 
+type htmxInput struct {
+	htmlInput
+	hx
+}
+
 type htmlDiv struct {
 	Id    string
 	Class string
