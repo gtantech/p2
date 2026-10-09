@@ -11,3 +11,8 @@ type PutFromRowActivityNameChange struct {
 	ActivityId uuid.UUID `json:"activityId"`
 	DomName    string    `json:"domName"`
 }
+
+type PutFromRowActivityDurationChange struct {
+	ActivityId uuid.UUID `json:"activityId"`
+	DomName    string    `json:"domName"`
+}
