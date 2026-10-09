@@ -29,7 +29,7 @@ func NewRoutes(presenter models.Presenter, store models.Model) *Routes {
 
 func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	homeProjectId := uuid.Max() //mock home project id
-	rt.presenter.DisplayHomeHandler(homeProjectId).ServeHTTP(w, r)
+	rt.presenter.HtmlHomeHandler(homeProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) GetHomeStyleHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,7 @@ func (rt *Routes) GetHomeStyleHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue("json")
+	jsonStr := getJson(r)
 	dto := jsonmodels.PostFromRowPlusBtn{}
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -52,29 +52,21 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
 		return
 	}
-	trs, err := rt.store.GetTableRows(dto.ProjectId)
+	rowCurrent, err := rt.store.GetTableRowByActivityId(dto.RelativeToActivityId)
 	if err != nil {
-		http.Error(w, "failed to get table rows", http.StatusInternalServerError)
-		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table rows from store", err)
+		http.Error(w, "failed to get requesting table row", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table row from store", err)
 		return
 	}
-	var rowAfter *models.TableRow = nil
-	var rowCurrent models.TableRow
-	for i := range trs {
-		if trs[i].ActivityId == dto.RelativeToActivityId {
-			rowCurrent = trs[i]
-		}
-		if i == 0 {
-			continue
-		}
-		if trs[i-1].ActivityId == dto.RelativeToActivityId {
-			rowAfter = &trs[i]
-			break
-		}
+	rowAfter, err := rt.store.GetNextTableRowByActivityId(dto.ProjectId, dto.RelativeToActivityId)
+	if err != nil {
+		http.Error(w, "failed to get next table row", http.StatusInternalServerError)
+		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting next table row from store", err)
+		return
 	}
 	insertRowRank := rowCurrent.SortRank
 	if rowAfter == nil {
-		insertRowRank += 1000
+		insertRowRank += models.TableRowSortRankStep
 	} else {
 		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
 	}
@@ -85,11 +77,11 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating new table row in store", err)
 		return
 	}
-	rt.presenter.DisplayTableRow(newTr).ServeHTTP(w, r)
+	rt.presenter.HtmlTableRow(newTr).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue("json")
+	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityNameChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -107,7 +99,7 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue("json")
+	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDependencyChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -129,7 +121,7 @@ func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {
-	jsonStr := r.FormValue("json")
+	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDurationChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
@@ -150,6 +142,10 @@ func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func getJson(r *http.Request) string {
+	return r.FormValue(jsonmodels.JsonMarshalField)
 }
 
 func parseDuration(s string) (time.Duration, error) {

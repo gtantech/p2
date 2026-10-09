@@ -13,7 +13,32 @@ type MockStore struct {
 	activities       []models.Activity
 	activitiesLookup map[uuid.UUID]*models.Activity
 	dependencies     map[uuid.UUID][]*models.Activity
-	tableRows        []models.TableRow
+	tableRows        []*models.TableRow
+	tableRowsLookup  map[uuid.UUID]*models.TableRow
+}
+
+// GetNextTableRowByActivityId implements [models.Model].
+func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (*models.TableRow, error) {
+	var rowAfter *models.TableRow = nil
+	trs, err := ms.GetTableRowsSortedByRank(projectId)
+	if err != nil {
+		return nil, err
+	}
+	for i := range trs {
+		if i == 0 {
+			continue
+		}
+		if trs[i-1].ActivityId == activityId {
+			rowAfter = &trs[i]
+			break
+		}
+	}
+	return rowAfter, nil
+}
+
+// GetTableRowByActivityId implements [models.Model].
+func (ms *MockStore) GetTableRowByActivityId(activityId uuid.UUID) (models.TableRow, error) {
+	return *ms.tableRowsLookup[activityId], nil
 }
 
 // UpdateActivityDependencies implements [models.Model].
@@ -32,12 +57,13 @@ func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, activityDe
 		}
 	}
 
-	for i, tr := range ms.tableRows {
-		if tr.ActivityId == activityId {
-			ms.tableRows[i].Dependencies = activityDependencyNames
-			break
+	ms.tableRowsLookup[activityId].Dependencies = func() []string {
+		dependencyStrSlice := make([]string, len(dependencies))
+		for i := range dependencies {
+			dependencyStrSlice[i] = dependencies[i].DisplayName
 		}
-	}
+		return dependencyStrSlice
+	}()
 	ms.dependencies[activityId] = dependenciesAddr
 	return dependencies, nil
 }
@@ -54,16 +80,22 @@ func (ms *MockStore) UpdateActivityName(activityId uuid.UUID, activityName strin
 	return *ms.activitiesLookup[activityId], nil
 }
 
-// GetTableRows implements [models.Model].
-func (ms *MockStore) GetTableRows(projectId uuid.UUID) ([]models.TableRow, error) {
+// GetTableRowsSortedByRank implements [models.Model].
+func (ms *MockStore) GetTableRowsSortedByRank(projectId uuid.UUID) ([]models.TableRow, error) {
 	trs := ms.tableRows
-	slices.SortFunc(trs, func(a, b models.TableRow) int {
+	slices.SortFunc(trs, func(a, b *models.TableRow) int {
 		if c := cmp.Compare(a.SortRank, b.SortRank); c != 0 {
 			return c
 		}
 		return cmp.Compare(a.SortRank, b.SortRank)
 	})
-	return trs, nil
+	return func() []models.TableRow {
+		trsSorted := make([]models.TableRow, len(trs))
+		for i := range trs {
+			trsSorted[i] = *trs[i]
+		}
+		return trsSorted
+	}(), nil
 }
 
 // CreateTableRow implements [models.Model].
@@ -74,7 +106,8 @@ func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, r
 		dependenciesStr = append(dependenciesStr, d.DisplayName)
 	}
 	tr := models.TableRow{Activity: ms.activitiesLookup[activityId], ProjectId: projectId, Dependencies: dependenciesStr, SortRank: rowSortRank}
-	ms.tableRows = append(ms.tableRows, tr)
+	ms.tableRows = append(ms.tableRows, &tr)
+	ms.tableRowsLookup[activityId] = ms.tableRows[len(ms.tableRows)-1]
 	return tr, nil
 }
 
@@ -89,6 +122,7 @@ func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, du
 func NewMockStore() *MockStore {
 	ms := &MockStore{}
 	ms.activitiesLookup = map[uuid.UUID]*models.Activity{}
+	ms.tableRowsLookup = map[uuid.UUID]*models.TableRow{}
 	ms.activities = []models.Activity{
 		{ActivityId: uuid.MustParse("dcce6c98-b31b-4ed6-a2ed-15d24ae96b41"), DisplayName: "A", Duration: 5 * time.Minute},
 		{ActivityId: uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b"), DisplayName: "B", Duration: 4 * time.Minute},
@@ -96,26 +130,16 @@ func NewMockStore() *MockStore {
 	}
 
 	ms.dependencies = map[uuid.UUID][]*models.Activity{}
-	ms.dependencies[uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b")] = []*models.Activity{&ms.activities[0]}
-	ms.dependencies[uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52")] = []*models.Activity{&ms.activities[0], &ms.activities[1]}
+	ms.dependencies[ms.activities[1].ActivityId] = []*models.Activity{&ms.activities[0]}
+	ms.dependencies[ms.activities[2].ActivityId] = []*models.Activity{&ms.activities[0], &ms.activities[1]}
 
-	ms.tableRows = []models.TableRow{}
+	ms.tableRows = []*models.TableRow{}
 
 	for i, a := range ms.activities {
 		ms.activitiesLookup[a.ActivityId] = &ms.activities[i]
-		ms.CreateTableRow(uuid.Max(), a.ActivityId, int64(i)*1000)
+		ms.CreateTableRow(uuid.Max(), a.ActivityId, int64(i)*models.TableRowSortRankStep)
 	}
 	return ms
-}
-
-// GetDependencies implements [models.Model].
-func (ms *MockStore) GetDependencies(activityId uuid.UUID) ([]models.Activity, error) {
-	resp := make([]models.Activity, len(ms.dependencies[activityId]))
-	for i := range ms.dependencies[activityId] {
-		resp[i] = *ms.dependencies[activityId][i]
-	}
-
-	return resp, nil
 }
 
 // GetActivities implements [models.Model].

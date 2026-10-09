@@ -26,9 +26,20 @@ func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) 
 
 	r.Get("/", rts.HomeHandler)
 	r.Get("/static/home_style.css", rts.GetHomeStyleHandler)
-	r.Post("/form/json/table/row/empty/component", rts.PostFromRowPlusBtnReturnsEmptyTableRowHandler)
-	r.Put("/form/json/table/row/activity/name", rts.PutActivityNameHandler)
-	r.Put("/form/json/table/row/activity/duration", rts.PutActivityDurationHandler)
-	r.Put("/form/json/table/row/activity/dependency", rts.PutActivityDependencyHandler)
+
+	r.Route("/form", func(r chi.Router) {
+		r.Route("/json", func(r chi.Router) {
+			r.Route("/table", func(r chi.Router) {
+				r.Route("/row", func(r chi.Router) {
+					r.Post("/empty/component", rts.PostFromRowPlusBtnReturnsEmptyTableRowHandler)
+					r.Route("/activity", func(r chi.Router) {
+						r.Put("/name", rts.PutActivityNameHandler)
+						r.Put("/duration", rts.PutActivityDurationHandler)
+						r.Put("/dependency", rts.PutActivityDependencyHandler)
+					})
+				})
+			})
+		})
+	})
 	return r
 }
