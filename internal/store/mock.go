@@ -19,6 +19,9 @@ type MockStore struct {
 
 // GetNextTableRowByActivityId implements [models.Model].
 func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (*models.TableRow, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return &models.TableRow{}, ErrActivityNotFound
+	}
 	var rowAfter *models.TableRow = nil
 	trs, err := ms.GetTableRowsSortedByRank(projectId)
 	if err != nil {
@@ -33,16 +36,25 @@ func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId
 			break
 		}
 	}
+	if rowAfter == nil {
+		return &models.TableRow{}, ErrEndOfTable
+	}
 	return rowAfter, nil
 }
 
 // GetTableRowByActivityId implements [models.Model].
 func (ms *MockStore) GetTableRowByActivityId(activityId uuid.UUID) (models.TableRow, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return models.TableRow{}, ErrActivityNotFound
+	}
 	return *ms.tableRowsLookup[activityId], nil
 }
 
 // UpdateActivityDependencies implements [models.Model].
 func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, activityDependencyNames []string) ([]models.Activity, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return []models.Activity{}, ErrActivityNotFound
+	}
 	dependenciesAddr := []*models.Activity{}
 	dependencies := []models.Activity{}
 
@@ -70,12 +82,18 @@ func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, activityDe
 
 // UpdateActivityDuration implements [models.Model].
 func (ms *MockStore) UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (models.Activity, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return models.Activity{}, ErrActivityNotFound
+	}
 	ms.activitiesLookup[activityId].Duration = duration
 	return *ms.activitiesLookup[activityId], nil
 }
 
 // UpdateActivityName implements [models.Model].
 func (ms *MockStore) UpdateActivityName(activityId uuid.UUID, activityName string) (models.Activity, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return models.Activity{}, ErrActivityNotFound
+	}
 	ms.activitiesLookup[activityId].DisplayName = activityName
 	return *ms.activitiesLookup[activityId], nil
 }
@@ -100,6 +118,9 @@ func (ms *MockStore) GetTableRowsSortedByRank(projectId uuid.UUID) ([]models.Tab
 
 // CreateTableRow implements [models.Model].
 func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (models.TableRow, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return models.TableRow{}, ErrActivityNotFound
+	}
 	dependenciesStr := []string{}
 	dependencies := ms.dependencies[activityId]
 	for _, d := range dependencies {
