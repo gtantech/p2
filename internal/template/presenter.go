@@ -8,6 +8,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/models/jsonmodels"
 )
 
 type TemplPresenter struct {
@@ -45,10 +46,14 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Autocomplete: Off,
 			Value:        tr.Duration.String(),
 		},
-		TableRowAddBtnParams: &htmlButton{
-			Class: "add-button",
-			Title: "Add activity",
-			Text:  "+",
+		TableRowAddBtnParams: &htmxButton{
+			Class:    "add-button",
+			Title:    "Add activity",
+			Text:     "+",
+			HxPost:   "/form/json/table/row/empty/component",
+			HxVals:   jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromRowPlusBtn{ProjectId: tr.ProjectId, RelativeToActivityId: tr.ActivityId}),
+			HxTarget: "closest tr",
+			HxSwap:   "afterend",
 		},
 	}
 	return dr

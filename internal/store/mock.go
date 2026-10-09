@@ -35,7 +35,7 @@ func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, r
 	for _, d := range dependencies {
 		dependenciesStr = append(dependenciesStr, d.DisplayName)
 	}
-	tr := models.TableRow{Activity: ms.activitiesLookup[activityId], Dependencies: dependenciesStr, SortRank: rowSortRank}
+	tr := models.TableRow{Activity: ms.activitiesLookup[activityId], ProjectId: projectId, Dependencies: dependenciesStr, SortRank: rowSortRank}
 	ms.tableRows = append(ms.tableRows, tr)
 	return tr, nil
 }
