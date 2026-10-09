@@ -45,6 +45,11 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Autocomplete: Off,
 			Value:        tr.Duration.String(),
 		},
+		TableRowAddBtnParams: &htmlButton{
+			Class: "add-button",
+			Title: "Add activity",
+			Text:  "+",
+		},
 	}
 	return dr
 }
