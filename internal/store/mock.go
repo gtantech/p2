@@ -54,8 +54,8 @@ func (ms *MockStore) UpdateActivityName(activityId uuid.UUID, activityName strin
 	return *ms.activitiesLookup[activityId], nil
 }
 
-// GetTableRows implements [models.Model].
-func (ms *MockStore) GetTableRows(projectId uuid.UUID) ([]models.TableRow, error) {
+// GetTableRowsSortedByRank implements [models.Model].
+func (ms *MockStore) GetTableRowsSortedByRank(projectId uuid.UUID) ([]models.TableRow, error) {
 	trs := ms.tableRows
 	slices.SortFunc(trs, func(a, b models.TableRow) int {
 		if c := cmp.Compare(a.SortRank, b.SortRank); c != 0 {

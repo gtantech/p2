@@ -52,7 +52,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
 		return
 	}
-	trs, err := rt.store.GetTableRows(dto.ProjectId)
+	trs, err := rt.store.GetTableRowsSortedByRank(dto.ProjectId)
 	if err != nil {
 		http.Error(w, "failed to get table rows", http.StatusInternalServerError)
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table rows from store", err)

@@ -13,11 +13,11 @@ type Presenter interface {
 }
 
 type Model interface {
-	GetActivities(projectId uuid.UUID) ([]Activity, error)
 	CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (Activity, error)
 	CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
+	GetActivities(projectId uuid.UUID) ([]Activity, error)
 	GetDependencies(activityId uuid.UUID) ([]Activity, error)
-	GetTableRows(projectId uuid.UUID) ([]TableRow, error)
+	GetTableRowsSortedByRank(projectId uuid.UUID) ([]TableRow, error)
 	UpdateActivityName(activityId uuid.UUID, activityName string) (Activity, error)
 	UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (Activity, error)
 	UpdateActivityDependencies(activityId uuid.UUID, activityDependencyNames []string) ([]Activity, error)
