@@ -47,21 +47,19 @@ func (ms *MockStore) GetTableRowByActivityId(activityId uuid.UUID) (models.Table
 }
 
 // UpdateActivityDependencies implements [models.Model].
-func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, activityDependencyNames []string) ([]models.Activity, error) {
+func (ms *MockStore) UpdateActivityDependencies(activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]models.Activity, error) {
 	if _, ok := ms.activitiesLookup[activityId]; !ok {
 		return []models.Activity{}, ErrActivityNotFound
 	}
 	dependenciesAddr := []*models.Activity{}
 	dependencies := []models.Activity{}
 
-	for _, d := range activityDependencyNames {
-		//find in activities
-		for j, a := range ms.activities {
-			if a.DisplayName == d {
-				dependencies = append(dependencies, ms.activities[j])
-				dependenciesAddr = append(dependenciesAddr, &ms.activities[j])
-				break
-			}
+	for _, d := range dependencyActivityIds {
+		if a, ok := ms.activitiesLookup[d]; ok {
+			dependencies = append(dependencies, *a)
+			dependenciesAddr = append(dependenciesAddr, a)
+		} else {
+			return []models.Activity{}, ErrActivityNotFound
 		}
 	}
 
