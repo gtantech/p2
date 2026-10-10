@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/models/jsonmodels"
+	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/static"
 )
 
@@ -59,14 +61,14 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		return
 	}
 	rowAfter, err := rt.store.GetNextTableRowByActivityId(dto.ProjectId, dto.RelativeToActivityId)
+	insertRowRank := int64(0)
 	if err != nil {
+		if errors.Is(err, store.ErrEndOfTable) {
+			insertRowRank = rowCurrent.SortRank + models.TableRowSortRankStep
+		}
 		http.Error(w, "failed to get next table row", http.StatusInternalServerError)
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting next table row from store", err)
 		return
-	}
-	insertRowRank := rowCurrent.SortRank
-	if rowAfter == nil {
-		insertRowRank += models.TableRowSortRankStep
 	} else {
 		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
 	}
