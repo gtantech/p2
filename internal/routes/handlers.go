@@ -50,12 +50,20 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 	}
 	activity, err := rt.store.CreateActivity(dto.ProjectId, "", 0)
 	if err != nil {
+		if errors.Is(err, store.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, "failed to create new activity", http.StatusInternalServerError)
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
 		return
 	}
 	rowCurrent, err := rt.store.GetTableRowByActivityId(dto.RelativeToActivityId)
 	if err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, "failed to get requesting table row", http.StatusInternalServerError)
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table row from store", err)
 		return
@@ -63,18 +71,35 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 	rowAfter, err := rt.store.GetNextTableRowByActivityId(dto.ProjectId, dto.RelativeToActivityId)
 	insertRowRank := int64(0)
 	if err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, store.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusBadRequest)
+			return
+		}
 		if errors.Is(err, store.ErrEndOfTable) {
 			insertRowRank = rowCurrent.SortRank + models.TableRowSortRankStep
+		} else {
+			http.Error(w, "failed to get next table row", http.StatusInternalServerError)
+			log.Printf("returned http internal server error status while %v. Encountered error %v", "getting next table row from store", err)
+			return
 		}
-		http.Error(w, "failed to get next table row", http.StatusInternalServerError)
-		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting next table row from store", err)
-		return
 	} else {
 		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
 	}
 
 	newTr, err := rt.store.CreateTableRow(dto.ProjectId, activity.ActivityId, insertRowRank)
 	if err != nil {
+		if errors.Is(err, store.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, "failed to create new table row", http.StatusInternalServerError)
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating new table row in store", err)
 		return
@@ -93,6 +118,10 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 	}
 	userInput := r.FormValue(dto.DomName)
 	if _, err := rt.store.UpdateActivityName(dto.ActivityId, userInput); err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
 		log.Printf("returned http internal server error for err: %v", err)
 		return
@@ -115,6 +144,10 @@ func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	if _, err := rt.store.UpdateActivityDependencies(dto.ActivityId, userInput); err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, "failed to update activity dependencies", http.StatusInternalServerError)
 		log.Printf("returned http internal server error for err: %v", err)
 		return
@@ -139,6 +172,10 @@ func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if _, err := rt.store.UpdateActivityDuration(dto.ActivityId, parseUserInput); err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
 		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
 		log.Printf("returned http internal server error for err: %v", err)
 		return
