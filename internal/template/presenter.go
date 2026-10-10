@@ -1,6 +1,7 @@
 package template
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/models/jsonmodels"
+	"github.com/gtantech/p2/internal/store"
 )
 
 type TemplPresenter struct {
@@ -88,8 +90,10 @@ func (t *TemplPresenter) RegisterModel(model models.Model) {
 
 // HtmlHomeHandler implements [models.Presenter].
 func (t *TemplPresenter) HtmlHomeHandler(projectId uuid.UUID) http.Handler {
-	tableRows, _ := t.model.GetTableRowsSortedByRank(projectId)
-
+	tableRows, err := t.model.GetTableRowsSortedByRank(projectId)
+	if errors.Is(err, store.ErrProjectNotFound) {
+		return NewTemplateErrHandler("project not found", http.StatusBadRequest)
+	}
 	h := homeParams{
 		Table: dependencyTable{
 			ProjectId: projectId,
