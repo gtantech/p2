@@ -33,7 +33,7 @@ type htmlDiv struct {
 	Role  string
 }
 
-func (h *htmlDiv) Items() []templ.KeyValue[string, any] {
+func (h htmlDiv) Items() []templ.KeyValue[string, any] {
 	items := make([]templ.KeyValue[string, any], 0, 3)
 
 	add := func(key, value string) {
@@ -47,6 +47,11 @@ func (h *htmlDiv) Items() []templ.KeyValue[string, any] {
 	add("class", h.Class)
 	add("role", h.Role)
 	return items
+}
+
+type htmxDiv struct {
+	htmlDiv
+	hx
 }
 
 type htmlButton struct {
@@ -66,7 +71,7 @@ type dependencyTableRow struct {
 	ActivityTextInputParams       *htmxInput
 	DependencyWrapperDivParams    *htmlDiv
 	DependencyTextInputParams     *htmxInput
-	DependencySuggestionDivParams *htmlDiv
+	DependencySuggestionDivParams *htmxDiv
 	DurationTextInputParams       *htmxInput
 	TableRowAddBtnParams          *htmxButton
 }
