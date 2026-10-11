@@ -50,6 +50,11 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, ProjectId: tr.ProjectId, DomName: activityDependencyDomName}),
 			HxTrigger:    "input changed delay:200ms",
 		},
+		DependencySuggestionDivParams: &htmlDiv{
+			Id:    fmt.Sprintf("dependency-suggestions-%s", tr.ActivityId),
+			Class: "autocomplete",
+			Role:  "listbox",
+		},
 		DurationTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("duration-input-id-%s", tr.ActivityId),
 			Name:         activityDurationDomName,
