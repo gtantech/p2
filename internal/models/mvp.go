@@ -40,5 +40,5 @@ type Model interface {
 	UpdateActivityDuration(activityId uuid.UUID, duration time.Duration) (Activity, error)
 
 	// UpdateActivityDependencies returns ErrActivityNotFound if activityId does not exist.
-	UpdateActivityDependencies(activityId uuid.UUID, activityDependencyNames []string) ([]Activity, error)
+	UpdateActivityDependencies(activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]Activity, error)
 }

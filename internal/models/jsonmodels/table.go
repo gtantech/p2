@@ -14,6 +14,7 @@ type PutFromRowActivityNameChange struct {
 
 type PutFromRowActivityDependencyChange struct {
 	ActivityId uuid.UUID `json:"activityId"`
+	ProjectId  uuid.UUID `json:"projectId"`
 	DomName    string    `json:"domName"`
 }
 

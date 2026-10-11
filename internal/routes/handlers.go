@@ -138,12 +138,33 @@ func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Re
 		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
 		return
 	}
-	userInput := strings.Split(r.FormValue(dto.DomName), ",")
-	for i := range userInput {
-		userInput[i] = strings.TrimSpace(userInput[i])
+
+	activities, err := rt.store.GetActivities(dto.ProjectId)
+	if err != nil {
+		if errors.Is(err, store.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusBadRequest)
+			return
+		}
+		log.Printf("returned http internal server error while getting activities from store. Encountered error: %s", err)
+		return
 	}
 
-	if _, err := rt.store.UpdateActivityDependencies(dto.ActivityId, userInput); err != nil {
+	activityNameMap := make(map[string]uuid.UUID)
+
+	for _, activity := range activities {
+		activityNameMap[activity.DisplayName] = activity.ActivityId
+	}
+	dependencyIds := []uuid.UUID{}
+
+	userInputs := strings.Split(r.FormValue(dto.DomName), ",")
+	for i := range userInputs {
+		userInput := strings.TrimSpace(userInputs[i])
+		if userInputId, ok := activityNameMap[userInput]; ok {
+			dependencyIds = append(dependencyIds, userInputId)
+		}
+	}
+
+	if _, err := rt.store.UpdateActivityDependencies(dto.ActivityId, dependencyIds); err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
 			http.Error(w, "activity not found", http.StatusBadRequest)
 			return
