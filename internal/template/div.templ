@@ -1,8 +1,9 @@
 package template
 
-templ DivWrapChildren(params *htmlDiv){
+templ DivWrapChildren(params *htmxDiv){
      <div
-        { params... }
+        { params.htmlDiv... }
+        { params.hx... }
     >
         { children... }
     </div>
