@@ -51,7 +51,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			HxTrigger:    "input changed delay:200ms",
 		},
 		DependencySuggestionDivParams: &htmxDiv{
-			Id:    fmt.Sprintf("dependency-suggestions-%s", tr.ActivityId),
+			Id:    fmt.Sprintf("dependency-suggestions-id-%s", tr.ActivityId),
 			Class: "autocomplete",
 			Role:  "listbox",
 		},
