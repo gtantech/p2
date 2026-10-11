@@ -30,6 +30,7 @@ type htmxInput struct {
 type htmlDiv struct {
 	Id    string
 	Class string
+	Role  string
 }
 
 type htmlButton struct {
