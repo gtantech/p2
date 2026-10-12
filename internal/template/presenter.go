@@ -19,6 +19,32 @@ type TemplPresenter struct {
 	model models.Model
 }
 
+// HtmxOobDependencySuggestionDropdown implements [models.Presenter].
+func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID) http.Handler {
+	components := []templ.Component{}
+	dependencySuggestionDiv := &htmxDiv{
+		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
+		Class:     "autocomplete",
+		Role:      "listbox",
+		HxSwapOob: "innerHTML",
+	}
+	dropDown := DependencyTableRowDependencyFieldDropdown(
+		dependencySuggestionDiv,
+		&htmxButton{
+			Class: "suggestion",
+			Title: "Add suggested activities",
+			Text:  fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
+		},
+	)
+	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
+	if len(suggestedActivityNames) > 0 {
+		components = append(components, dropDown)
+	} else {
+		components = append(components, clearDropdown)
+	}
+	return templ.Handler(MultiComponent(components))
+}
+
 // HtmlTableRow implements [models.Presenter].
 func (t *TemplPresenter) HtmlTableRow(tr models.TableRow) http.Handler {
 	dr := todependencyTableRow(tr)
