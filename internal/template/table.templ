@@ -65,3 +65,9 @@ templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams *h
         @Button(btnParams)
     }
 }
+
+templ TemplateWrapper(component templ.Component){
+    <template>
+        @component
+    </template>
+}
