@@ -11,6 +11,7 @@ type Presenter interface {
 	HtmlHomeHandler(projectId uuid.UUID) http.Handler
 	HtmlTableRow(tr TableRow) http.Handler
 	HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID) http.Handler
+	HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows []TableRow, rowActivityId uuid.UUID) http.Handler
 }
 
 type Model interface {
