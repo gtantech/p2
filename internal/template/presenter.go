@@ -13,8 +13,56 @@ import (
 	"github.com/gtantech/p2/internal/store"
 )
 
+var _ models.Presenter = (*TemplPresenter)(nil) //ensures TemplPresenter implements models.Presenter at compile time
+
 type TemplPresenter struct {
 	model models.Model
+}
+
+// HtmlTableRow implements [models.Presenter].
+func (t *TemplPresenter) HtmlTableRow(tr models.TableRow) http.Handler {
+	dr := todependencyTableRow(tr)
+	return templ.Handler(DependencyTableRow(dr))
+}
+
+func NewTemplPresenter() *TemplPresenter {
+	return &TemplPresenter{}
+}
+
+// RegisterModel implements [models.Presenter].
+func (t *TemplPresenter) RegisterModel(model models.Model) {
+	t.model = model
+}
+
+// HtmlHomeHandler implements [models.Presenter].
+func (t *TemplPresenter) HtmlHomeHandler(projectId uuid.UUID) http.Handler {
+	tableRows, err := t.model.GetTableRowsSortedByRank(projectId)
+	if errors.Is(err, store.ErrProjectNotFound) {
+		return NewTemplateErrHandler("project not found", http.StatusBadRequest)
+	}
+	h := homeParams{
+		Table: dependencyTable{
+			ProjectId: projectId,
+			Rows: func() []dependencyTableRow {
+				dtr := make([]dependencyTableRow, len(tableRows))
+				for i, tr := range tableRows {
+					dtr[i] = todependencyTableRow(tr)
+				}
+				return dtr
+			}(),
+		},
+		TableWrapperDivParams: &htmlDiv{
+			Id:    fmt.Sprintf("table-wrapper-id-%s", projectId),
+			Class: "table-wrapper",
+		},
+		ContainerDivParams: &htmlDiv{
+			Class: "container",
+		},
+		PageTitle: "Project Planner",
+	}
+
+	component := Home(h)
+	return templ.Handler(component)
 }
 
 func todependencyTableRow(tr models.TableRow) dependencyTableRow {
@@ -77,51 +125,3 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 	}
 	return dr
 }
-
-// HtmlTableRow implements [models.Presenter].
-func (t *TemplPresenter) HtmlTableRow(tr models.TableRow) http.Handler {
-	dr := todependencyTableRow(tr)
-	return templ.Handler(DependencyTableRow(dr))
-}
-
-func NewTemplPresenter() *TemplPresenter {
-	return &TemplPresenter{}
-}
-
-// RegisterModel implements [models.Presenter].
-func (t *TemplPresenter) RegisterModel(model models.Model) {
-	t.model = model
-}
-
-// HtmlHomeHandler implements [models.Presenter].
-func (t *TemplPresenter) HtmlHomeHandler(projectId uuid.UUID) http.Handler {
-	tableRows, err := t.model.GetTableRowsSortedByRank(projectId)
-	if errors.Is(err, store.ErrProjectNotFound) {
-		return NewTemplateErrHandler("project not found", http.StatusBadRequest)
-	}
-	h := homeParams{
-		Table: dependencyTable{
-			ProjectId: projectId,
-			Rows: func() []dependencyTableRow {
-				dtr := make([]dependencyTableRow, len(tableRows))
-				for i, tr := range tableRows {
-					dtr[i] = todependencyTableRow(tr)
-				}
-				return dtr
-			}(),
-		},
-		TableWrapperDivParams: &htmlDiv{
-			Id:    fmt.Sprintf("table-wrapper-id-%s", projectId),
-			Class: "table-wrapper",
-		},
-		ContainerDivParams: &htmlDiv{
-			Class: "container",
-		},
-		PageTitle: "Project Planner",
-	}
-
-	component := Home(h)
-	return templ.Handler(component)
-}
-
-var _ models.Presenter = (*TemplPresenter)(nil) //ensures TemplPresenter implements models.Presenter at compile time
