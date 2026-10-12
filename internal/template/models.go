@@ -30,6 +30,28 @@ type htmxInput struct {
 type htmlDiv struct {
 	Id    string
 	Class string
+	Role  string
+}
+
+func (h htmlDiv) Items() []templ.KeyValue[string, any] {
+	items := make([]templ.KeyValue[string, any], 0, 3)
+
+	add := func(key, value string) {
+		if value != "" {
+			items = append(items, templ.KV[string, any](key, value))
+		}
+	}
+
+	// attributes
+	add("id", h.Id)
+	add("class", h.Class)
+	add("role", h.Role)
+	return items
+}
+
+type htmxDiv struct {
+	htmlDiv
+	hx
 }
 
 type htmlButton struct {
@@ -44,13 +66,14 @@ type htmxButton struct {
 }
 
 type dependencyTableRow struct {
-	Id                         string
-	Class                      string
-	ActivityTextInputParams    *htmxInput
-	DependencyWrapperDivParams *htmlDiv
-	DependencyTextInputParams  *htmxInput
-	DurationTextInputParams    *htmxInput
-	TableRowAddBtnParams       *htmxButton
+	Id                            string
+	Class                         string
+	ActivityTextInputParams       *htmxInput
+	DependencyWrapperDivParams    *htmlDiv
+	DependencyTextInputParams     *htmxInput
+	DependencySuggestionDivParams *htmxDiv
+	DurationTextInputParams       *htmxInput
+	TableRowAddBtnParams          *htmxButton
 }
 
 type dependencyTable struct {

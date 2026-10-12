@@ -10,6 +10,7 @@ type Presenter interface {
 	RegisterModel(model Model)
 	HtmlHomeHandler(projectId uuid.UUID) http.Handler
 	HtmlTableRow(tr TableRow) http.Handler
+	HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID) http.Handler
 }
 
 type Model interface {

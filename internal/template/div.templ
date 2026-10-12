@@ -1,0 +1,10 @@
+package template
+
+templ DivWrapChildren(params *htmxDiv){
+     <div
+        { params.htmlDiv... }
+        { params.hx... }
+    >
+        { children... }
+    </div>
+}

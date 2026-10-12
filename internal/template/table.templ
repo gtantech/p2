@@ -42,6 +42,7 @@ templ DependencyTableRow(params dependencyTableRow){
                 id={params.DependencyWrapperDivParams.Id}
             >
                 @TextInput(params.DependencyTextInputParams)
+                @DivWrapChildren(params.DependencySuggestionDivParams)
             </div>
         </td>
         
@@ -57,4 +58,10 @@ templ DependencyTableRow(params dependencyTableRow){
             </div>
         </td>
     </tr>
+}
+
+templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams *htmxButton){
+    @DivWrapChildren(divParams){
+        @Button(btnParams)
+    }
 }

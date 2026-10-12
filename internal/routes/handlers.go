@@ -129,7 +129,7 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
-func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDependencyChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
@@ -157,10 +157,13 @@ func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Re
 	dependencyIds := []uuid.UUID{}
 
 	userInputs := strings.Split(r.FormValue(dto.DomName), ",")
+	userAddNewActiivtyName := []string{}
 	for i := range userInputs {
 		userInput := strings.TrimSpace(userInputs[i])
 		if userInputId, ok := activityNameMap[userInput]; ok {
 			dependencyIds = append(dependencyIds, userInputId)
+		} else if userInput != "" {
+			userAddNewActiivtyName = append(userAddNewActiivtyName, userInput)
 		}
 	}
 
@@ -173,7 +176,8 @@ func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Re
 		log.Printf("returned http internal server error for err: %v", err)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+
+	rt.presenter.HtmxPutActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {
