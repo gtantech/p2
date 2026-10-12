@@ -29,7 +29,7 @@ templ DependencyTable(params dependencyTable){
 }
 
 templ DependencyTableRow(params dependencyTableRow){
-    <tr class={params.Class} id={params.Id}>
+    <tr class={params.Class} id={params.Id} {params.hxAttr...}>
            <!-- activity name -->
         <td>
             @TextInput(params.ActivityTextInputParams)

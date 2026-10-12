@@ -68,6 +68,7 @@ type htmxButton struct {
 type dependencyTableRow struct {
 	Id                            string
 	Class                         string
+	hxAttr                        hx
 	ActivityTextInputParams       *htmxInput
 	DependencyWrapperDivParams    *htmlDiv
 	DependencyTextInputParams     *htmxInput
