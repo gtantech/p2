@@ -129,7 +129,7 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
-func (rt *Routes) PutActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDependencyChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)

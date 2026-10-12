@@ -120,7 +120,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Placeholder:  "Activity A, Activity B...",
 			Autocomplete: Off,
 			Value:        strings.Join(tr.Dependencies, ", "),
-			HxPut:        "/form/json/table/row/activity/dependency",
+			HxPost:       "/form/json/table/row/activity/dependency",
 			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, ProjectId: tr.ProjectId, DomName: activityDependencyDomName}),
 			HxTrigger:    "input changed delay:200ms",
 		},

@@ -35,7 +35,7 @@ func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) 
 					r.Route("/activity", func(r chi.Router) {
 						r.Put("/name", rts.PutActivityNameHandler)
 						r.Put("/duration", rts.PutActivityDurationHandler)
-						r.Put("/dependency", rts.PutActivityDependencyHandler)
+						r.Post("/dependency", rts.PostActivityDependencyHandler)
 					})
 				})
 			})
