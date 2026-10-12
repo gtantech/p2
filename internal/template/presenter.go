@@ -35,14 +35,14 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 	for _, tr := range createdTableRows {
 		dtr := todependencyTableRow(tr)
 		dtr.hxAttr.HxSwapOob = fmt.Sprintf("beforeend:#activity-table-body-%s", tr.ProjectId)
-		components = append(components, DependencyTableRow(dtr))
+		components = append(components, TemplateWrapper(DependencyTableRow(dtr)))
 	}
 
 	return templ.Handler(MultiComponent(components))
 }
 
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
-func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID) http.Handler {
+func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
@@ -53,9 +53,15 @@ func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityN
 	dropDown := DependencyTableRowDependencyFieldDropdown(
 		dependencySuggestionDiv,
 		&htmxButton{
-			Class: "suggestion",
-			Title: "Add suggested activities",
-			Text:  fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
+			Class:  "suggestion",
+			Title:  "Add suggested activities",
+			Text:   fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
+			HxPost: "/form/json/table/row/activity/dependency/suggestion/selected/add-new",
+			HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromDependencySuggestionAddNew{
+				ActivityId:         rowActivityId,
+				ProjectId:          projectId,
+				ActivitiesToCreate: suggestedActivityNames,
+			}),
 		},
 	)
 	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
