@@ -21,6 +21,10 @@ type Model interface {
 	// and ErrActivityNotFound if activityId does not exist.
 	CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
 
+	// CreateTableRowAtBottom returns ErrProjectNotFound if projectId does not exist,
+	// and ErrActivityNotFound if activityId does not exist.
+	CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid.UUID) (TableRow, error)
+
 	// GetActivities returns ErrProjectNotFound if projectId does not exist.
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
 
