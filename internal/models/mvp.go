@@ -26,18 +26,15 @@ type Model interface {
 	// and ErrActivityNotFound if activityId does not exist.
 	CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid.UUID) (TableRow, error)
 
+	// CreateTableRowBelow returns ErrProjectNotFound if projectId does not exist,
+	// and ErrActivityNotFound if activityId or belowActivityId does not exist.
+	CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UUID, belowActivityId uuid.UUID) (TableRow, error)
+
 	// GetActivities returns ErrProjectNotFound if projectId does not exist.
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
 
 	// GetTableRowsSortedByRank returns ErrProjectNotFound if projectId does not exist.
 	GetTableRowsSortedByRank(projectId uuid.UUID) ([]TableRow, error)
-
-	// GetTableRowByActivityId returns ErrActivityNotFound if activityId does not exist.
-	GetTableRowByActivityId(activityId uuid.UUID) (TableRow, error)
-
-	// GetNextTableRowByActivityId returns ErrEndOfTable if the row specified by activityId is the last row,
-	// ErrProjectNotFound if projectId does not exist, and ErrActivityNotFound if activityId does not exist.
-	GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (TableRow, error)
 
 	// UpdateActivityName returns ErrActivityNotFound if activityId does not exist.
 	UpdateActivityName(activityId uuid.UUID, activityName string) (Activity, error)
