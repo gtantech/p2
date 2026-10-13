@@ -30,6 +30,10 @@ type Model interface {
 	// and ErrActivityNotFound if activityId or belowActivityId does not exist.
 	CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UUID, belowActivityId uuid.UUID) (TableRow, error)
 
+	// CreateTableRowBelow returns ErrProjectNotFound if projectId does not exist,
+	// and ErrActivityNotFound if successorActivityId or predecessorActivityId does not exist.
+	CreateDependency(projectId uuid.UUID, successorActivityId uuid.UUID, predecessorActivityId uuid.UUID) (Dependency, error)
+
 	// GetActivities returns ErrProjectNotFound if projectId does not exist.
 	GetActivities(projectId uuid.UUID) ([]Activity, error)
 
