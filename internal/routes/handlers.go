@@ -213,7 +213,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	rt.presenter.HtmxPutActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
+	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {

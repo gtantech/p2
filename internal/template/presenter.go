@@ -49,7 +49,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 }
 
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
-func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
+func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
