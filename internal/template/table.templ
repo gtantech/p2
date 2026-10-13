@@ -67,7 +67,7 @@ templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams *h
 }
 
 templ TemplateTableBodyWrapper(components []templ.Component, hxAttr hx){
-    <template>
+    @TemplateWrapChildren(){
         <tbody
             { hxAttr... }    
         >
@@ -75,5 +75,5 @@ templ TemplateTableBodyWrapper(components []templ.Component, hxAttr hx){
                 @component
             }
         </tbody>
-    </template>
+    }
 }
