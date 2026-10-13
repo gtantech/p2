@@ -143,6 +143,14 @@ func (ms *MockStore) GetTableRowsSortedByRank(projectId uuid.UUID) ([]models.Tab
 		trsSorted := make([]models.TableRow, len(trs))
 		for i := range trs {
 			trsSorted[i] = *trs[i]
+			trsSorted[i].Dependencies = func() []string {
+				dependenciesStr := []string{}
+				dependencies := ms.dependencies[trs[i].ActivityId]
+				for _, d := range dependencies {
+					dependenciesStr = append(dependenciesStr, d.DisplayName)
+				}
+				return dependenciesStr
+			}()
 		}
 		return trsSorted
 	}(), nil
