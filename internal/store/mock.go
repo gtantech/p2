@@ -187,8 +187,3 @@ func NewMockStore() *MockStore {
 func (ms *MockStore) GetActivities(projectId uuid.UUID) ([]models.Activity, error) {
 	return ms.activities, nil
 }
-
-// GetHome implements [models.Model].
-func (ms *MockStore) GetHome() models.Home {
-	return models.Home{Name: "World"}
-}
