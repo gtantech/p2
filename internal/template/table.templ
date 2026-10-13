@@ -19,13 +19,16 @@ templ DependencyTable(params dependencyTable){
                 </th>
             </tr>
         </thead>
-
-        <tbody id={fmt.Sprintf("activity-table-body-%s", params.ProjectId)}>
-            for _, row := range params.Rows{
-                @DependencyTableRow(row)
-            }
-        </tbody>
+        @DependencyTableBody(params.dependencyTableBody)
     </table>
+}
+
+templ DependencyTableBody(params dependencyTableBody){
+    <tbody id={fmt.Sprintf("activity-table-body-%s", params.ProjectId)} { params.hxAttr... }>
+        for _, row := range params.Rows{
+            @DependencyTableRow(row)
+        }
+    </tbody>
 }
 
 templ DependencyTableRow(params dependencyTableRow){
@@ -66,14 +69,8 @@ templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams *h
     }
 }
 
-templ TemplateTableBodyWrapper(components []templ.Component, hxAttr hx){
+templ TemplateDependencyTableBody(params dependencyTableBody){
     @TemplateWrapChildren(){
-        <tbody
-            { hxAttr... }    
-        >
-            for _, component := range components{
-                @component
-            }
-        </tbody>
+        @DependencyTableBody(params)
     }
 }
