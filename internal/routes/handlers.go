@@ -129,6 +129,19 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 			return
 		}
 		createdTableRows = append(createdTableRows, tr)
+		if _, err := rt.store.CreateDependency(dto.ProjectId, dto.ActivityId, a.ActivityId); err != nil {
+			if errors.Is(err, store.ErrProjectNotFound) {
+				http.Error(w, "project not found", http.StatusBadRequest)
+				return
+			}
+			if errors.Is(err, store.ErrActivityNotFound) {
+				http.Error(w, "activity not found", http.StatusBadRequest)
+				return
+			}
+			http.Error(w, fmt.Sprintf("failed to create new dependency with name: %v", name), http.StatusInternalServerError)
+			log.Printf("returned http internal server error while creating new dependency: %s", name)
+			return
+		}
 	}
 	rt.presenter.HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows, dto.ActivityId).ServeHTTP(w, r)
 }
