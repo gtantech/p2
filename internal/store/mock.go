@@ -9,12 +9,26 @@ import (
 	"github.com/gtantech/p2/internal/models"
 )
 
+var _ models.Model = (*MockStore)(nil) //ensures MockStore implements models.Model at compile time
+
 type MockStore struct {
 	activities       []models.Activity
 	activitiesLookup map[uuid.UUID]*models.Activity
 	dependencies     map[uuid.UUID][]*models.Activity
 	tableRows        []*models.TableRow
 	tableRowsLookup  map[uuid.UUID]*models.TableRow
+}
+
+// CreateTableRowAtBottom implements [models.Model].
+func (ms *MockStore) CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
+	maxSortRank := int64(0)
+	for _, tr := range ms.tableRows {
+		if tr.SortRank > maxSortRank {
+			maxSortRank = tr.SortRank
+		}
+	}
+
+	return ms.CreateTableRow(projectId, activityId, maxSortRank+models.TableRowSortRankStep)
 }
 
 // GetNextTableRowByActivityId implements [models.Model].
@@ -166,5 +180,3 @@ func (ms *MockStore) GetActivities(projectId uuid.UUID) ([]models.Activity, erro
 func (ms *MockStore) GetHome() models.Home {
 	return models.Home{Name: "World"}
 }
-
-var _ models.Model = (*MockStore)(nil) //ensures MockStore implements models.Model at compile time

@@ -129,6 +129,42 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
+func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := getJson(r)
+	var dto jsonmodels.PostFromDependencySuggestionAddNew
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
+		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
+		return
+	}
+	createdTableRows := []models.TableRow{}
+	for _, name := range dto.ActivitiesToCreate {
+		a, err := rt.store.CreateActivity(dto.ProjectId, name, 0)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to create new activity with name: %v", name), http.StatusInternalServerError)
+			log.Printf("returned http internal server error while creating new activity: %s", name)
+			return
+		}
+		tr, err := rt.store.CreateTableRowAtBottom(dto.ProjectId, a.ActivityId)
+		if err != nil {
+			if errors.Is(err, store.ErrProjectNotFound) {
+				http.Error(w, "project not found", http.StatusBadRequest)
+				return
+			}
+			if errors.Is(err, store.ErrActivityNotFound) {
+				http.Error(w, "activity not found", http.StatusBadRequest)
+				return
+			}
+			http.Error(w, fmt.Sprintf("failed to create new table row with name: %v", name), http.StatusInternalServerError)
+			log.Printf("returned http internal server error while creating new table row: %s", name)
+			return
+		}
+		createdTableRows = append(createdTableRows, tr)
+	}
+	rt.presenter.HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows, dto.ActivityId).ServeHTTP(w, r)
+}
+
 func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := getJson(r)
 	var dto jsonmodels.PutFromRowActivityDependencyChange
@@ -177,7 +213,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	rt.presenter.HtmxPutActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId).ServeHTTP(w, r)
+	rt.presenter.HtmxPutActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {

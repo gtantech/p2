@@ -10,7 +10,8 @@ type Presenter interface {
 	RegisterModel(model Model)
 	HtmlHomeHandler(projectId uuid.UUID) http.Handler
 	HtmlTableRow(tr TableRow) http.Handler
-	HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID) http.Handler
+	HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler
+	HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows []TableRow, rowActivityId uuid.UUID) http.Handler
 }
 
 type Model interface {
@@ -20,6 +21,10 @@ type Model interface {
 	// CreateTableRow returns ErrProjectNotFound if projectId does not exist,
 	// and ErrActivityNotFound if activityId does not exist.
 	CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
+
+	// CreateTableRowAtBottom returns ErrProjectNotFound if projectId does not exist,
+	// and ErrActivityNotFound if activityId does not exist.
+	CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid.UUID) (TableRow, error)
 
 	// GetActivities returns ErrProjectNotFound if projectId does not exist.
 	GetActivities(projectId uuid.UUID) ([]Activity, error)

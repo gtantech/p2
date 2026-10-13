@@ -19,8 +19,37 @@ type TemplPresenter struct {
 	model models.Model
 }
 
+// HtmxPostActivityDependencySuggestionAddNewHandlerResp implements [models.Presenter].
+func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows []models.TableRow, rowActivityId uuid.UUID) http.Handler {
+	components := []templ.Component{}
+	dependencySuggestionDiv := &htmxDiv{
+		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
+		Class:     "autocomplete",
+		Role:      "listbox",
+		HxSwapOob: "innerHTML",
+	}
+
+	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
+	components = append(components, clearDropdown)
+
+	if len(createdTableRows) > 0 {
+		components = append(components, TemplateTableBodyWrapper(func() []templ.Component {
+			tableRowComponents := []templ.Component{}
+			for _, tr := range createdTableRows {
+				dtr := todependencyTableRow(tr)
+				tableRowComponents = append(tableRowComponents, DependencyTableRow(dtr))
+			}
+			return tableRowComponents
+		}(), hx{
+			HxSwapOob: fmt.Sprintf("beforeend:#activity-table-body-%s", createdTableRows[0].ProjectId),
+		}))
+	}
+
+	return templ.Handler(MultiComponent(components))
+}
+
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
-func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID) http.Handler {
+func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
@@ -31,9 +60,15 @@ func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityN
 	dropDown := DependencyTableRowDependencyFieldDropdown(
 		dependencySuggestionDiv,
 		&htmxButton{
-			Class: "suggestion",
-			Title: "Add suggested activities",
-			Text:  fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
+			Class:  "suggestion",
+			Title:  "Add suggested activities",
+			Text:   fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
+			HxPost: "/form/json/table/row/activity/dependency/suggestion/selected/add-new",
+			HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromDependencySuggestionAddNew{
+				ActivityId:         rowActivityId,
+				ProjectId:          projectId,
+				ActivitiesToCreate: suggestedActivityNames,
+			}),
 		},
 	)
 	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
