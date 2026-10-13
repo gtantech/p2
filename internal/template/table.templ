@@ -66,8 +66,14 @@ templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams *h
     }
 }
 
-templ TemplateWrapper(component templ.Component){
+templ TemplateTableBodyWrapper(components []templ.Component, hxAttr hx){
     <template>
-        @component
+        <tbody
+            { hxAttr... }    
+        >
+            for _, component := range components{
+                @component
+            }
+        </tbody>
     </template>
 }

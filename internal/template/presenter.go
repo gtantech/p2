@@ -32,10 +32,17 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
 	components = append(components, clearDropdown)
 
-	for _, tr := range createdTableRows {
-		dtr := todependencyTableRow(tr)
-		dtr.hxAttr.HxSwapOob = fmt.Sprintf("beforeend:#activity-table-body-%s", tr.ProjectId)
-		components = append(components, TemplateWrapper(DependencyTableRow(dtr)))
+	if len(createdTableRows) > 0 {
+		components = append(components, TemplateTableBodyWrapper(func() []templ.Component {
+			tableRowComponents := []templ.Component{}
+			for _, tr := range createdTableRows {
+				dtr := todependencyTableRow(tr)
+				tableRowComponents = append(tableRowComponents, DependencyTableRow(dtr))
+			}
+			return tableRowComponents
+		}(), hx{
+			HxSwapOob: fmt.Sprintf("beforeend:#activity-table-body-%s", createdTableRows[0].ProjectId),
+		}))
 	}
 
 	return templ.Handler(MultiComponent(components))
