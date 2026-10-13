@@ -2,6 +2,7 @@ package store
 
 import (
 	"cmp"
+	"errors"
 	"slices"
 	"time"
 	"uuid"
@@ -19,6 +20,46 @@ type MockStore struct {
 	tableRowsLookup  map[uuid.UUID]*models.TableRow
 }
 
+// CreateTableRowBelow implements [models.Model].
+func (ms *MockStore) CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UUID, belowActivityId uuid.UUID) (models.TableRow, error) {
+	if _, ok := ms.activitiesLookup[activityId]; !ok {
+		return models.TableRow{}, ErrActivityNotFound
+	}
+	if _, ok := ms.activitiesLookup[belowActivityId]; !ok {
+		return models.TableRow{}, ErrActivityNotFound
+	}
+
+	rowAfter, err := func() (models.TableRow, error) {
+		trs, err := ms.GetTableRowsSortedByRank(projectId)
+		if err != nil {
+			return models.TableRow{}, err
+		}
+		for i := range trs {
+			if i == 0 {
+				continue
+			}
+			if trs[i-1].ActivityId == activityId {
+				return trs[i], nil
+			}
+		}
+		return models.TableRow{}, ErrEndOfTable
+	}()
+
+	insertRowRank := int64(0)
+	rowCurrent := ms.tableRowsLookup[belowActivityId]
+	if err != nil {
+		if errors.Is(err, ErrEndOfTable) {
+			insertRowRank = rowCurrent.SortRank + models.TableRowSortRankStep
+		} else {
+			return models.TableRow{}, err
+		}
+	} else {
+		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
+	}
+
+	return ms.CreateTableRow(projectId, activityId, insertRowRank)
+}
+
 // CreateTableRowAtBottom implements [models.Model].
 func (ms *MockStore) CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
 	maxSortRank := int64(0)
@@ -29,35 +70,6 @@ func (ms *MockStore) CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid
 	}
 
 	return ms.CreateTableRow(projectId, activityId, maxSortRank+models.TableRowSortRankStep)
-}
-
-// GetNextTableRowByActivityId implements [models.Model].
-func (ms *MockStore) GetNextTableRowByActivityId(projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
-	if _, ok := ms.activitiesLookup[activityId]; !ok {
-		return models.TableRow{}, ErrActivityNotFound
-	}
-
-	trs, err := ms.GetTableRowsSortedByRank(projectId)
-	if err != nil {
-		return models.TableRow{}, err
-	}
-	for i := range trs {
-		if i == 0 {
-			continue
-		}
-		if trs[i-1].ActivityId == activityId {
-			return trs[i], nil
-		}
-	}
-	return models.TableRow{}, ErrEndOfTable
-}
-
-// GetTableRowByActivityId implements [models.Model].
-func (ms *MockStore) GetTableRowByActivityId(activityId uuid.UUID) (models.TableRow, error) {
-	if _, ok := ms.activitiesLookup[activityId]; !ok {
-		return models.TableRow{}, ErrActivityNotFound
-	}
-	return *ms.tableRowsLookup[activityId], nil
 }
 
 // UpdateActivityDependencies implements [models.Model].
