@@ -58,39 +58,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
 		return
 	}
-	rowCurrent, err := rt.store.GetTableRowByActivityId(dto.RelativeToActivityId)
-	if err != nil {
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
-			return
-		}
-		http.Error(w, "failed to get requesting table row", http.StatusInternalServerError)
-		log.Printf("returned http internal server error status while %v. Encountered error %v", "getting table row from store", err)
-		return
-	}
-	rowAfter, err := rt.store.GetNextTableRowByActivityId(dto.ProjectId, dto.RelativeToActivityId)
-	insertRowRank := int64(0)
-	if err != nil {
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
-			return
-		}
-		if errors.Is(err, store.ErrProjectNotFound) {
-			http.Error(w, "project not found", http.StatusBadRequest)
-			return
-		}
-		if errors.Is(err, store.ErrEndOfTable) {
-			insertRowRank = rowCurrent.SortRank + models.TableRowSortRankStep
-		} else {
-			http.Error(w, "failed to get next table row", http.StatusInternalServerError)
-			log.Printf("returned http internal server error status while %v. Encountered error %v", "getting next table row from store", err)
-			return
-		}
-	} else {
-		insertRowRank = (rowCurrent.SortRank / 2) + (rowAfter.SortRank / 2)
-	}
-
-	newTr, err := rt.store.CreateTableRow(dto.ProjectId, activity.ActivityId, insertRowRank)
+	newTr, err := rt.store.CreateTableRowBelow(dto.ProjectId, activity.ActivityId, dto.RelativeToActivityId)
 	if err != nil {
 		if errors.Is(err, store.ErrProjectNotFound) {
 			http.Error(w, "project not found", http.StatusBadRequest)
@@ -213,7 +181,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	rt.presenter.HtmxPutActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
+	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {

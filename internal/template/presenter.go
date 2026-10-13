@@ -33,23 +33,26 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 	components = append(components, clearDropdown)
 
 	if len(createdTableRows) > 0 {
-		components = append(components, TemplateTableBodyWrapper(func() []templ.Component {
-			tableRowComponents := []templ.Component{}
-			for _, tr := range createdTableRows {
-				dtr := todependencyTableRow(tr)
-				tableRowComponents = append(tableRowComponents, DependencyTableRow(dtr))
-			}
-			return tableRowComponents
-		}(), hx{
-			HxSwapOob: fmt.Sprintf("beforeend:#activity-table-body-%s", createdTableRows[0].ProjectId),
-		}))
+		dependencyTableRows := []dependencyTableRow{}
+		for _, tr := range createdTableRows {
+			dependencyTableRows = append(dependencyTableRows, todependencyTableRow(tr))
+		}
+		b := TemplateDependencyTableBody(dependencyTableBody{
+			ProjectId: createdTableRows[0].ProjectId,
+			hxAttr: hx{
+				HxSwapOob: fmt.Sprintf("beforeend:#activity-table-body-%s", createdTableRows[0].ProjectId),
+			},
+			Rows: dependencyTableRows,
+		})
+
+		components = append(components, b)
 	}
 
 	return templ.Handler(MultiComponent(components))
 }
 
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
-func (t *TemplPresenter) HtmxPutActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
+func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),

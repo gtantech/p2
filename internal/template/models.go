@@ -77,9 +77,14 @@ type dependencyTableRow struct {
 	TableRowAddBtnParams          *htmxButton
 }
 
-type dependencyTable struct {
+type dependencyTableBody struct {
 	ProjectId uuid.UUID
+	hxAttr    hx
 	Rows      []dependencyTableRow
+}
+
+type dependencyTable struct {
+	dependencyTableBody
 }
 
 type homeParams struct {
