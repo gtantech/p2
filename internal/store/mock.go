@@ -20,6 +20,18 @@ type MockStore struct {
 	tableRowsLookup  map[uuid.UUID]*models.TableRow
 }
 
+// CreateDependency implements [models.Model].
+func (ms *MockStore) CreateDependency(projectId uuid.UUID, successorActivityId uuid.UUID, predecessorActivityId uuid.UUID) (models.Dependency, error) {
+	if _, ok := ms.activitiesLookup[successorActivityId]; !ok {
+		return models.Dependency{}, ErrActivityNotFound
+	}
+	if _, ok := ms.activitiesLookup[predecessorActivityId]; !ok {
+		return models.Dependency{}, ErrActivityNotFound
+	}
+	ms.dependencies[successorActivityId] = append(ms.dependencies[successorActivityId], ms.activitiesLookup[predecessorActivityId])
+	return models.Dependency{DependencyId: successorActivityId, SuccessorActivityId: successorActivityId, PredecessorActivityId: predecessorActivityId}, nil
+}
+
 // CreateTableRowBelow implements [models.Model].
 func (ms *MockStore) CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UUID, belowActivityId uuid.UUID) (models.TableRow, error) {
 	if _, ok := ms.activitiesLookup[activityId]; !ok {
