@@ -181,7 +181,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Class:    "add-button",
 			Title:    "Add activity",
 			Text:     "+",
-			HxPost:   "/form/json/table/row/empty/component",
+			HxPost:   "/form/json/table/row/empty/below",
 			HxVals:   jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromRowPlusBtn{ProjectId: tr.ProjectId, RelativeToActivityId: tr.ActivityId}),
 			HxTarget: "closest tr",
 			HxSwap:   "afterend",
