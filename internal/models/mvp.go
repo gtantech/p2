@@ -15,6 +15,10 @@ type Presenter interface {
 }
 
 type Model interface {
+
+	//Creates a project and returns the newly created project
+	CreateProject(projectName string) Project
+
 	// Creates a new activity in the store and returns the newly created activity.
 	// CreateActivity returns ErrProjectNotFound if projectId does not exist.
 	CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (Activity, error)
