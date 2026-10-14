@@ -50,7 +50,7 @@ func (ms *MockStore) CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UU
 			if i == 0 {
 				continue
 			}
-			if trs[i-1].ActivityId == activityId {
+			if trs[i-1].ActivityId == belowActivityId {
 				return trs[i], nil
 			}
 		}

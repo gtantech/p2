@@ -31,7 +31,7 @@ func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) 
 		r.Route("/json", func(r chi.Router) {
 			r.Route("/table", func(r chi.Router) {
 				r.Route("/row", func(r chi.Router) {
-					r.Post("/empty/component", rts.PostFromRowPlusBtnReturnsEmptyTableRowHandler)
+					r.Post("/empty/below", rts.PostFromRowPlusBtnReturnsEmptyTableRowHandler)
 					r.Route("/activity", func(r chi.Router) {
 						r.Put("/name", rts.PutActivityNameHandler)
 						r.Put("/duration", rts.PutActivityDurationHandler)
