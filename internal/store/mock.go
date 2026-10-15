@@ -26,7 +26,7 @@ type MockStore struct {
 }
 
 // CreateProject implements [models.Model].
-func (ms *MockStore) CreateProject(projectName string) models.Project {
+func (ms *MockStore) CreateProject(projectName string) (models.Project, error) {
 	p := models.Project{
 		ProjectId:          uuid.NewV7(),
 		ProjectDisplayName: projectName,
@@ -36,7 +36,7 @@ func (ms *MockStore) CreateProject(projectName string) models.Project {
 		activities:  []models.Activity{},
 		tableRows:   []*models.TableRow{},
 	}
-	return p
+	return p, nil
 }
 
 // CreateDependency implements [models.Model].
