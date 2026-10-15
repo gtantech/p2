@@ -116,6 +116,42 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			}
 		}
 	})
+
+	t.Run("Create Table Row At Bottom", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 4)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+		}
+		//add table rows excluding the last activity
+		for i := range len(activities) - 1 {
+			activityToAdd := activities[i]
+			createTableRow(p, activityToAdd, int64(i), t, s)
+		}
+
+		//add table row to the bottom
+		lastActivity := activities[len(activities)-1]
+		_, err := s.CreateTableRowAtBottom(p.ProjectId, lastActivity.ActivityId)
+		if err != nil {
+			t.Fatalf("Failed to create table row at bottom. Encountered error: %v", err)
+		}
+
+		//check if table rows returned is sorted correctly despite adding in reverse order
+		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		if err != nil {
+			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
+		}
+		for i, tr := range trs {
+			if tr.ActivityId != activities[i].ActivityId {
+				t.Errorf("got %v, want %v", tr.ActivityId, activities[i].ActivityId)
+			}
+		}
+	})
 }
 
 func TestMockStoreContract(t *testing.T) {
