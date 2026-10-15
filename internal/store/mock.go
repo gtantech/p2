@@ -41,6 +41,9 @@ func (ms *MockStore) CreateProject(projectName string) (models.Project, error) {
 
 // CreateDependency implements [models.Model].
 func (ms *MockStore) CreateDependency(projectId uuid.UUID, successorActivityId uuid.UUID, predecessorActivityId uuid.UUID) (models.Dependency, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return models.Dependency{}, ErrProjectNotFound
+	}
 	if _, ok := ms.activitiesLookup[successorActivityId]; !ok {
 		return models.Dependency{}, ErrActivityNotFound
 	}
@@ -53,6 +56,9 @@ func (ms *MockStore) CreateDependency(projectId uuid.UUID, successorActivityId u
 
 // CreateTableRowBelow implements [models.Model].
 func (ms *MockStore) CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UUID, belowActivityId uuid.UUID) (models.TableRow, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return models.TableRow{}, ErrProjectNotFound
+	}
 	if _, ok := ms.activitiesLookup[activityId]; !ok {
 		return models.TableRow{}, ErrActivityNotFound
 	}
@@ -93,6 +99,9 @@ func (ms *MockStore) CreateTableRowBelow(projectId uuid.UUID, activityId uuid.UU
 
 // CreateTableRowAtBottom implements [models.Model].
 func (ms *MockStore) CreateTableRowAtBottom(projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return models.TableRow{}, ErrProjectNotFound
+	}
 	maxSortRank := int64(0)
 	for _, tr := range ms.projectLookup[projectId].tableRows {
 		if tr.SortRank > maxSortRank {
@@ -151,6 +160,9 @@ func (ms *MockStore) UpdateActivityName(activityId uuid.UUID, activityName strin
 
 // GetTableRowsSortedByRank implements [models.Model].
 func (ms *MockStore) GetTableRowsSortedByRank(projectId uuid.UUID) ([]models.TableRow, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return []models.TableRow{}, ErrProjectNotFound
+	}
 	trs := ms.projectLookup[projectId].tableRows
 	slices.SortFunc(trs, func(a, b *models.TableRow) int {
 		if c := cmp.Compare(a.SortRank, b.SortRank); c != 0 {
@@ -177,6 +189,9 @@ func (ms *MockStore) GetTableRowsSortedByRank(projectId uuid.UUID) ([]models.Tab
 
 // CreateTableRow implements [models.Model].
 func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (models.TableRow, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return models.TableRow{}, ErrProjectNotFound
+	}
 	if _, ok := ms.activitiesLookup[activityId]; !ok {
 		return models.TableRow{}, ErrActivityNotFound
 	}
@@ -193,6 +208,9 @@ func (ms *MockStore) CreateTableRow(projectId uuid.UUID, activityId uuid.UUID, r
 
 // CreateActivity implements [models.Model].
 func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, duration time.Duration) (models.Activity, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return models.Activity{}, ErrProjectNotFound
+	}
 	a := models.Activity{ActivityId: uuid.NewV7(), DisplayName: activityName, Duration: duration}
 	ms.activitiesLookup[a.ActivityId] = &a
 	ms.projectLookup[projectId].activities = append(ms.projectLookup[projectId].activities, a)
@@ -230,5 +248,8 @@ func NewMockStore() *MockStore {
 
 // GetActivities implements [models.Model].
 func (ms *MockStore) GetActivities(projectId uuid.UUID) ([]models.Activity, error) {
+	if _, ok := ms.projectLookup[projectId]; !ok {
+		return []models.Activity{}, ErrProjectNotFound
+	}
 	return ms.projectLookup[projectId].activities, nil
 }
