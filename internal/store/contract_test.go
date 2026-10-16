@@ -152,6 +152,44 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			}
 		}
 	})
+
+	t.Run("Create Table Row Below", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 4)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+		}
+		//add table rows excluding the last 2 activities
+		for i := range len(activities) - 2 {
+			activityToAdd := activities[i]
+			createTableRow(p, activityToAdd, int64(i*1000), t, s)
+		}
+
+		//add table row for the last activity
+		createTableRow(p, activities[len(activities)-1], int64(len(activities)-1)*1000, t, s)
+
+		//add table row between the 3rd last and last activity
+		_, err := s.CreateTableRowBelow(p.ProjectId, activities[len(activities)-2].ActivityId, activities[len(activities)-3].ActivityId)
+		if err != nil {
+			t.Fatalf("Failed to create table row below. Encountered error: %v", err)
+		}
+
+		//check if table rows returned is sorted correctly
+		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		if err != nil {
+			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
+		}
+		for i, tr := range trs {
+			if tr.ActivityId != activities[i].ActivityId {
+				t.Errorf("got %v, want %v", tr.ActivityId, activities[i].ActivityId)
+			}
+		}
+	})
 }
 
 func TestMockStoreContract(t *testing.T) {
