@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"testing"
 	"time"
@@ -55,6 +56,19 @@ func createActivity(activityName string, activityDuration time.Duration, p model
 		t.Fatalf("got %v, want %v", got, want)
 	}
 	return a
+}
+
+func assertActivity(gotActivity models.Activity, wantActivity models.Activity, t *testing.T) {
+	t.Helper()
+	if got, want := gotActivity.ActivityId, wantActivity.ActivityId; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	if got, want := gotActivity.DisplayName, wantActivity.DisplayName; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	if got, want := gotActivity.Duration, wantActivity.Duration; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
 }
 
 func testModelContract(t *testing.T, newStore func() models.Model) {
@@ -233,6 +247,43 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			if got, want := tr.Dependencies, wantDependencies[tr.ActivityId]; !slices.Equal(got, want) {
 				t.Errorf("got %v, want %v", got, want)
 			}
+		}
+	})
+
+	t.Run("Update Activity Name", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 3)
+		activitiesMap := make(map[uuid.UUID]models.Activity)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+			activitiesMap[activities[i].ActivityId] = activities[i]
+		}
+
+		activityToUpdate := activities[1]
+		updatedName := "updated name"
+
+		a, err := s.UpdateActivityName(activityToUpdate.ActivityId, updatedName)
+		if err != nil {
+			t.Fatalf("Failed to update activity name. Encountered error: %v", err)
+		}
+		wantUpdatedActivity := models.Activity{ActivityId: activityToUpdate.ActivityId, DisplayName: updatedName, Duration: activityToUpdate.Duration}
+		assertActivity(a, wantUpdatedActivity, t)
+		wantActivitiesMap := make(map[uuid.UUID]models.Activity)
+		maps.Copy(wantActivitiesMap, activitiesMap)
+		wantActivitiesMap[wantUpdatedActivity.ActivityId] = wantUpdatedActivity
+
+		getActivities, err := s.GetActivities(p.ProjectId)
+		if err != nil {
+			t.Fatalf("Failed to get activities. Encountered error %v", err)
+		}
+
+		for _, storeActivity := range getActivities {
+			assertActivity(storeActivity, wantActivitiesMap[storeActivity.ActivityId], t)
 		}
 	})
 }
