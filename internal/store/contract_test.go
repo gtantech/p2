@@ -323,6 +323,47 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			assertActivity(storeActivity, wantActivitiesMap[storeActivity.ActivityId], t)
 		}
 	})
+
+	t.Run("Update Activity Dependencies", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 3)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+		}
+		//add table rows
+		for i := range len(activities) {
+			activityToAdd := activities[i]
+			createTableRow(p, activityToAdd, int64(i), t, s)
+		}
+
+		a, err := s.UpdateActivityDependencies(activities[1].ActivityId, []uuid.UUID{activities[0].ActivityId})
+		if err != nil {
+			t.Fatalf("Failed to create dependency. Encountered error: %v", err)
+		}
+		if got, want := a[0].ActivityId, activities[0].ActivityId; got != want {
+			t.Fatalf("got %v, want %v", got, want)
+		}
+
+		wantDependencies := map[uuid.UUID][]string{}
+		wantDependencies[activities[0].ActivityId] = []string{}
+		wantDependencies[activities[1].ActivityId] = []string{activities[0].DisplayName}
+		wantDependencies[activities[2].ActivityId] = []string{}
+		//check if table rows returned is sorted correctly despite adding in reverse order
+		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		if err != nil {
+			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
+		}
+		for _, tr := range trs {
+			if got, want := tr.Dependencies, wantDependencies[tr.ActivityId]; !slices.Equal(got, want) {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		}
+	})
 }
 
 func TestMockStoreContract(t *testing.T) {
