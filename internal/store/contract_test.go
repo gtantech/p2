@@ -286,6 +286,43 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			assertActivity(storeActivity, wantActivitiesMap[storeActivity.ActivityId], t)
 		}
 	})
+
+	t.Run("Update Activity Duration", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 3)
+		activitiesMap := make(map[uuid.UUID]models.Activity)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+			activitiesMap[activities[i].ActivityId] = activities[i]
+		}
+
+		activityToUpdate := activities[1]
+		updatedDuration := 6 * time.Minute
+
+		a, err := s.UpdateActivityDuration(activityToUpdate.ActivityId, updatedDuration)
+		if err != nil {
+			t.Fatalf("Failed to update activity duration. Encountered error: %v", err)
+		}
+		wantUpdatedActivity := models.Activity{ActivityId: activityToUpdate.ActivityId, DisplayName: activityToUpdate.DisplayName, Duration: updatedDuration}
+		assertActivity(a, wantUpdatedActivity, t)
+		wantActivitiesMap := make(map[uuid.UUID]models.Activity)
+		maps.Copy(wantActivitiesMap, activitiesMap)
+		wantActivitiesMap[wantUpdatedActivity.ActivityId] = wantUpdatedActivity
+
+		getActivities, err := s.GetActivities(p.ProjectId)
+		if err != nil {
+			t.Fatalf("Failed to get activities. Encountered error %v", err)
+		}
+
+		for _, storeActivity := range getActivities {
+			assertActivity(storeActivity, wantActivitiesMap[storeActivity.ActivityId], t)
+		}
+	})
 }
 
 func TestMockStoreContract(t *testing.T) {
