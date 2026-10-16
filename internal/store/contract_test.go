@@ -5,6 +5,7 @@ import (
 	"slices"
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/gtantech/p2/internal/models"
 )
@@ -187,6 +188,50 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		for i, tr := range trs {
 			if tr.ActivityId != activities[i].ActivityId {
 				t.Errorf("got %v, want %v", tr.ActivityId, activities[i].ActivityId)
+			}
+		}
+	})
+
+	t.Run("Create Dependency", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 3)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+		}
+		//add table rows
+		for i := range len(activities) {
+			activityToAdd := activities[i]
+			createTableRow(p, activityToAdd, int64(i), t, s)
+		}
+
+		d, err := s.CreateDependency(p.ProjectId, activities[1].ActivityId, activities[0].ActivityId)
+		if err != nil {
+			t.Fatalf("Failed to create dependency. Encountered error: %v", err)
+		}
+		if got, want := d.SuccessorActivityId, activities[1].ActivityId; got != want {
+			t.Fatalf("got %v, want %v", got, want)
+		}
+		if got, want := d.PredecessorActivityId, activities[0].ActivityId; got != want {
+			t.Fatalf("got %v, want %v", got, want)
+		}
+
+		wantDependencies := map[uuid.UUID][]string{}
+		wantDependencies[activities[0].ActivityId] = []string{}
+		wantDependencies[activities[1].ActivityId] = []string{activities[0].DisplayName}
+		wantDependencies[activities[2].ActivityId] = []string{}
+		//check if table rows returned is sorted correctly despite adding in reverse order
+		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		if err != nil {
+			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
+		}
+		for _, tr := range trs {
+			if got, want := tr.Dependencies, wantDependencies[tr.ActivityId]; !slices.Equal(got, want) {
+				t.Errorf("got %v, want %v", got, want)
 			}
 		}
 	})
