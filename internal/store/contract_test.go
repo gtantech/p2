@@ -126,9 +126,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
 		for i, tr := range trs {
-			if tr.ActivityId != activities[i].ActivityId {
-				t.Errorf("got %v, want %v", tr.ActivityId, activities[i].ActivityId)
-			}
+			assertActivity(*tr.Activity, activities[i], t)
 		}
 	})
 
@@ -162,9 +160,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
 		for i, tr := range trs {
-			if tr.ActivityId != activities[i].ActivityId {
-				t.Errorf("got %v, want %v", tr.ActivityId, activities[i].ActivityId)
-			}
+			assertActivity(*tr.Activity, activities[i], t)
 		}
 	})
 
@@ -200,9 +196,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
 		for i, tr := range trs {
-			if tr.ActivityId != activities[i].ActivityId {
-				t.Errorf("got %v, want %v", tr.ActivityId, activities[i].ActivityId)
-			}
+			assertActivity(*tr.Activity, activities[i], t)
 		}
 	})
 
