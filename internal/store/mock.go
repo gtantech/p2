@@ -220,20 +220,25 @@ func (ms *MockStore) CreateActivity(projectId uuid.UUID, activityName string, du
 func NewMockStore() *MockStore {
 	ms := &MockStore{}
 	ms.projectLookup = make(map[uuid.UUID]*project)
+	ms.activitiesLookup = map[uuid.UUID]*models.Activity{}
+	ms.tableRowsLookup = map[uuid.UUID]*models.TableRow{}
+	ms.dependencies = map[uuid.UUID][]*models.Activity{}
+	return ms
+}
+
+func NewMockStoreWithValues() *MockStore {
+	ms := NewMockStore()
 	ms.projectLookup[uuid.Max()] = &project{
 		projectName: "mock project",
 		activities:  []*models.Activity{},
 		tableRows:   []*models.TableRow{},
 	}
-	ms.activitiesLookup = map[uuid.UUID]*models.Activity{}
-	ms.tableRowsLookup = map[uuid.UUID]*models.TableRow{}
 	ms.projectLookup[uuid.Max()].activities = []*models.Activity{
 		{ActivityId: uuid.MustParse("dcce6c98-b31b-4ed6-a2ed-15d24ae96b41"), DisplayName: "A", Duration: 5 * time.Minute},
 		{ActivityId: uuid.MustParse("a4518b28-e597-4295-a532-3a501a75ab2b"), DisplayName: "B", Duration: 4 * time.Minute},
 		{ActivityId: uuid.MustParse("aa5a833c-2407-464c-93c4-fa9edba03b52"), DisplayName: "C", Duration: 3 * time.Minute},
 	}
 
-	ms.dependencies = map[uuid.UUID][]*models.Activity{}
 	ms.dependencies[ms.projectLookup[uuid.Max()].activities[1].ActivityId] = []*models.Activity{ms.projectLookup[uuid.Max()].activities[0]}
 	ms.dependencies[ms.projectLookup[uuid.Max()].activities[2].ActivityId] = []*models.Activity{ms.projectLookup[uuid.Max()].activities[0], ms.projectLookup[uuid.Max()].activities[1]}
 
