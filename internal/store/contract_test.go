@@ -14,7 +14,7 @@ import (
 func createTestProject(t *testing.T, store models.Model) models.Project {
 	t.Helper()
 	projectName := "test project"
-	p, err := store.CreateProject(projectName)
+	p, err := store.CreateProject(t.Context(), projectName)
 	if err != nil {
 		t.Fatalf("Failed to create new project. Encountered error: %v", err)
 	}
@@ -26,7 +26,7 @@ func createTestProject(t *testing.T, store models.Model) models.Project {
 
 func createTableRow(project models.Project, activity models.Activity, sortRowRank int64, t *testing.T, store models.Model) models.TableRow {
 	t.Helper()
-	tr, err := store.CreateTableRow(project.ProjectId, activity.ActivityId, sortRowRank)
+	tr, err := store.CreateTableRow(t.Context(), project.ProjectId, activity.ActivityId, sortRowRank)
 	if err != nil {
 		t.Fatalf("Failed to create new table row. Encountered error: %v", err)
 	}
@@ -45,7 +45,7 @@ func createTableRow(project models.Project, activity models.Activity, sortRowRan
 
 func createActivity(activityName string, activityDuration time.Duration, p models.Project, t *testing.T, store models.Model) models.Activity {
 	t.Helper()
-	a, err := store.CreateActivity(p.ProjectId, activityName, activityDuration)
+	a, err := store.CreateActivity(t.Context(), p.ProjectId, activityName, activityDuration)
 	if err != nil {
 		t.Fatalf("Failed to create new activity. Encountered error: %v", err)
 	}
@@ -79,7 +79,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		p := createTestProject(t, s)
 
 		// check no activites present
-		a_getEmpty, err := s.GetActivities(p.ProjectId)
+		a_getEmpty, err := s.GetActivities(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get activities. Encountered error: %v", err)
 		}
@@ -93,7 +93,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		a := createActivity(activityName, activityDuration, p, t, s)
 
 		// check activity was added
-		a_get, err := s.GetActivities(p.ProjectId)
+		a_get, err := s.GetActivities(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get activities. Encountered error: %v", err)
 		}
@@ -121,7 +121,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		}
 
 		//check if table rows returned is sorted correctly despite adding in reverse order
-		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		trs, err := s.GetTableRowsSortedByRank(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
@@ -149,13 +149,13 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 
 		//add table row to the bottom
 		lastActivity := activities[len(activities)-1]
-		_, err := s.CreateTableRowAtBottom(p.ProjectId, lastActivity.ActivityId)
+		_, err := s.CreateTableRowAtBottom(t.Context(), p.ProjectId, lastActivity.ActivityId)
 		if err != nil {
 			t.Fatalf("Failed to create table row at bottom. Encountered error: %v", err)
 		}
 
 		//check if table rows returned is sorted correctly despite adding in reverse order
-		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		trs, err := s.GetTableRowsSortedByRank(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
@@ -185,13 +185,13 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		createTableRow(p, activities[len(activities)-1], int64(len(activities)-1)*1000, t, s)
 
 		//add table row between the 3rd last and last activity
-		_, err := s.CreateTableRowBelow(p.ProjectId, activities[len(activities)-2].ActivityId, activities[len(activities)-3].ActivityId)
+		_, err := s.CreateTableRowBelow(t.Context(), p.ProjectId, activities[len(activities)-2].ActivityId, activities[len(activities)-3].ActivityId)
 		if err != nil {
 			t.Fatalf("Failed to create table row below. Encountered error: %v", err)
 		}
 
 		//check if table rows returned is sorted correctly
-		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		trs, err := s.GetTableRowsSortedByRank(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
@@ -217,7 +217,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			createTableRow(p, activityToAdd, int64(i), t, s)
 		}
 
-		d, err := s.CreateDependency(p.ProjectId, activities[1].ActivityId, activities[0].ActivityId)
+		d, err := s.CreateDependency(t.Context(), p.ProjectId, activities[1].ActivityId, activities[0].ActivityId)
 		if err != nil {
 			t.Fatalf("Failed to create dependency. Encountered error: %v", err)
 		}
@@ -233,7 +233,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		wantDependencies[activities[1].ActivityId] = []string{activities[0].DisplayName}
 		wantDependencies[activities[2].ActivityId] = []string{}
 		//check if table rows returned is sorted correctly despite adding in reverse order
-		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		trs, err := s.GetTableRowsSortedByRank(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
@@ -261,7 +261,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		activityToUpdate := activities[1]
 		updatedName := "updated name"
 
-		a, err := s.UpdateActivityName(activityToUpdate.ActivityId, updatedName)
+		a, err := s.UpdateActivityName(t.Context(), activityToUpdate.ActivityId, updatedName)
 		if err != nil {
 			t.Fatalf("Failed to update activity name. Encountered error: %v", err)
 		}
@@ -271,7 +271,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		maps.Copy(wantActivitiesMap, activitiesMap)
 		wantActivitiesMap[wantUpdatedActivity.ActivityId] = wantUpdatedActivity
 
-		getActivities, err := s.GetActivities(p.ProjectId)
+		getActivities, err := s.GetActivities(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get activities. Encountered error %v", err)
 		}
@@ -298,7 +298,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		activityToUpdate := activities[1]
 		updatedDuration := 6 * time.Minute
 
-		a, err := s.UpdateActivityDuration(activityToUpdate.ActivityId, updatedDuration)
+		a, err := s.UpdateActivityDuration(t.Context(), activityToUpdate.ActivityId, updatedDuration)
 		if err != nil {
 			t.Fatalf("Failed to update activity duration. Encountered error: %v", err)
 		}
@@ -308,7 +308,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		maps.Copy(wantActivitiesMap, activitiesMap)
 		wantActivitiesMap[wantUpdatedActivity.ActivityId] = wantUpdatedActivity
 
-		getActivities, err := s.GetActivities(p.ProjectId)
+		getActivities, err := s.GetActivities(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get activities. Encountered error %v", err)
 		}
@@ -335,7 +335,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			createTableRow(p, activityToAdd, int64(i), t, s)
 		}
 
-		a, err := s.UpdateActivityDependencies(activities[1].ActivityId, []uuid.UUID{activities[0].ActivityId})
+		a, err := s.UpdateActivityDependencies(t.Context(), activities[1].ActivityId, []uuid.UUID{activities[0].ActivityId})
 		if err != nil {
 			t.Fatalf("Failed to create dependency. Encountered error: %v", err)
 		}
@@ -348,7 +348,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		wantDependencies[activities[1].ActivityId] = []string{activities[0].DisplayName}
 		wantDependencies[activities[2].ActivityId] = []string{}
 		//check if table rows returned is sorted correctly despite adding in reverse order
-		trs, err := s.GetTableRowsSortedByRank(p.ProjectId)
+		trs, err := s.GetTableRowsSortedByRank(t.Context(), p.ProjectId)
 		if err != nil {
 			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
 		}
