@@ -339,5 +339,21 @@ func (s *SqliteStore) UpdateActivityDuration(ctx context.Context, activityId uui
 
 // UpdateActivityName implements [models.Model].
 func (s *SqliteStore) UpdateActivityName(ctx context.Context, activityId uuid.UUID, activityName string) (models.Activity, error) {
-	panic("unimplemented")
+	a, err := s.queries.UpdateActivityName(ctx, sqlitedb.UpdateActivityNameParams{
+		ID:       activityId.String(),
+		DispName: activityName,
+	})
+
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.Activity{}, err
+		}
+		return models.Activity{}, ErrActivityNotFound
+	}
+
+	return models.Activity{
+		ActivityId:  uuid.MustParse(a.ID),
+		DisplayName: a.DispName,
+		Duration:    time.Duration(a.Duration),
+	}, nil
 }
