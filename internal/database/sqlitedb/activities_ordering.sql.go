@@ -9,6 +9,64 @@ import (
 	"context"
 )
 
+const findCurrentAndNextActivityByProjectIdAndActivityId = `-- name: FindCurrentAndNextActivityByProjectIdAndActivityId :many
+WITH project_activities AS (
+    SELECT id, project_id, successor_activity_id, sort_rank
+    FROM activities_ordering
+    WHERE project_id = ?
+),
+current_activity AS (
+    SELECT sort_rank, successor_activity_id
+    FROM project_activities
+    WHERE successor_activity_id = ?
+)
+SELECT id, project_id, successor_activity_id, sort_rank
+FROM project_activities
+WHERE sort_rank > (SELECT sort_rank FROM current_activity) OR successor_activity_id = current_activity
+ORDER BY sort_rank
+LIMIT 2
+`
+
+type FindCurrentAndNextActivityByProjectIdAndActivityIdParams struct {
+	ProjectID           string
+	SuccessorActivityID string
+}
+
+type FindCurrentAndNextActivityByProjectIdAndActivityIdRow struct {
+	ID                  string
+	ProjectID           string
+	SuccessorActivityID string
+	SortRank            int64
+}
+
+func (q *Queries) FindCurrentAndNextActivityByProjectIdAndActivityId(ctx context.Context, arg FindCurrentAndNextActivityByProjectIdAndActivityIdParams) ([]FindCurrentAndNextActivityByProjectIdAndActivityIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, findCurrentAndNextActivityByProjectIdAndActivityId, arg.ProjectID, arg.SuccessorActivityID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindCurrentAndNextActivityByProjectIdAndActivityIdRow
+	for rows.Next() {
+		var i FindCurrentAndNextActivityByProjectIdAndActivityIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.SuccessorActivityID,
+			&i.SortRank,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findLastActivityByProjectId = `-- name: FindLastActivityByProjectId :one
 SELECT id, project_id, successor_activity_id, sort_rank
 FROM activities_ordering
@@ -20,48 +78,6 @@ LIMIT 1
 func (q *Queries) FindLastActivityByProjectId(ctx context.Context, projectID string) (ActivitiesOrdering, error) {
 	row := q.db.QueryRowContext(ctx, findLastActivityByProjectId, projectID)
 	var i ActivitiesOrdering
-	err := row.Scan(
-		&i.ID,
-		&i.ProjectID,
-		&i.SuccessorActivityID,
-		&i.SortRank,
-	)
-	return i, err
-}
-
-const findNextActivityByProjectIdAndActivityId = `-- name: FindNextActivityByProjectIdAndActivityId :one
-WITH project_activities AS (
-    SELECT id, project_id, successor_activity_id, sort_rank
-    FROM activities_ordering
-    WHERE project_id = ?
-),
-current_activity AS (
-    SELECT sort_rank
-    FROM project_activities
-    WHERE successor_activity_id = ?
-)
-SELECT id, project_id, successor_activity_id, sort_rank
-FROM project_activities
-WHERE sort_rank > (SELECT sort_rank FROM current_activity)
-ORDER BY sort_rank
-LIMIT 1
-`
-
-type FindNextActivityByProjectIdAndActivityIdParams struct {
-	ProjectID           string
-	SuccessorActivityID string
-}
-
-type FindNextActivityByProjectIdAndActivityIdRow struct {
-	ID                  string
-	ProjectID           string
-	SuccessorActivityID string
-	SortRank            int64
-}
-
-func (q *Queries) FindNextActivityByProjectIdAndActivityId(ctx context.Context, arg FindNextActivityByProjectIdAndActivityIdParams) (FindNextActivityByProjectIdAndActivityIdRow, error) {
-	row := q.db.QueryRowContext(ctx, findNextActivityByProjectIdAndActivityId, arg.ProjectID, arg.SuccessorActivityID)
-	var i FindNextActivityByProjectIdAndActivityIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.ProjectID,
