@@ -25,6 +25,38 @@ func (q *Queries) FindActivityById(ctx context.Context, id string) (Activity, er
 	return i, err
 }
 
+const findAllActivitiesByProject = `-- name: FindAllActivitiesByProject :many
+SELECT id, project_id, disp_name, duration FROM activities WHERE project_id = ?
+`
+
+func (q *Queries) FindAllActivitiesByProject(ctx context.Context, projectID string) ([]Activity, error) {
+	rows, err := q.db.QueryContext(ctx, findAllActivitiesByProject, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Activity
+	for rows.Next() {
+		var i Activity
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.DispName,
+			&i.Duration,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertActivity = `-- name: InsertActivity :one
 INSERT INTO activities (id, project_id, disp_name, duration)
 VALUES (?, ?, ?, ?)
