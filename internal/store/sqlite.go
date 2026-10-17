@@ -64,7 +64,17 @@ func (s *SqliteStore) CreateDependency(ctx context.Context, projectId uuid.UUID,
 
 // CreateProject implements [models.Model].
 func (s *SqliteStore) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
-	panic("unimplemented")
+	resp, err := s.queries.InsertProject(ctx, sqlitedb.InsertProjectParams{
+		ID:       uuid.NewV7().String(),
+		DispName: projectName,
+	})
+	if err != nil {
+		return models.Project{}, err
+	}
+	return models.Project{
+		ProjectId:          uuid.MustParse(resp.ID),
+		ProjectDisplayName: resp.DispName,
+	}, nil
 }
 
 // CreateTableRow implements [models.Model].
