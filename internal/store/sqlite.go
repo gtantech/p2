@@ -124,7 +124,14 @@ func (s *SqliteStore) CreateTableRow(ctx context.Context, projectId uuid.UUID, a
 
 // CreateTableRowAtBottom implements [models.Model].
 func (s *SqliteStore) CreateTableRowAtBottom(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
-	panic("unimplemented")
+	lastActivityResp, err := s.queries.FindLastActivityByProjectId(ctx, projectId.String())
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.TableRow{}, err
+		}
+		return models.TableRow{}, ErrProjectNotFound
+	}
+	return s.CreateTableRow(ctx, projectId, activityId, lastActivityResp.SortRank+models.TableRowSortRankStep)
 }
 
 // CreateTableRowBelow implements [models.Model].
