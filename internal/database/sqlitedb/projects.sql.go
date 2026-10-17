@@ -19,3 +19,20 @@ func (q *Queries) FindProjectById(ctx context.Context, id string) (Project, erro
 	err := row.Scan(&i.ID, &i.DispName)
 	return i, err
 }
+
+const insertProject = `-- name: InsertProject :one
+INSERT INTO projects (id, disp_name) VALUES (?, ?)
+RETURNING id, disp_name
+`
+
+type InsertProjectParams struct {
+	ID       string
+	DispName string
+}
+
+func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (Project, error) {
+	row := q.db.QueryRowContext(ctx, insertProject, arg.ID, arg.DispName)
+	var i Project
+	err := row.Scan(&i.ID, &i.DispName)
+	return i, err
+}
