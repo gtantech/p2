@@ -2,6 +2,8 @@ package store
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 	"uuid"
 
@@ -21,7 +23,14 @@ type SqliteStore struct {
 
 // CreateActivity implements [models.Model].
 func (s *SqliteStore) CreateActivity(ctx context.Context, projectId uuid.UUID, activityName string, duration time.Duration) (models.Activity, error) {
-	panic("unimplemented")
+	resp, err := s.queries.InsertActivity(ctx, sqlitedb.InsertActivityParams{ID: uuid.NewV7().String(), ProjectID: projectId.String(), DispName: activityName, Duration: int64(duration)})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Activity{}, ErrProjectNotFound
+		}
+		return models.Activity{}, err
+	}
+	return models.Activity{ActivityId: uuid.MustParse(resp.ID), DisplayName: resp.DispName, Duration: time.Duration(resp.Duration)}, nil
 }
 
 // CreateDependency implements [models.Model].
