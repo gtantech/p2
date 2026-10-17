@@ -8,6 +8,7 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/gtantech/p2/internal/database/sqlitedb"
 	"github.com/gtantech/p2/internal/models"
 )
 
@@ -363,5 +364,11 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 func TestMockStoreContract(t *testing.T) {
 	testModelContract(t, func() models.Model {
 		return NewMockStore()
+	})
+}
+
+func TestSqliteStoreContract(t *testing.T) {
+	testModelContract(t, func() models.Model {
+		return NewSqliteStore(*sqlitedb.New(sqlitedb.NewSQLiteDb(":memory:")))
 	})
 }
