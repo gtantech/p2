@@ -9,6 +9,26 @@ import (
 	"context"
 )
 
+const findLastActivityByProjectId = `-- name: FindLastActivityByProjectId :one
+SELECT id, project_id, successor_activity_id, sort_rank
+FROM activities_ordering
+WHERE project_id = ?
+ORDER BY sort_rank
+LIMIT 1
+`
+
+func (q *Queries) FindLastActivityByProjectId(ctx context.Context, projectID string) (ActivitiesOrdering, error) {
+	row := q.db.QueryRowContext(ctx, findLastActivityByProjectId, projectID)
+	var i ActivitiesOrdering
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.SuccessorActivityID,
+		&i.SortRank,
+	)
+	return i, err
+}
+
 const insertActivityOrdering = `-- name: InsertActivityOrdering :one
 INSERT INTO activities_ordering (id, project_id, successor_activity_id, sort_rank)
 VALUES (?, ?, ?, ?)
