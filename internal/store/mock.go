@@ -114,7 +114,7 @@ func (ms *MockStore) CreateTableRowAtBottom(ctx context.Context, projectId uuid.
 }
 
 // UpdateActivityDependencies implements [models.Model].
-func (ms *MockStore) UpdateActivityDependencies(ctx context.Context, activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]models.Activity, error) {
+func (ms *MockStore) UpdateActivityDependencies(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]models.Activity, error) {
 	if _, ok := ms.activitiesLookup[activityId]; !ok {
 		return []models.Activity{}, ErrActivityNotFound
 	}

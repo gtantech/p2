@@ -192,7 +192,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if _, err := rt.store.UpdateActivityDependencies(r.Context(), dto.ActivityId, dependencyIds); err != nil {
+	if _, err := rt.store.UpdateActivityDependencies(r.Context(), dto.ProjectId, dto.ActivityId, dependencyIds); err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
 			http.Error(w, "activity not found", http.StatusBadRequest)
 			return

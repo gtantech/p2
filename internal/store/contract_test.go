@@ -335,7 +335,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			createTableRow(p, activityToAdd, int64(i), t, s)
 		}
 
-		a, err := s.UpdateActivityDependencies(t.Context(), activities[1].ActivityId, []uuid.UUID{activities[0].ActivityId})
+		a, err := s.UpdateActivityDependencies(t.Context(), p.ProjectId, activities[1].ActivityId, []uuid.UUID{activities[0].ActivityId})
 		if err != nil {
 			t.Fatalf("Failed to create dependency. Encountered error: %v", err)
 		}
