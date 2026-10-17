@@ -187,7 +187,44 @@ func (s *SqliteStore) GetActivities(ctx context.Context, projectId uuid.UUID) ([
 
 // GetTableRowsSortedByRank implements [models.Model].
 func (s *SqliteStore) GetTableRowsSortedByRank(ctx context.Context, projectId uuid.UUID) ([]models.TableRow, error) {
-	panic("unimplemented")
+	_, err := s.queries.FindProjectById(ctx, projectId.String())
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return []models.TableRow{}, err
+		}
+		return []models.TableRow{}, ErrProjectNotFound
+	}
+	dependenciesResp, err := s.queries.FindAllPredecessorNamesByProjectId(ctx, projectId.String())
+	if err != nil {
+		return []models.TableRow{}, err
+	}
+
+	activitiesResp, err := s.queries.FindAllActivitiesByProjectSorted(ctx, projectId.String())
+	if err != nil {
+		return []models.TableRow{}, err
+	}
+
+	successorDependencyNames := make(map[uuid.UUID][]string)
+	for _, d := range dependenciesResp {
+		successorDependencyNames[uuid.MustParse(d.SuccessorActivityID)] = append(successorDependencyNames[uuid.MustParse(d.SuccessorActivityID)], d.PredecessorActivityName)
+	}
+
+	tr := make([]models.TableRow, len(activitiesResp))
+
+	for i, a := range activitiesResp {
+		activityUuid := uuid.MustParse(a.ID)
+		tr[i] = models.TableRow{
+			Activity: &models.Activity{
+				ActivityId:  activityUuid,
+				DisplayName: a.DispName,
+				Duration:    time.Duration(a.Duration),
+			},
+			ProjectId:    projectId,
+			Dependencies: successorDependencyNames[activityUuid],
+			SortRank:     a.SortRank,
+		}
+	}
+	return tr, nil
 }
 
 // UpdateActivityDependencies implements [models.Model].
