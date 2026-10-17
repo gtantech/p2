@@ -228,8 +228,92 @@ func (s *SqliteStore) GetTableRowsSortedByRank(ctx context.Context, projectId uu
 }
 
 // UpdateActivityDependencies implements [models.Model].
-func (s *SqliteStore) UpdateActivityDependencies(ctx context.Context, activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]models.Activity, error) {
-	panic("unimplemented")
+func (s *SqliteStore) UpdateActivityDependencies(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]models.Activity, error) {
+	dependenciesResp, err := s.queries.FindAllDependenciesBySuccessorId(ctx, activityId.String())
+	if err != nil {
+		return []models.Activity{}, err
+	}
+
+	if len(dependenciesResp) == len(dependencyActivityIds) {
+		for i, dr := range dependenciesResp {
+			//update only if ids are different
+			if dependencyActivityIds[i] != uuid.MustParse(dr.PredecessorActivityID) {
+				_, err := s.queries.UpdatePredecessorById(ctx, sqlitedb.UpdatePredecessorByIdParams{
+					ID:                    dr.ID,
+					PredecessorActivityID: dependencyActivityIds[i].String(),
+				})
+				if err != nil {
+					if !errors.Is(err, sql.ErrNoRows) {
+						return []models.Activity{}, err
+					}
+					return []models.Activity{}, ErrActivityNotFound
+				}
+			}
+		}
+	} else {
+		minSize := min(len(dependencyActivityIds), len(dependenciesResp))
+		maxSize := max(len(dependencyActivityIds), len(dependenciesResp))
+		for i := range minSize {
+			dr := dependenciesResp[i]
+			if dependencyActivityIds[i] != uuid.MustParse(dr.PredecessorActivityID) {
+				_, err := s.queries.UpdatePredecessorById(ctx, sqlitedb.UpdatePredecessorByIdParams{
+					ID:                    dr.ID,
+					PredecessorActivityID: dependencyActivityIds[i].String(),
+				})
+				if err != nil {
+					if !errors.Is(err, sql.ErrNoRows) {
+						return []models.Activity{}, err
+					}
+					return []models.Activity{}, ErrActivityNotFound
+				}
+			}
+		}
+
+		if maxSize == len(dependenciesResp) {
+			//user deleted values
+			for i := minSize; i < maxSize; i++ {
+				dependencyToDelete := dependenciesResp[i]
+				if err := s.queries.DeleteDependencyById(ctx, dependencyToDelete.ID); err != nil {
+					return []models.Activity{}, err
+				}
+			}
+		} else {
+			//user added values
+			for i := minSize; i < maxSize; i++ {
+				dependencyIdToAdd := dependencyActivityIds[i]
+				_, err := s.queries.InsertDependency(ctx, sqlitedb.InsertDependencyParams{
+					ID:                    uuid.NewV7().String(),
+					ProjectID:             projectId.String(),
+					Relationship:          string(models.FS),
+					PredecessorActivityID: dependencyIdToAdd.String(),
+					SuccessorActivityID:   activityId.String(),
+				})
+
+				if err != nil {
+					return []models.Activity{}, err
+				}
+			}
+		}
+	}
+
+	dependencyActivitiesResp, err := s.queries.FindAllPredecessorActivitiesBySuccessorActivityId(ctx, activityId.String())
+
+	if err != nil {
+		return []models.Activity{}, err
+	}
+
+	updatedDependencies := make([]models.Activity, len(dependencyActivitiesResp))
+
+	for i, da := range dependencyActivitiesResp {
+		updatedDependencies[i] = models.Activity{
+			ActivityId:  uuid.MustParse(da.ID),
+			DisplayName: da.DispName,
+			Duration:    time.Duration(da.Duration),
+		}
+	}
+
+	return updatedDependencies, nil
+
 }
 
 // UpdateActivityDuration implements [models.Model].
