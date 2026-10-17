@@ -60,6 +60,7 @@ type Model interface {
 	UpdateActivityDuration(ctx context.Context, activityId uuid.UUID, duration time.Duration) (Activity, error)
 
 	// Updates the dependencies of the activity associated with the activityId.
-	// UpdateActivityDependencies returns ErrActivityNotFound if activityId does not exist.
-	UpdateActivityDependencies(ctx context.Context, activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]Activity, error)
+	// UpdateActivityDependencies returns ErrProjectNotFound if projectId does not exist,
+	// and ErrActivityNotFound if successorActivityId or predecessorActivityId does not exist.
+	UpdateActivityDependencies(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, dependencyActivityIds []uuid.UUID) ([]Activity, error)
 }
