@@ -13,12 +13,12 @@ import (
 
 var _ models.Model = (*SqliteStore)(nil) //ensures SqliteStore implements models.Model at compile time
 
-func NewSqliteStore(queries sqlitedb.Queries) *SqliteStore {
+func NewSqliteStore(queries *sqlitedb.Queries) *SqliteStore {
 	return &SqliteStore{queries: queries}
 }
 
 type SqliteStore struct {
-	queries sqlitedb.Queries
+	queries *sqlitedb.Queries
 }
 
 // CreateActivity implements [models.Model].

@@ -369,6 +369,6 @@ func TestMockStoreContract(t *testing.T) {
 
 func TestSqliteStoreContract(t *testing.T) {
 	testModelContract(t, func() models.Model {
-		return NewSqliteStore(*sqlitedb.New(sqlitedb.NewSQLiteDb(":memory:")))
+		return NewSqliteStore(sqlitedb.New(sqlitedb.NewSQLiteDb(":memory:")))
 	})
 }
