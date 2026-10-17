@@ -22,7 +22,8 @@ current_activity AS (
 )
 SELECT id, project_id, successor_activity_id, sort_rank
 FROM project_activities
-WHERE sort_rank > (SELECT sort_rank FROM current_activity) OR successor_activity_id = current_activity
+WHERE sort_rank > (SELECT sort_rank FROM current_activity)
+   OR successor_activity_id = (SELECT successor_activity_id FROM current_activity)
 ORDER BY sort_rank
 LIMIT 2
 `
