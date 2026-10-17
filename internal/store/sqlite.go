@@ -79,7 +79,47 @@ func (s *SqliteStore) CreateProject(ctx context.Context, projectName string) (mo
 
 // CreateTableRow implements [models.Model].
 func (s *SqliteStore) CreateTableRow(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (models.TableRow, error) {
-	panic("unimplemented")
+	activityOrderingResp, err := s.queries.InsertActivityOrdering(ctx, sqlitedb.InsertActivityOrderingParams{
+		ID:                  uuid.NewV7().String(),
+		ProjectID:           projectId.String(),
+		SuccessorActivityID: activityId.String(),
+		SortRank:            rowSortRank,
+	})
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.TableRow{}, err
+		}
+		if _, err := s.queries.FindProjectById(ctx, projectId.String()); err != nil && errors.Is(err, sql.ErrNoRows) {
+			return models.TableRow{}, ErrProjectNotFound
+		}
+		if _, err := s.queries.FindActivityById(ctx, activityId.String()); err != nil && errors.Is(err, sql.ErrNoRows) {
+			return models.TableRow{}, ErrActivityNotFound
+		}
+	}
+	actvityResp, err := s.queries.FindActivityById(ctx, activityOrderingResp.SuccessorActivityID)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.TableRow{}, err
+		}
+		return models.TableRow{}, ErrActivityNotFound
+	}
+	dependenciesResp, err := s.queries.FindAllPredecessorNamesBySuccessor(ctx, activityOrderingResp.SuccessorActivityID)
+	return models.TableRow{
+		Activity: &models.Activity{
+			ActivityId:  uuid.MustParse(actvityResp.ID),
+			DisplayName: actvityResp.DispName,
+			Duration:    time.Duration(actvityResp.Duration),
+		},
+		ProjectId: uuid.MustParse(actvityResp.ProjectID),
+		Dependencies: func() []string {
+			dependencies := make([]string, len(dependenciesResp))
+			for i, d := range dependenciesResp {
+				dependencies[i] = d.PredecessorActivityName
+			}
+			return dependencies
+		}(),
+		SortRank: activityOrderingResp.SortRank,
+	}, nil
 }
 
 // CreateTableRowAtBottom implements [models.Model].
