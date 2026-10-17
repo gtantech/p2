@@ -21,6 +21,10 @@ type SqliteStore struct {
 	queries *sqlitedb.Queries
 }
 
+func toActivity(dto *sqlitedb.Activity) *models.Activity {
+	return &models.Activity{ActivityId: uuid.MustParse(dto.ID), DisplayName: dto.DispName, Duration: time.Duration(dto.Duration)}
+}
+
 // CreateActivity implements [models.Model].
 func (s *SqliteStore) CreateActivity(ctx context.Context, projectId uuid.UUID, activityName string, duration time.Duration) (models.Activity, error) {
 	resp, err := s.queries.InsertActivity(ctx, sqlitedb.InsertActivityParams{ID: uuid.NewV7().String(), ProjectID: projectId.String(), DispName: activityName, Duration: int64(duration)})
@@ -30,7 +34,7 @@ func (s *SqliteStore) CreateActivity(ctx context.Context, projectId uuid.UUID, a
 		}
 		return models.Activity{}, err
 	}
-	return models.Activity{ActivityId: uuid.MustParse(resp.ID), DisplayName: resp.DispName, Duration: time.Duration(resp.Duration)}, nil
+	return *toActivity(&resp), nil
 }
 
 // CreateDependency implements [models.Model].
@@ -105,11 +109,7 @@ func (s *SqliteStore) CreateTableRow(ctx context.Context, projectId uuid.UUID, a
 	}
 	dependenciesResp, err := s.queries.FindAllPredecessorNamesBySuccessor(ctx, activityOrderingResp.SuccessorActivityID)
 	return models.TableRow{
-		Activity: &models.Activity{
-			ActivityId:  uuid.MustParse(actvityResp.ID),
-			DisplayName: actvityResp.DispName,
-			Duration:    time.Duration(actvityResp.Duration),
-		},
+		Activity:  toActivity(&actvityResp),
 		ProjectId: uuid.MustParse(actvityResp.ProjectID),
 		Dependencies: func() []string {
 			dependencies := make([]string, len(dependenciesResp))
@@ -174,12 +174,8 @@ func (s *SqliteStore) GetActivities(ctx context.Context, projectId uuid.UUID) ([
 
 	return func() []models.Activity {
 		activities := make([]models.Activity, len(resp))
-		for i, a := range resp {
-			activities[i] = models.Activity{
-				ActivityId:  uuid.MustParse(a.ID),
-				DisplayName: a.DispName,
-				Duration:    time.Duration(a.Duration),
-			}
+		for i := range resp {
+			activities[i] = *toActivity(&resp[i])
 		}
 		return activities
 	}(), nil
@@ -330,11 +326,7 @@ func (s *SqliteStore) UpdateActivityDuration(ctx context.Context, activityId uui
 		return models.Activity{}, ErrActivityNotFound
 	}
 
-	return models.Activity{
-		ActivityId:  uuid.MustParse(a.ID),
-		DisplayName: a.DispName,
-		Duration:    time.Duration(a.Duration),
-	}, nil
+	return *toActivity(&a), nil
 }
 
 // UpdateActivityName implements [models.Model].
@@ -351,9 +343,5 @@ func (s *SqliteStore) UpdateActivityName(ctx context.Context, activityId uuid.UU
 		return models.Activity{}, ErrActivityNotFound
 	}
 
-	return models.Activity{
-		ActivityId:  uuid.MustParse(a.ID),
-		DisplayName: a.DispName,
-		Duration:    time.Duration(a.Duration),
-	}, nil
+	return *toActivity(&a), nil
 }
