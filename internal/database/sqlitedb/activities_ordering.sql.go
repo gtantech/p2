@@ -72,7 +72,7 @@ const findLastActivityByProjectId = `-- name: FindLastActivityByProjectId :one
 SELECT id, project_id, successor_activity_id, sort_rank
 FROM activities_ordering
 WHERE project_id = ?
-ORDER BY sort_rank
+ORDER BY sort_rank DESC
 LIMIT 1
 `
 

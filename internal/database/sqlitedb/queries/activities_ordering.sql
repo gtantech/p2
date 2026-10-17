@@ -7,7 +7,7 @@ RETURNING *;
 SELECT *
 FROM activities_ordering
 WHERE project_id = ?
-ORDER BY sort_rank
+ORDER BY sort_rank DESC
 LIMIT 1;
 
 -- name: FindCurrentAndNextActivityByProjectIdAndActivityId :many
