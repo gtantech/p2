@@ -35,7 +35,31 @@ func (s *SqliteStore) CreateActivity(ctx context.Context, projectId uuid.UUID, a
 
 // CreateDependency implements [models.Model].
 func (s *SqliteStore) CreateDependency(ctx context.Context, projectId uuid.UUID, successorActivityId uuid.UUID, predecessorActivityId uuid.UUID) (models.Dependency, error) {
-	panic("unimplemented")
+	resp, err := s.queries.InsertDependency(ctx, sqlitedb.InsertDependencyParams{
+		ID:                    uuid.NewV7().String(),
+		ProjectID:             projectId.String(),
+		Relationship:          string(models.FS),
+		PredecessorActivityID: predecessorActivityId.String(),
+		SuccessorActivityID:   successorActivityId.String(),
+	})
+	if err != nil {
+		if _, err := s.queries.FindProjectById(ctx, projectId.String()); err != nil {
+			return models.Dependency{}, ErrProjectNotFound
+		}
+		if _, err := s.queries.FindActivityById(ctx, successorActivityId.String()); err != nil {
+			return models.Dependency{}, ErrActivityNotFound
+		}
+		if _, err := s.queries.FindActivityById(ctx, predecessorActivityId.String()); err != nil {
+			return models.Dependency{}, ErrActivityNotFound
+		}
+		return models.Dependency{}, err
+	}
+
+	return models.Dependency{
+		DependencyId:          uuid.MustParse(resp.ID),
+		SuccessorActivityId:   uuid.MustParse(resp.SuccessorActivityID),
+		PredecessorActivityId: uuid.MustParse(resp.PredecessorActivityID),
+	}, nil
 }
 
 // CreateProject implements [models.Model].
