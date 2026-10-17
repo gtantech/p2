@@ -136,7 +136,30 @@ func (s *SqliteStore) CreateTableRowAtBottom(ctx context.Context, projectId uuid
 
 // CreateTableRowBelow implements [models.Model].
 func (s *SqliteStore) CreateTableRowBelow(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, belowActivityId uuid.UUID) (models.TableRow, error) {
-	panic("unimplemented")
+	insertRowRank := int64(0)
+	rowCurrentAndBelowResp, err := s.queries.FindCurrentAndNextActivityByProjectIdAndActivityId(ctx, sqlitedb.FindCurrentAndNextActivityByProjectIdAndActivityIdParams{
+		ProjectID:           projectId.String(),
+		SuccessorActivityID: belowActivityId.String(),
+	})
+	if err != nil {
+		return models.TableRow{}, err
+	}
+	if len(rowCurrentAndBelowResp) == 0 {
+		if _, err := s.queries.FindProjectById(ctx, projectId.String()); err != nil {
+			return models.TableRow{}, ErrProjectNotFound
+		}
+		if _, err := s.queries.FindActivityById(ctx, belowActivityId.String()); err != nil {
+			return models.TableRow{}, ErrActivityNotFound
+		}
+	}
+	if len(rowCurrentAndBelowResp) == 1 {
+		// end of table
+		insertRowRank = rowCurrentAndBelowResp[0].SortRank + models.TableRowSortRankStep
+	} else {
+		insertRowRank = (rowCurrentAndBelowResp[0].SortRank / 2) + (rowCurrentAndBelowResp[1].SortRank / 2)
+	}
+
+	return s.CreateTableRow(ctx, projectId, activityId, insertRowRank)
 }
 
 // GetActivities implements [models.Model].
