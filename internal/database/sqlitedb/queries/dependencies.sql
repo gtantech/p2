@@ -27,3 +27,30 @@ JOIN activities predecessor
     ON predecessor.id = d.predecessor_activity_id
    AND predecessor.project_id = d.project_id
 WHERE d.project_id = ?;
+
+-- name: FindAllDependenciesBySuccessorId :many
+SELECT *
+FROM dependencies
+WHERE successor_activity_id = ?;
+
+-- name: UpdatePredecessorById :one
+UPDATE dependencies
+SET 
+    predecessor_activity_id = ?
+WHERE id = ?
+RETURNING *;
+
+-- name: FindAllPredecessorActivitiesBySuccessorActivityId :many
+SELECT
+    d.id AS dependency_id,
+    d.relationship,
+    predecessor.*
+FROM dependencies d
+JOIN activities predecessor
+    ON predecessor.id = d.predecessor_activity_id
+   AND predecessor.project_id = d.project_id
+WHERE d.successor_activity_id = ?;
+
+-- name: DeleteDependencyById :exec
+DELETE FROM dependencies
+WHERE id = ?;
