@@ -1,7 +1,6 @@
 package template
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,7 +9,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/models/jsonmodels"
-	"github.com/gtantech/p2/internal/store"
 )
 
 var _ models.Presenter = (*TemplPresenter)(nil) //ensures TemplPresenter implements models.Presenter at compile time
@@ -93,30 +91,21 @@ func NewTemplPresenter() *TemplPresenter {
 	return &TemplPresenter{}
 }
 
-// RegisterModel implements [models.Presenter].
-func (t *TemplPresenter) RegisterModel(model models.Model) {
-	t.model = model
-}
-
 // HtmlHomeHandler implements [models.Presenter].
-func (t *TemplPresenter) HtmlHomeHandler(projectId uuid.UUID) http.Handler {
-	tableRows, err := t.model.GetTableRowsSortedByRank(projectId)
-	if errors.Is(err, store.ErrProjectNotFound) {
-		return NewTemplateErrHandler("project not found", http.StatusBadRequest)
-	}
+func (t *TemplPresenter) HtmlHomeHandler(table models.Table) http.Handler {
 	h := homeParams{
 		Table: dependencyTable{
-			ProjectId: projectId,
+			ProjectId: table.ProjectId,
 			Rows: func() []dependencyTableRow {
-				dtr := make([]dependencyTableRow, len(tableRows))
-				for i, tr := range tableRows {
+				dtr := make([]dependencyTableRow, len(table.Rows))
+				for i, tr := range table.Rows {
 					dtr[i] = todependencyTableRow(tr)
 				}
 				return dtr
 			}(),
 		},
 		TableWrapperDivParams: &htmlDiv{
-			Id:    fmt.Sprintf("table-wrapper-id-%s", projectId),
+			Id:    fmt.Sprintf("table-wrapper-id-%s", table.ProjectId),
 			Class: "table-wrapper",
 		},
 		ContainerDivParams: &htmlDiv{

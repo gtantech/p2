@@ -25,13 +25,21 @@ type Routes struct {
 
 func NewRoutes(presenter models.Presenter, store models.Model) *Routes {
 	r := &Routes{presenter: presenter, store: store}
-	presenter.RegisterModel(store)
 	return r
 }
 
 func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	homeProjectId := uuid.Max() //mock home project id
-	rt.presenter.HtmlHomeHandler(homeProjectId).ServeHTTP(w, r)
+	tableRows, err := rt.store.GetTableRowsSortedByRank(r.Context(), homeProjectId)
+	if errors.Is(err, store.ErrProjectNotFound) {
+		http.Error(w, "project not found", http.StatusBadRequest)
+		return
+	}
+	table := models.Table{
+		ProjectId: homeProjectId,
+		Rows:      tableRows,
+	}
+	rt.presenter.HtmlHomeHandler(table).ServeHTTP(w, r)
 }
 
 func (rt *Routes) GetHomeStyleHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +56,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
 		return
 	}
-	activity, err := rt.store.CreateActivity(dto.ProjectId, "", 0)
+	activity, err := rt.store.CreateActivity(r.Context(), dto.ProjectId, "", 0)
 	if err != nil {
 		if errors.Is(err, store.ErrProjectNotFound) {
 			http.Error(w, "project not found", http.StatusBadRequest)
@@ -58,7 +66,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
 		return
 	}
-	newTr, err := rt.store.CreateTableRowBelow(dto.ProjectId, activity.ActivityId, dto.RelativeToActivityId)
+	newTr, err := rt.store.CreateTableRowBelow(r.Context(), dto.ProjectId, activity.ActivityId, dto.RelativeToActivityId)
 	if err != nil {
 		if errors.Is(err, store.ErrProjectNotFound) {
 			http.Error(w, "project not found", http.StatusBadRequest)
@@ -85,7 +93,7 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	userInput := r.FormValue(dto.DomName)
-	if _, err := rt.store.UpdateActivityName(dto.ActivityId, userInput); err != nil {
+	if _, err := rt.store.UpdateActivityName(r.Context(), dto.ActivityId, userInput); err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
 			http.Error(w, "activity not found", http.StatusBadRequest)
 			return
@@ -108,13 +116,13 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 	}
 	createdTableRows := []models.TableRow{}
 	for _, name := range dto.ActivitiesToCreate {
-		a, err := rt.store.CreateActivity(dto.ProjectId, name, 0)
+		a, err := rt.store.CreateActivity(r.Context(), dto.ProjectId, name, 0)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to create new activity with name: %v", name), http.StatusInternalServerError)
 			log.Printf("returned http internal server error while creating new activity: %s", name)
 			return
 		}
-		tr, err := rt.store.CreateTableRowAtBottom(dto.ProjectId, a.ActivityId)
+		tr, err := rt.store.CreateTableRowAtBottom(r.Context(), dto.ProjectId, a.ActivityId)
 		if err != nil {
 			if errors.Is(err, store.ErrProjectNotFound) {
 				http.Error(w, "project not found", http.StatusBadRequest)
@@ -129,7 +137,7 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 			return
 		}
 		createdTableRows = append(createdTableRows, tr)
-		if _, err := rt.store.CreateDependency(dto.ProjectId, dto.ActivityId, a.ActivityId); err != nil {
+		if _, err := rt.store.CreateDependency(r.Context(), dto.ProjectId, dto.ActivityId, a.ActivityId); err != nil {
 			if errors.Is(err, store.ErrProjectNotFound) {
 				http.Error(w, "project not found", http.StatusBadRequest)
 				return
@@ -156,7 +164,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	activities, err := rt.store.GetActivities(dto.ProjectId)
+	activities, err := rt.store.GetActivities(r.Context(), dto.ProjectId)
 	if err != nil {
 		if errors.Is(err, store.ErrProjectNotFound) {
 			http.Error(w, "project not found", http.StatusBadRequest)
@@ -184,7 +192,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if _, err := rt.store.UpdateActivityDependencies(dto.ActivityId, dependencyIds); err != nil {
+	if _, err := rt.store.UpdateActivityDependencies(r.Context(), dto.ProjectId, dto.ActivityId, dependencyIds); err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
 			http.Error(w, "activity not found", http.StatusBadRequest)
 			return
@@ -213,7 +221,7 @@ func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Requ
 		log.Printf("returned http bad request error while parsing user input: <%s>", userInput)
 		return
 	}
-	if _, err := rt.store.UpdateActivityDuration(dto.ActivityId, parseUserInput); err != nil {
+	if _, err := rt.store.UpdateActivityDuration(r.Context(), dto.ActivityId, parseUserInput); err != nil {
 		if errors.Is(err, store.ErrActivityNotFound) {
 			http.Error(w, "activity not found", http.StatusBadRequest)
 			return
