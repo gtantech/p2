@@ -9,6 +9,22 @@ import (
 	"context"
 )
 
+const findActivityById = `-- name: FindActivityById :one
+SELECT id, project_id, disp_name, duration FROM activities WHERE id = ?
+`
+
+func (q *Queries) FindActivityById(ctx context.Context, id string) (Activity, error) {
+	row := q.db.QueryRowContext(ctx, findActivityById, id)
+	var i Activity
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.DispName,
+		&i.Duration,
+	)
+	return i, err
+}
+
 const insertActivity = `-- name: InsertActivity :one
 INSERT INTO activities (id, project_id, disp_name, duration)
 VALUES (?, ?, ?, ?)
