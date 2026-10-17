@@ -8,8 +8,7 @@ import (
 )
 
 type Presenter interface {
-	RegisterModel(model Model)
-	HtmlHomeHandler(projectId uuid.UUID) http.Handler
+	HtmlHomeHandler(table Table) http.Handler
 	HtmlTableRow(tr TableRow) http.Handler
 	HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler
 	HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows []TableRow, rowActivityId uuid.UUID) http.Handler
