@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gtantech/p2/internal/database/sqlitedb"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/internal/template"
@@ -20,7 +21,7 @@ func NewServer(config models.ServerConfig) *Server {
 		port: config.Port,
 	}
 	t := template.NewTemplPresenter()
-	store := store.NewMockStoreWithValues()
+	store := store.NewSqliteStore(sqlitedb.New(sqlitedb.NewSQLiteDb(":memory:")))
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", newServer.port),
