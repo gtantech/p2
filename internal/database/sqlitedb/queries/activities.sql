@@ -17,3 +17,10 @@ JOIN activities_ordering ao
     AND a.project_id = ao.project_id
 WHERE a.project_id = ?
 ORDER BY ao.sort_rank;
+
+-- name: UpdateActivityDuration :one
+UPDATE activities
+SET 
+    duration = ?
+WHERE id = ?
+RETURNING *;
