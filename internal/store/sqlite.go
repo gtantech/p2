@@ -164,7 +164,25 @@ func (s *SqliteStore) CreateTableRowBelow(ctx context.Context, projectId uuid.UU
 
 // GetActivities implements [models.Model].
 func (s *SqliteStore) GetActivities(ctx context.Context, projectId uuid.UUID) ([]models.Activity, error) {
-	panic("unimplemented")
+	resp, err := s.queries.FindAllActivitiesByProject(ctx, projectId.String())
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return []models.Activity{}, err
+		}
+		return []models.Activity{}, ErrProjectNotFound
+	}
+
+	return func() []models.Activity {
+		activities := make([]models.Activity, len(resp))
+		for i, a := range resp {
+			activities[i] = models.Activity{
+				ActivityId:  uuid.MustParse(a.ID),
+				DisplayName: a.DispName,
+				Duration:    time.Duration(a.Duration),
+			}
+		}
+		return activities
+	}(), nil
 }
 
 // GetTableRowsSortedByRank implements [models.Model].
