@@ -29,6 +29,48 @@ func (q *Queries) FindLastActivityByProjectId(ctx context.Context, projectID str
 	return i, err
 }
 
+const findNextActivityByProjectIdAndActivityId = `-- name: FindNextActivityByProjectIdAndActivityId :one
+WITH project_activities AS (
+    SELECT id, project_id, successor_activity_id, sort_rank
+    FROM activities_ordering
+    WHERE project_id = ?
+),
+current_activity AS (
+    SELECT sort_rank
+    FROM project_activities
+    WHERE successor_activity_id = ?
+)
+SELECT id, project_id, successor_activity_id, sort_rank
+FROM project_activities
+WHERE sort_rank > (SELECT sort_rank FROM current_activity)
+ORDER BY sort_rank
+LIMIT 1
+`
+
+type FindNextActivityByProjectIdAndActivityIdParams struct {
+	ProjectID           string
+	SuccessorActivityID string
+}
+
+type FindNextActivityByProjectIdAndActivityIdRow struct {
+	ID                  string
+	ProjectID           string
+	SuccessorActivityID string
+	SortRank            int64
+}
+
+func (q *Queries) FindNextActivityByProjectIdAndActivityId(ctx context.Context, arg FindNextActivityByProjectIdAndActivityIdParams) (FindNextActivityByProjectIdAndActivityIdRow, error) {
+	row := q.db.QueryRowContext(ctx, findNextActivityByProjectIdAndActivityId, arg.ProjectID, arg.SuccessorActivityID)
+	var i FindNextActivityByProjectIdAndActivityIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.SuccessorActivityID,
+		&i.SortRank,
+	)
+	return i, err
+}
+
 const insertActivityOrdering = `-- name: InsertActivityOrdering :one
 INSERT INTO activities_ordering (id, project_id, successor_activity_id, sort_rank)
 VALUES (?, ?, ?, ?)
