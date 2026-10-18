@@ -51,6 +51,10 @@ type Model interface {
 	// GetTableRowsSortedByRank returns ErrProjectNotFound if projectId does not exist.
 	GetTableRowsSortedByRank(ctx context.Context, projectId uuid.UUID) ([]TableRow, error)
 
+	// Gets the predecessor activity ids associated with the succcesor id.
+	// GetDependenciesBySuccessorActivityId returns ErrActivityNotFound if successorActivityId does not exist
+	GetDependenciesBySuccessorActivityId(ctx context.Context, successorActivityId uuid.UUID) ([]Dependency, error)
+
 	// Updates the name of the activity associated with activityId.
 	// UpdateActivityName returns ErrActivityNotFound if activityId does not exist.
 	UpdateActivityName(ctx context.Context, activityId uuid.UUID, activityName string) (Activity, error)
