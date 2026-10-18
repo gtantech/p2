@@ -50,7 +50,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 }
 
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
-func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
+func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
@@ -66,9 +66,10 @@ func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivity
 			Text:   fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
 			HxPost: "/form/json/table/row/activity/dependency/suggestion/selected/add-new",
 			HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromDependencySuggestionAddNew{
-				ActivityId:         rowActivityId,
-				ProjectId:          projectId,
-				ActivitiesToCreate: suggestedActivityNames,
+				ActivityId:                   rowActivityId,
+				ProjectId:                    projectId,
+				ActivitiesToCreate:           suggestedActivityNames,
+				ActivitiesToCreateFinalIndex: suggestedActivityFinalIndex,
 			}),
 		},
 	)

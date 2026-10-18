@@ -24,7 +24,8 @@ type PutFromRowActivityDurationChange struct {
 }
 
 type PostFromDependencySuggestionAddNew struct {
-	ActivityId         uuid.UUID `json:"activityId"`
-	ProjectId          uuid.UUID `json:"projectId"`
-	ActivitiesToCreate []string
+	ActivityId                   uuid.UUID `json:"activityId"`
+	ProjectId                    uuid.UUID `json:"projectId"`
+	ActivitiesToCreate           []string  `json:"activitesToCreate"`
+	ActivitiesToCreateFinalIndex []int     `json:"activitiesToCreateFinalIndex"`
 }

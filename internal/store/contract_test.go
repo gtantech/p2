@@ -359,6 +359,45 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 			}
 		}
 	})
+
+	t.Run("Get Dependencies By Successor", func(t *testing.T) {
+		s := newStore()
+		p := createTestProject(t, s)
+
+		// add activity
+		activities := make([]models.Activity, 3)
+		for i := range len(activities) {
+			activityName := fmt.Sprintf("test activity %v", i+1)
+			activityDuration := 5 * time.Minute
+			activities[i] = createActivity(activityName, activityDuration, p, t, s)
+		}
+		//add table rows
+		for i := range len(activities) {
+			activityToAdd := activities[i]
+			createTableRow(p, activityToAdd, int64(i), t, s)
+		}
+		dependenciesCreated := make([]models.Dependency, 2)
+		for i := range 2 {
+			d, err := s.CreateDependency(t.Context(), p.ProjectId, activities[0].ActivityId, activities[i+1].ActivityId)
+			if err != nil {
+				t.Fatalf("Failed to create dependency. Encountered error: %v", err)
+			}
+			dependenciesCreated[i] = d
+		}
+		d, err := s.GetDependenciesBySuccessorActivityId(t.Context(), activities[0].ActivityId)
+		if err != nil {
+			t.Fatalf("Failed to get dependencies. Encountered error: %v", err)
+		}
+		if len(d) != len(dependenciesCreated) {
+			t.Fatalf("number of created dependencies is %v but got back %v", len(dependenciesCreated), len(d))
+		}
+
+		for i := range len(d) {
+			if d[i] != dependenciesCreated[i] {
+				t.Errorf("got %+v, want %+v", d[i], dependenciesCreated[i])
+			}
+		}
+	})
 }
 
 func TestSqliteStoreContract(t *testing.T) {

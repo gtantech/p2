@@ -10,7 +10,7 @@ import (
 type Presenter interface {
 	HtmlHomeHandler(table Table) http.Handler
 	HtmlTableRow(tr TableRow) http.Handler
-	HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler
+	HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler
 	HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows []TableRow, rowActivityId uuid.UUID) http.Handler
 }
 
@@ -50,6 +50,10 @@ type Model interface {
 	// Gets the table rows associated with the projectId sorted by sort rank.
 	// GetTableRowsSortedByRank returns ErrProjectNotFound if projectId does not exist.
 	GetTableRowsSortedByRank(ctx context.Context, projectId uuid.UUID) ([]TableRow, error)
+
+	// Gets the predecessor activity ids associated with the succcesor id.
+	// GetDependenciesBySuccessorActivityId returns ErrActivityNotFound if successorActivityId does not exist
+	GetDependenciesBySuccessorActivityId(ctx context.Context, successorActivityId uuid.UUID) ([]Dependency, error)
 
 	// Updates the name of the activity associated with activityId.
 	// UpdateActivityName returns ErrActivityNotFound if activityId does not exist.
