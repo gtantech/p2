@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/models/jsonmodels"
-	"github.com/gtantech/p2/internal/store"
 	"github.com/gtantech/p2/static"
 )
 
@@ -31,9 +29,10 @@ func NewRoutes(presenter models.Presenter, store models.Model) *Routes {
 func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	homeProjectId := uuid.Max() //mock home project id
 	tableRows, err := rt.store.GetTableRowsSortedByRank(r.Context(), homeProjectId)
-	if errors.Is(err, store.ErrProjectNotFound) {
-		http.Error(w, "project not found", http.StatusBadRequest)
-		return
+	if err != nil {
+		if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "getting sorted table rows from store", err)) {
+			return
+		}
 	}
 	table := models.Table{
 		ProjectId: homeProjectId,
@@ -58,27 +57,15 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 	}
 	activity, err := rt.store.CreateActivity(r.Context(), dto.ProjectId, "", 0)
 	if err != nil {
-		if errors.Is(err, store.ErrProjectNotFound) {
-			http.Error(w, "project not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "creating activity in store", err)) {
 			return
 		}
-		http.Error(w, "failed to create new activity", http.StatusInternalServerError)
-		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating activity in store", err)
-		return
 	}
 	newTr, err := rt.store.CreateTableRowBelow(r.Context(), dto.ProjectId, activity.ActivityId, dto.RelativeToActivityId)
 	if err != nil {
-		if errors.Is(err, store.ErrProjectNotFound) {
-			http.Error(w, "project not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "creating new table row in store", err)) {
 			return
 		}
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
-			return
-		}
-		http.Error(w, "failed to create new table row", http.StatusInternalServerError)
-		log.Printf("returned http internal server error status while %v. Encountered error %v", "creating new table row in store", err)
-		return
 	}
 	rt.presenter.HtmlTableRow(newTr).ServeHTTP(w, r)
 }
@@ -94,13 +81,9 @@ func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request)
 	}
 	userInput := r.FormValue(dto.DomName)
 	if _, err := rt.store.UpdateActivityName(r.Context(), dto.ActivityId, userInput); err != nil {
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error while updating activity name from store. Encountered error: %s", err)) {
 			return
 		}
-		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
-		log.Printf("returned http internal server error for err: %v", err)
-		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
@@ -118,35 +101,23 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 	for _, name := range dto.ActivitiesToCreate {
 		a, err := rt.store.CreateActivity(r.Context(), dto.ProjectId, name, 0)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to create new activity with name: %v", name), http.StatusInternalServerError)
-			log.Printf("returned http internal server error while creating new activity: %s", name)
-			return
+			if storeErrorHandler(err, w, fmt.Sprintf("error while creating new activity: %s", name)) {
+				return
+			}
 		}
 		tr, err := rt.store.CreateTableRowAtBottom(r.Context(), dto.ProjectId, a.ActivityId)
 		if err != nil {
-			if errors.Is(err, store.ErrProjectNotFound) {
-				http.Error(w, "project not found", http.StatusBadRequest)
+			if storeErrorHandler(err, w, fmt.Sprintf("error while creating new table row: %s", name)) {
 				return
 			}
-			if errors.Is(err, store.ErrActivityNotFound) {
-				http.Error(w, "activity not found", http.StatusBadRequest)
-				return
-			}
-			http.Error(w, fmt.Sprintf("failed to create new table row with name: %v", name), http.StatusInternalServerError)
-			log.Printf("returned http internal server error while creating new table row: %s", name)
-			return
 		}
 		createdTableRows = append(createdTableRows, tr)
 	}
 	dependencies, err := rt.store.GetDependenciesBySuccessorActivityId(r.Context(), dto.ActivityId)
 	if err != nil {
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error while getting dependencies by successor id with successor id: %v. Encountered error: %v", dto.ActivityId, err)) {
 			return
 		}
-		http.Error(w, "failed to get dependencies", http.StatusInternalServerError)
-		log.Printf("returned http internal server error while getting dependencies by successor id with successor id: %v. Encountered error: %v", dto.ActivityId, err)
-		return
 	}
 	createdDependencyIdxMap := make(map[int]uuid.UUID)
 	for i := range len(dto.ActivitiesToCreateFinalIndex) {
@@ -166,17 +137,9 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 	}
 
 	if _, err := rt.store.UpdateActivityDependencies(r.Context(), dto.ProjectId, dto.ActivityId, updatedDependencyIds); err != nil {
-		if errors.Is(err, store.ErrProjectNotFound) {
-			http.Error(w, "project not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error while updating dependency. Encountered error %v", err)) {
 			return
 		}
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
-			return
-		}
-		http.Error(w, "failed to update dependency", http.StatusInternalServerError)
-		log.Printf("returned http internal server error while updating dependency. Encountered error %v", err)
-		return
 	}
 
 	rt.presenter.HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows, dto.ActivityId).ServeHTTP(w, r)
@@ -194,12 +157,9 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 
 	activities, err := rt.store.GetActivities(r.Context(), dto.ProjectId)
 	if err != nil {
-		if errors.Is(err, store.ErrProjectNotFound) {
-			http.Error(w, "project not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error while getting activities from store. Encountered error: %s", err)) {
 			return
 		}
-		log.Printf("returned http internal server error while getting activities from store. Encountered error: %s", err)
-		return
 	}
 
 	activityNameMap := make(map[string]uuid.UUID)
@@ -223,13 +183,9 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 	}
 
 	if _, err := rt.store.UpdateActivityDependencies(r.Context(), dto.ProjectId, dto.ActivityId, dependencyIds); err != nil {
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error while updating activity dependencies from store. Encountered error: %s", err)) {
 			return
 		}
-		http.Error(w, "failed to update activity dependencies", http.StatusInternalServerError)
-		log.Printf("returned http internal server error for err: %v", err)
-		return
 	}
 
 	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, unknownDependencyFinalIdx, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
@@ -252,13 +208,9 @@ func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if _, err := rt.store.UpdateActivityDuration(r.Context(), dto.ActivityId, parseUserInput); err != nil {
-		if errors.Is(err, store.ErrActivityNotFound) {
-			http.Error(w, "activity not found", http.StatusBadRequest)
+		if storeErrorHandler(err, w, fmt.Sprintf("error while updating activity duration from store. Encountered error: %s", err)) {
 			return
 		}
-		http.Error(w, "failed to update activity name", http.StatusInternalServerError)
-		log.Printf("returned http internal server error for err: %v", err)
-		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
