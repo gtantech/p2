@@ -17,12 +17,34 @@ func NewSqliteStore(queries *sqlitedb.Queries) *SqliteStore {
 	return &SqliteStore{queries: queries}
 }
 
+func toActivity(dto *sqlitedb.Activity) *models.Activity {
+	return &models.Activity{ActivityId: uuid.MustParse(dto.ID), DisplayName: dto.DispName, Duration: time.Duration(dto.Duration)}
+}
+
 type SqliteStore struct {
 	queries *sqlitedb.Queries
 }
 
-func toActivity(dto *sqlitedb.Activity) *models.Activity {
-	return &models.Activity{ActivityId: uuid.MustParse(dto.ID), DisplayName: dto.DispName, Duration: time.Duration(dto.Duration)}
+// GetPredecessorIdBySuccessorActivityId implements [models.Model].
+func (s *SqliteStore) GetDependenciesBySuccessorActivityId(ctx context.Context, successorActivityId uuid.UUID) ([]models.Dependency, error) {
+	if _, err := s.queries.FindActivityById(ctx, successorActivityId.String()); err != nil {
+		return []models.Dependency{}, ErrActivityNotFound
+	}
+	resp, err := s.queries.FindAllPredecessorActivitiesBySuccessorActivityId(ctx, successorActivityId.String())
+	if err != nil {
+		return []models.Dependency{}, err
+	}
+	return func() []models.Dependency {
+		d := make([]models.Dependency, len(resp))
+		for i := range len(resp) {
+			d[i] = models.Dependency{
+				DependencyId:          uuid.MustParse(resp[i].DependencyID),
+				SuccessorActivityId:   successorActivityId,
+				PredecessorActivityId: uuid.MustParse(resp[i].ID),
+			}
+		}
+		return d
+	}(), nil
 }
 
 // CreateActivity implements [models.Model].
