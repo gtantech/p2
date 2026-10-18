@@ -56,16 +56,12 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRowHandler(w http.ResponseW
 		return
 	}
 	activity, err := rt.store.CreateActivity(r.Context(), dto.ProjectId, "", 0)
-	if err != nil {
-		if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "creating activity in store", err)) {
-			return
-		}
+	if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "creating activity in store", err)) {
+		return
 	}
 	newTr, err := rt.store.CreateTableRowBelow(r.Context(), dto.ProjectId, activity.ActivityId, dto.RelativeToActivityId)
-	if err != nil {
-		if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "creating new table row in store", err)) {
-			return
-		}
+	if storeErrorHandler(err, w, fmt.Sprintf("error status while %v. Encountered error %v", "creating new table row in store", err)) {
+		return
 	}
 	rt.presenter.HtmlTableRow(newTr).ServeHTTP(w, r)
 }
@@ -100,24 +96,18 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 	createdTableRows := []models.TableRow{}
 	for _, name := range dto.ActivitiesToCreate {
 		a, err := rt.store.CreateActivity(r.Context(), dto.ProjectId, name, 0)
-		if err != nil {
-			if storeErrorHandler(err, w, fmt.Sprintf("error while creating new activity: %s", name)) {
-				return
-			}
+		if storeErrorHandler(err, w, fmt.Sprintf("error while creating new activity: %s", name)) {
+			return
 		}
 		tr, err := rt.store.CreateTableRowAtBottom(r.Context(), dto.ProjectId, a.ActivityId)
-		if err != nil {
-			if storeErrorHandler(err, w, fmt.Sprintf("error while creating new table row: %s", name)) {
-				return
-			}
+		if storeErrorHandler(err, w, fmt.Sprintf("error while creating new table row: %s", name)) {
+			return
 		}
 		createdTableRows = append(createdTableRows, tr)
 	}
 	dependencies, err := rt.store.GetDependenciesBySuccessorActivityId(r.Context(), dto.ActivityId)
-	if err != nil {
-		if storeErrorHandler(err, w, fmt.Sprintf("error while getting dependencies by successor id with successor id: %v. Encountered error: %v", dto.ActivityId, err)) {
-			return
-		}
+	if storeErrorHandler(err, w, fmt.Sprintf("error while getting dependencies by successor id with successor id: %v. Encountered error: %v", dto.ActivityId, err)) {
+		return
 	}
 	createdDependencyIdxMap := make(map[int]uuid.UUID)
 	for i := range len(dto.ActivitiesToCreateFinalIndex) {
@@ -156,10 +146,8 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 	}
 
 	activities, err := rt.store.GetActivities(r.Context(), dto.ProjectId)
-	if err != nil {
-		if storeErrorHandler(err, w, fmt.Sprintf("error while getting activities from store. Encountered error: %s", err)) {
-			return
-		}
+	if storeErrorHandler(err, w, fmt.Sprintf("error while getting activities from store. Encountered error: %s", err)) {
+		return
 	}
 
 	activityNameMap := make(map[string]uuid.UUID)
