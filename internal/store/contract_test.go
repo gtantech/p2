@@ -145,7 +145,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		//add table rows excluding the last activity
 		for i := range len(activities) - 1 {
 			activityToAdd := activities[i]
-			createTableRow(p, activityToAdd, int64(i), t, s)
+			createTableRow(p, activityToAdd, int64(i)*models.TableRowSortRankStep, t, s)
 		}
 
 		//add table row to the bottom
