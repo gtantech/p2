@@ -103,8 +103,7 @@ func (s *SqliteStore) CreateProject(ctx context.Context, projectName string) (mo
 	}, nil
 }
 
-// CreateTableRow implements [models.Model].
-func (s *SqliteStore) CreateTableRow(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (models.TableRow, error) {
+func (s *SqliteStore) createTableRow(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (models.TableRow, error) {
 	activityOrderingResp, err := s.queries.InsertActivityOrdering(ctx, sqlitedb.InsertActivityOrderingParams{
 		ID:                  uuid.NewV7().String(),
 		ProjectID:           projectId.String(),
@@ -146,14 +145,20 @@ func (s *SqliteStore) CreateTableRow(ctx context.Context, projectId uuid.UUID, a
 
 // CreateTableRowAtBottom implements [models.Model].
 func (s *SqliteStore) CreateTableRowAtBottom(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID) (models.TableRow, error) {
-	lastActivityResp, err := s.queries.FindLastActivityByProjectId(ctx, projectId.String())
-	if err != nil {
+	if _, err := s.queries.FindProjectById(ctx, projectId.String()); err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return models.TableRow{}, err
 		}
 		return models.TableRow{}, ErrProjectNotFound
 	}
-	return s.CreateTableRow(ctx, projectId, activityId, lastActivityResp.SortRank+models.TableRowSortRankStep)
+	lastActivityResp, err := s.queries.FindLastActivityByProjectId(ctx, projectId.String())
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.TableRow{}, err
+		}
+		return s.createTableRow(ctx, projectId, activityId, models.TableRowSortRankStep)
+	}
+	return s.createTableRow(ctx, projectId, activityId, lastActivityResp.SortRank+models.TableRowSortRankStep)
 }
 
 // CreateTableRowBelow implements [models.Model].
@@ -181,7 +186,7 @@ func (s *SqliteStore) CreateTableRowBelow(ctx context.Context, projectId uuid.UU
 		insertRowRank = (rowCurrentAndBelowResp[0].SortRank / 2) + (rowCurrentAndBelowResp[1].SortRank / 2)
 	}
 
-	return s.CreateTableRow(ctx, projectId, activityId, insertRowRank)
+	return s.createTableRow(ctx, projectId, activityId, insertRowRank)
 }
 
 // GetActivities implements [models.Model].
