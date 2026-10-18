@@ -10,7 +10,7 @@ import (
 type Presenter interface {
 	HtmlHomeHandler(table Table) http.Handler
 	HtmlTableRow(tr TableRow) http.Handler
-	HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler
+	HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler
 	HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows []TableRow, rowActivityId uuid.UUID) http.Handler
 }
 

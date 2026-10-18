@@ -137,20 +137,48 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 			return
 		}
 		createdTableRows = append(createdTableRows, tr)
-		if _, err := rt.store.CreateDependency(r.Context(), dto.ProjectId, dto.ActivityId, a.ActivityId); err != nil {
-			if errors.Is(err, store.ErrProjectNotFound) {
-				http.Error(w, "project not found", http.StatusBadRequest)
-				return
-			}
-			if errors.Is(err, store.ErrActivityNotFound) {
-				http.Error(w, "activity not found", http.StatusBadRequest)
-				return
-			}
-			http.Error(w, fmt.Sprintf("failed to create new dependency with name: %v", name), http.StatusInternalServerError)
-			log.Printf("returned http internal server error while creating new dependency: %s", name)
+	}
+	dependencies, err := rt.store.GetDependenciesBySuccessorActivityId(r.Context(), dto.ActivityId)
+	if err != nil {
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
 			return
 		}
+		http.Error(w, "failed to get dependencies", http.StatusInternalServerError)
+		log.Printf("returned http internal server error while getting dependencies by successor id with successor id: %v. Encountered error: %v", dto.ActivityId, err)
+		return
 	}
+	createdDependencyIdxMap := make(map[int]uuid.UUID)
+	for i := range len(dto.ActivitiesToCreateFinalIndex) {
+		idx := dto.ActivitiesToCreateFinalIndex[i]
+		createdDependencyIdxMap[idx] = createdTableRows[i].ActivityId
+	}
+	dependencyCount := len(dependencies) + len(dto.ActivitiesToCreate)
+	knownDependencyIdx := 0
+	updatedDependencyIds := make([]uuid.UUID, dependencyCount)
+	for i := range dependencyCount {
+		if _, ok := createdDependencyIdxMap[i]; !ok {
+			updatedDependencyIds[i] = dependencies[knownDependencyIdx].PredecessorActivityId
+			knownDependencyIdx += 1
+		} else {
+			updatedDependencyIds[i] = createdDependencyIdxMap[i]
+		}
+	}
+
+	if _, err := rt.store.UpdateActivityDependencies(r.Context(), dto.ProjectId, dto.ActivityId, updatedDependencyIds); err != nil {
+		if errors.Is(err, store.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, store.ErrActivityNotFound) {
+			http.Error(w, "activity not found", http.StatusBadRequest)
+			return
+		}
+		http.Error(w, "failed to update dependency", http.StatusInternalServerError)
+		log.Printf("returned http internal server error while updating dependency. Encountered error %v", err)
+		return
+	}
+
 	rt.presenter.HtmxPostActivityDependencySuggestionAddNewHandlerResp(createdTableRows, dto.ActivityId).ServeHTTP(w, r)
 }
 
@@ -183,12 +211,14 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 
 	userInputs := strings.Split(r.FormValue(dto.DomName), ",")
 	userAddNewActiivtyName := []string{}
+	unknownDependencyFinalIdx := []int{}
 	for i := range userInputs {
 		userInput := strings.TrimSpace(userInputs[i])
 		if userInputId, ok := activityNameMap[userInput]; ok {
 			dependencyIds = append(dependencyIds, userInputId)
 		} else if userInput != "" {
 			userAddNewActiivtyName = append(userAddNewActiivtyName, userInput)
+			unknownDependencyFinalIdx = append(unknownDependencyFinalIdx, i)
 		}
 	}
 
@@ -202,7 +232,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
+	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, unknownDependencyFinalIdx, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {
