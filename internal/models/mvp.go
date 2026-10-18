@@ -23,11 +23,6 @@ type Model interface {
 	// CreateActivity returns ErrProjectNotFound if projectId does not exist.
 	CreateActivity(ctx context.Context, projectId uuid.UUID, activityName string, duration time.Duration) (Activity, error)
 
-	// Creates a new dependency table row and returns the newly created row.
-	// CreateTableRow returns ErrProjectNotFound if projectId does not exist,
-	// and ErrActivityNotFound if activityId does not exist.
-	CreateTableRow(ctx context.Context, projectId uuid.UUID, activityId uuid.UUID, rowSortRank int64) (TableRow, error)
-
 	// Creates a new dependency table row with a sort rank greater than the maximum sort rank by [TableRowSortRankStep] amount and returns the newly created row.
 	// CreateTableRowAtBottom returns ErrProjectNotFound if projectId does not exist,
 	// and ErrActivityNotFound if activityId does not exist.

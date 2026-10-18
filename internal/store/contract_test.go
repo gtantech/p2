@@ -25,20 +25,17 @@ func createTestProject(t *testing.T, store models.Model) models.Project {
 	return p
 }
 
-func createTableRow(project models.Project, activity models.Activity, sortRowRank int64, t *testing.T, store models.Model) models.TableRow {
+func createTableRowAtBottom(project models.Project, activity models.Activity, t *testing.T, store models.Model) models.TableRow {
 	t.Helper()
-	tr, err := store.CreateTableRow(t.Context(), project.ProjectId, activity.ActivityId, sortRowRank)
+	tr, err := store.CreateTableRowAtBottom(t.Context(), project.ProjectId, activity.ActivityId)
 	if err != nil {
 		t.Fatalf("Failed to create new table row. Encountered error: %v", err)
 	}
-	wantTr := models.TableRow{Activity: &activity, Dependencies: []string{}, SortRank: sortRowRank}
+	wantTr := models.TableRow{Activity: &activity, Dependencies: []string{}}
 	if got, want := *tr.Activity, *wantTr.Activity; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 	if got, want := tr.Dependencies, wantTr.Dependencies; !slices.Equal(got, want) {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-	if got, want := tr.SortRank, wantTr.SortRank; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 	return tr
@@ -103,34 +100,6 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		}
 	})
 
-	t.Run("Create and Get Sorted Table Row", func(t *testing.T) {
-		s := newStore()
-		p := createTestProject(t, s)
-
-		// add activity
-		activities := make([]models.Activity, 3)
-		for i := range len(activities) {
-			activityName := fmt.Sprintf("test activity %v", i+1)
-			activityDuration := 5 * time.Minute
-			activities[i] = createActivity(activityName, activityDuration, p, t, s)
-		}
-		//add table rows in reverse order (from bottom to top relative to activities)
-		for i := range len(activities) {
-			ib := len(activities) - 1 - i
-			activityToAdd := activities[ib]
-			createTableRow(p, activityToAdd, int64(ib), t, s)
-		}
-
-		//check if table rows returned is sorted correctly despite adding in reverse order
-		trs, err := s.GetTableRowsSortedByRank(t.Context(), p.ProjectId)
-		if err != nil {
-			t.Fatalf("Failed to get table rows sorted by rank. Encountered error: %v", err)
-		}
-		for i, tr := range trs {
-			assertActivity(*tr.Activity, activities[i], t)
-		}
-	})
-
 	t.Run("Create Table Row At Bottom", func(t *testing.T) {
 		s := newStore()
 		p := createTestProject(t, s)
@@ -145,7 +114,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		//add table rows excluding the last activity
 		for i := range len(activities) - 1 {
 			activityToAdd := activities[i]
-			createTableRow(p, activityToAdd, int64(i)*models.TableRowSortRankStep, t, s)
+			createTableRowAtBottom(p, activityToAdd, t, s)
 		}
 
 		//add table row to the bottom
@@ -179,11 +148,11 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		//add table rows excluding the last 2 activities
 		for i := range len(activities) - 2 {
 			activityToAdd := activities[i]
-			createTableRow(p, activityToAdd, int64(i*1000), t, s)
+			createTableRowAtBottom(p, activityToAdd, t, s)
 		}
 
 		//add table row for the last activity
-		createTableRow(p, activities[len(activities)-1], int64(len(activities)-1)*1000, t, s)
+		createTableRowAtBottom(p, activities[len(activities)-1], t, s)
 
 		//add table row between the 3rd last and last activity
 		_, err := s.CreateTableRowBelow(t.Context(), p.ProjectId, activities[len(activities)-2].ActivityId, activities[len(activities)-3].ActivityId)
@@ -215,7 +184,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		//add table rows
 		for i := range len(activities) {
 			activityToAdd := activities[i]
-			createTableRow(p, activityToAdd, int64(i), t, s)
+			createTableRowAtBottom(p, activityToAdd, t, s)
 		}
 
 		d, err := s.CreateDependency(t.Context(), p.ProjectId, activities[1].ActivityId, activities[0].ActivityId)
@@ -333,7 +302,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		//add table rows
 		for i := range len(activities) {
 			activityToAdd := activities[i]
-			createTableRow(p, activityToAdd, int64(i), t, s)
+			createTableRowAtBottom(p, activityToAdd, t, s)
 		}
 
 		a, err := s.UpdateActivityDependencies(t.Context(), p.ProjectId, activities[1].ActivityId, []uuid.UUID{activities[0].ActivityId})
@@ -374,7 +343,7 @@ func testModelContract(t *testing.T, newStore func() models.Model) {
 		//add table rows
 		for i := range len(activities) {
 			activityToAdd := activities[i]
-			createTableRow(p, activityToAdd, int64(i), t, s)
+			createTableRowAtBottom(p, activityToAdd, t, s)
 		}
 		dependenciesCreated := make([]models.Dependency, 2)
 		for i := range 2 {
