@@ -137,7 +137,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityNameChange{ActivityId: tr.ActivityId, DomName: activityNameDomName}),
 			HxTrigger:    "input changed delay:200ms",
 		},
-		DependencyWrapperDivParams: &htmlDiv{
+		DependencyWrapperDivParams: &htmxDiv{
 			Id:    fmt.Sprintf("dependency-wrapper-id-%s", tr.ActivityId),
 			Class: "dependency-wrapper",
 		},

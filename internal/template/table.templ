@@ -40,13 +40,10 @@ templ DependencyTableRow(params dependencyTableRow){
         
         <!-- Dependencies -->
         <td>
-            <div
-                class={params.DependencyWrapperDivParams.Class}
-                id={params.DependencyWrapperDivParams.Id}
-            >
+            @DivWrapChildren(params.DependencyWrapperDivParams){
                 @TextInput(params.DependencyTextInputParams)
                 @DivWrapChildren(params.DependencySuggestionDivParams)
-            </div>
+            }
         </td>
         
         <!-- Duration -->

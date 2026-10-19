@@ -70,7 +70,7 @@ type dependencyTableRow struct {
 	Class                         string
 	hxAttr                        hx
 	ActivityTextInputParams       *htmxInput
-	DependencyWrapperDivParams    *htmlDiv
+	DependencyWrapperDivParams    *htmxDiv
 	DependencyTextInputParams     *htmxInput
 	DependencySuggestionDivParams *htmxDiv
 	DurationTextInputParams       *htmxInput
