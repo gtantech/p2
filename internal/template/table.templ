@@ -60,9 +60,11 @@ templ DependencyTableRow(params dependencyTableRow){
     </tr>
 }
 
-templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams *htmxButton){
+templ DependencyTableRowDependencyFieldDropdown(divParams *htmxDiv, btnParams []*htmxButton){
     @DivWrapChildren(divParams){
-        @Button(btnParams)
+        for _, btn := range btnParams{
+            @Button(btn)
+        }
     }
 }
 
