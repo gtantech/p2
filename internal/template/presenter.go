@@ -52,11 +52,18 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
 func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, suggestionActiveIndex int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
+	activityDependencyDomName := "dependency_input"
+	dependencyChangeDto := jsonmodels.PutFromRowActivityDependencyChange{ActivityId: rowActivityId, ProjectId: projectId, DomName: activityDependencyDomName}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
 		Class:     "autocomplete",
 		Role:      "listbox",
-		HxSwapOob: "innerHTML",
+		HxSwapOob: "outerHTML",
+		HxPost:    "/form/json/table/row/activity/dependency",
+		HxTrigger: fmt.Sprintf("keyup[key=='Escape'||code=='ArrowUp'||code=='ArrowDown'] from:#dependency-input-id-%s", rowActivityId),
+		HxVals:    fmt.Sprintf("js:{action: event.code, json: %s}", jsonmodels.MarshalParams(dependencyChangeDto)),
+		HxInclude: fmt.Sprintf("#dependency-input-id-%s", rowActivityId),
+		HxSwap:    "none",
 	}
 	suggestionClassName := "suggestion"
 	activeSuggestionClassName := strings.Join([]string{suggestionClassName, "active"}, " ")
