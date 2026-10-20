@@ -137,6 +137,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 	activityNameDomName := "activity_input"
 	activityDurationDomName := "duration_input"
 	activityDependencyDomName := "dependency_input"
+	dependencyChangeDto := jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, ProjectId: tr.ProjectId, DomName: activityDependencyDomName}
 	dr := dependencyTableRow{
 		Id:    fmt.Sprintf("activity-row-id-%s", tr.ActivityId),
 		Class: "activity-row",
@@ -163,7 +164,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Autocomplete: Off,
 			Value:        strings.Join(tr.Dependencies, ", "),
 			HxPost:       "/form/json/table/row/activity/dependency",
-			HxVals:       jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, ProjectId: tr.ProjectId, DomName: activityDependencyDomName}),
+			HxVals:       jsonmodels.MarshalParamsToJsonField(dependencyChangeDto),
 			HxTrigger:    "input changed delay:200ms",
 		},
 		DependencySuggestionDivParams: &htmxDiv{
@@ -172,7 +173,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Role:      "listbox",
 			HxPost:    "/form/json/table/row/activity/dependency",
 			HxTrigger: fmt.Sprintf("keyup[key=='Escape'||code=='ArrowUp'||code=='ArrowDown'] from:#dependency-input-id-%s", tr.ActivityId),
-			HxVals:    fmt.Sprintf("js:{action: event.code, json: %s}", jsonmodels.MarshalParams(jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, ProjectId: tr.ProjectId, DomName: activityDependencyDomName})),
+			HxVals:    fmt.Sprintf("js:{action: event.code, json: %s}", jsonmodels.MarshalParams(dependencyChangeDto)),
 			HxInclude: fmt.Sprintf("#dependency-input-id-%s", tr.ActivityId),
 			HxSwap:    "none",
 		},
