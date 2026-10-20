@@ -144,7 +144,7 @@ input:focus {
         color 0.08s ease;
 }
 
-.suggestion:hover {
+.suggestion:hover, .active .suggestion{
     background: #f3f4f6;
 }
 
