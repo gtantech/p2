@@ -51,6 +51,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
 func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
+	selectedIndex := -1
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
@@ -58,20 +59,34 @@ func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivity
 		Role:      "listbox",
 		HxSwapOob: "innerHTML",
 	}
+	suggestionClassName := "suggestion"
+	activeSuggestionClassName := strings.Join([]string{suggestionClassName, "active"}, " ")
 	dropDown := DependencyTableRowDependencyFieldDropdown(
 		dependencySuggestionDiv,
-		[]*htmxButton{{
-			Class:  "suggestion",
-			Title:  "Add suggested activities",
-			Text:   fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
-			HxPost: "/form/json/table/row/activity/dependency/suggestion/selected/add-new",
-			HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromDependencySuggestionAddNew{
-				ActivityId:                   rowActivityId,
-				ProjectId:                    projectId,
-				ActivitiesToCreate:           suggestedActivityNames,
-				ActivitiesToCreateFinalIndex: suggestedActivityFinalIndex,
-			}),
-		}},
+		func() []*htmxButton {
+			btns := []*htmxButton{}
+			var class string
+			for i := range 1 {
+				if i != selectedIndex {
+					class = suggestionClassName
+				} else {
+					class = activeSuggestionClassName
+				}
+				btns = append(btns, &htmxButton{
+					Class:  class,
+					Title:  "Add suggested activities",
+					Text:   fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
+					HxPost: "/form/json/table/row/activity/dependency/suggestion/selected/add-new",
+					HxVals: jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromDependencySuggestionAddNew{
+						ActivityId:                   rowActivityId,
+						ProjectId:                    projectId,
+						ActivitiesToCreate:           suggestedActivityNames,
+						ActivitiesToCreateFinalIndex: suggestedActivityFinalIndex,
+					}),
+				})
+			}
+			return btns
+		}(),
 	)
 	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
 	if len(suggestedActivityNames) > 0 {
