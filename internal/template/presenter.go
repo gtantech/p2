@@ -60,7 +60,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivity
 	}
 	dropDown := DependencyTableRowDependencyFieldDropdown(
 		dependencySuggestionDiv,
-		&htmxButton{
+		[]*htmxButton{{
 			Class:  "suggestion",
 			Title:  "Add suggested activities",
 			Text:   fmt.Sprintf("Add new activity: %v", strings.Join(suggestedActivityNames, ", ")),
@@ -71,7 +71,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivity
 				ActivitiesToCreate:           suggestedActivityNames,
 				ActivitiesToCreateFinalIndex: suggestedActivityFinalIndex,
 			}),
-		},
+		}},
 	)
 	clearDropdown := DivWrapChildren(dependencySuggestionDiv)
 	if len(suggestedActivityNames) > 0 {
