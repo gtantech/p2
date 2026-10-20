@@ -167,9 +167,14 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			HxTrigger:    "input changed delay:200ms",
 		},
 		DependencySuggestionDivParams: &htmxDiv{
-			Id:    fmt.Sprintf("dependency-suggestions-id-%s", tr.ActivityId),
-			Class: "autocomplete",
-			Role:  "listbox",
+			Id:        fmt.Sprintf("dependency-suggestions-id-%s", tr.ActivityId),
+			Class:     "autocomplete",
+			Role:      "listbox",
+			HxPost:    "/form/json/table/row/activity/dependency",
+			HxTrigger: fmt.Sprintf("keyup[key=='Escape'||code=='ArrowUp'||code=='ArrowDown'] from:#dependency-input-id-%s", tr.ActivityId),
+			HxVals:    fmt.Sprintf("js:{action: event.code, json: %s}", jsonmodels.MarshalParams(jsonmodels.PutFromRowActivityDependencyChange{ActivityId: tr.ActivityId, ProjectId: tr.ProjectId, DomName: activityDependencyDomName})),
+			HxInclude: fmt.Sprintf("#dependency-input-id-%s", tr.ActivityId),
+			HxSwap:    "none",
 		},
 		DurationTextInputParams: &htmxInput{
 			Id:           fmt.Sprintf("duration-input-id-%s", tr.ActivityId),
