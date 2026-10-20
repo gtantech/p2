@@ -50,8 +50,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencySuggestionAddNewHandlerResp(c
 }
 
 // HtmxOobDependencySuggestionDropdown implements [models.Presenter].
-func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
-	selectedIndex := -1
+func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivityNames []string, suggestedActivityFinalIndex []int, suggestionActiveIndex int, rowActivityId uuid.UUID, projectId uuid.UUID) http.Handler {
 	components := []templ.Component{}
 	dependencySuggestionDiv := &htmxDiv{
 		Id:        fmt.Sprintf("dependency-suggestions-id-%s", rowActivityId),
@@ -67,7 +66,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivity
 			btns := []*htmxButton{}
 			var class string
 			for i := range 1 {
-				if i != selectedIndex {
+				if i != suggestionActiveIndex {
 					class = suggestionClassName
 				} else {
 					class = activeSuggestionClassName
