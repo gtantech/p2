@@ -137,8 +137,21 @@ func (rt *Routes) PostActivityDependencySuggestionAddNewHandler(w http.ResponseW
 
 func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := getJson(r)
+	activeIndex, err := strconv.Atoi(r.FormValue("activeIndex"))
+	if err != nil {
+		activeIndex = -1
+	}
+
+	keyEvent := r.FormValue("action")
+	if keyEvent == "ArrowUp" {
+		activeIndex = max(activeIndex-1, -1)
+	}
+	if keyEvent == "ArrowDown" {
+		activeIndex = max(activeIndex+1, 0)
+	}
+
 	var dto jsonmodels.PutFromRowActivityDependencyChange
-	err := json.Unmarshal([]byte(jsonStr), &dto)
+	err = json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
 		http.Error(w, "failed to parse json", http.StatusBadRequest)
 		log.Printf("returned http bad request error while parsing json: %s", jsonStr)
@@ -175,8 +188,7 @@ func (rt *Routes) PostActivityDependencyHandler(w http.ResponseWriter, r *http.R
 			return
 		}
 	}
-	suggestionActiveIndex := -1
-	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, unknownDependencyFinalIdx, suggestionActiveIndex, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
+	rt.presenter.HtmxPostActivityDependencyHandlerResp(userAddNewActiivtyName, unknownDependencyFinalIdx, activeIndex, dto.ActivityId, dto.ProjectId).ServeHTTP(w, r)
 }
 
 func (rt *Routes) PutActivityDurationHandler(w http.ResponseWriter, r *http.Request) {

@@ -61,7 +61,7 @@ func (t *TemplPresenter) HtmxPostActivityDependencyHandlerResp(suggestedActivity
 		HxSwapOob: "outerHTML",
 		HxPost:    "/form/json/table/row/activity/dependency",
 		HxTrigger: fmt.Sprintf("keyup[key=='Escape'||code=='ArrowUp'||code=='ArrowDown'] from:#dependency-input-id-%s", rowActivityId),
-		HxVals:    fmt.Sprintf("js:{action: event.code, json: %s}", jsonmodels.MarshalParams(dependencyChangeDto)),
+		HxVals:    fmt.Sprintf("js:{action: event.code, json: %s, activeIndex: %d}", jsonmodels.MarshalParams(dependencyChangeDto), suggestionActiveIndex),
 		HxInclude: fmt.Sprintf("#dependency-input-id-%s", rowActivityId),
 		HxSwap:    "none",
 	}
@@ -180,7 +180,7 @@ func todependencyTableRow(tr models.TableRow) dependencyTableRow {
 			Role:      "listbox",
 			HxPost:    "/form/json/table/row/activity/dependency",
 			HxTrigger: fmt.Sprintf("keyup[key=='Escape'||code=='ArrowUp'||code=='ArrowDown'] from:#dependency-input-id-%s", tr.ActivityId),
-			HxVals:    fmt.Sprintf("js:{action: event.code, json: %s}", jsonmodels.MarshalParams(dependencyChangeDto)),
+			HxVals:    fmt.Sprintf("js:{action: event.code, json: %s, activeIndex: %d}", jsonmodels.MarshalParams(dependencyChangeDto), -1),
 			HxInclude: fmt.Sprintf("#dependency-input-id-%s", tr.ActivityId),
 			HxSwap:    "none",
 		},
