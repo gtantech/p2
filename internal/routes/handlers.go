@@ -8,10 +8,10 @@ import (
 )
 
 type Routes struct {
-	store models.Model
+	store models.Store
 }
 
-func NewRoutes(store models.Model) *Routes {
+func NewRoutes(store models.Store) *Routes {
 	r := &Routes{store: store}
 	return r
 }

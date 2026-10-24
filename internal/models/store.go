@@ -1,5 +1,5 @@
 package models
 
-type Model interface {
+type Store interface {
 	GetHome() Home
 }

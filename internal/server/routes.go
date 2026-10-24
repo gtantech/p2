@@ -10,7 +10,7 @@ import (
 	"github.com/gtantech/p2/internal/routes"
 )
 
-func (s *Server) RegisterRoutes(store models.Model) http.Handler {
+func (s *Server) RegisterRoutes(store models.Store) http.Handler {
 	rts := routes.NewRoutes(store)
 
 	r := chi.NewRouter()
