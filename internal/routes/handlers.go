@@ -8,13 +8,11 @@ import (
 )
 
 type Routes struct {
-	presenter models.Presenter
-	store     models.Model
+	store models.Model
 }
 
-func NewRoutes(presenter models.Presenter, store models.Model) *Routes {
-	r := &Routes{presenter: presenter, store: store}
-	presenter.RegisterModel(store)
+func NewRoutes(store models.Model) *Routes {
+	r := &Routes{store: store}
 	return r
 }
 

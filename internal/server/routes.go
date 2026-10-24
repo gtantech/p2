@@ -10,8 +10,8 @@ import (
 	"github.com/gtantech/p2/internal/routes"
 )
 
-func (s *Server) RegisterRoutes(presenter models.Presenter, store models.Model) http.Handler {
-	rts := routes.NewRoutes(presenter, store)
+func (s *Server) RegisterRoutes(store models.Model) http.Handler {
+	rts := routes.NewRoutes(store)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
