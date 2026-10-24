@@ -17,7 +17,8 @@ func NewRoutes(store models.Model) *Routes {
 }
 
 func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	rt.ViewHome(w, r, models.Home{Name: "World"})
+	props := rt.store.GetHome()
+	rt.ViewHome(w, r, props)
 }
 
 func (rt *Routes) ViewHome(w http.ResponseWriter, r *http.Request, props models.Home) {
