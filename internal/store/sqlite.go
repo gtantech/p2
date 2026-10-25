@@ -76,7 +76,7 @@ func (s *Sqlite) GetTable(ctx context.Context, projectId uuid.UUID) (models.Tabl
 				tableRows[i] = models.TableRow{
 					RowId:           uuid.MustParse(row.RowID),
 					ActivityName:    row.DispName,
-					DependencyNames: activityDependencies[uuid.MustParse(row.ID)],
+					DependencyNames: activityDependencies[uuid.MustParse(row.ActivityID)],
 					Duration:        time.Duration(row.Duration),
 				}
 			}

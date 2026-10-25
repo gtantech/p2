@@ -48,21 +48,21 @@ func InjectMockValues(db *sql.DB) *sql.DB {
 	db.Exec("INSERT INTO projects (id, disp_name) VALUES (?, ?)", projectId, "mock project")
 
 	activities := []Activity{
-		{ID: "dcce6c98-b31b-4ed6-a2ed-15d24ae96b41", ProjectID: projectId.String(), DispName: "A", Duration: int64(5 * time.Minute)},
-		{ID: "a4518b28-e597-4295-a532-3a501a75ab2b", ProjectID: projectId.String(), DispName: "B", Duration: int64(2 * time.Minute)},
-		{ID: "aa5a833c-2407-464c-93c4-fa9edba03b52", ProjectID: projectId.String(), DispName: "C", Duration: int64(3 * time.Minute)},
+		{ActivityID: "dcce6c98-b31b-4ed6-a2ed-15d24ae96b41", ProjectID: projectId.String(), DispName: "A", Duration: int64(5 * time.Minute)},
+		{ActivityID: "a4518b28-e597-4295-a532-3a501a75ab2b", ProjectID: projectId.String(), DispName: "B", Duration: int64(2 * time.Minute)},
+		{ActivityID: "aa5a833c-2407-464c-93c4-fa9edba03b52", ProjectID: projectId.String(), DispName: "C", Duration: int64(3 * time.Minute)},
 	}
 	for i, a := range activities {
-		db.Exec("INSERT INTO activities (id, project_id, disp_name, duration) VALUES (?, ?, ?, ?)",
-			a.ID, projectId, a.DispName, a.Duration)
+		db.Exec("INSERT INTO activities (activity_id, project_id, disp_name, duration) VALUES (?, ?, ?, ?)",
+			a.ActivityID, projectId, a.DispName, a.Duration)
 		db.Exec("INSERT INTO activities_ordering (id, project_id, successor_activity_id, sort_rank) VALUES (?, ?, ?, ?)",
-			uuid.NewV7(), projectId, a.ID, int64(i)*models.TableRowSortRankStep)
+			uuid.NewV7(), projectId, a.ActivityID, int64(i)*models.TableRowSortRankStep)
 	}
 
 	db.Exec("INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) VALUES (?, ?, ?, ?, ?)",
-		uuid.NewV7(), projectId, models.FS, activities[0].ID, activities[2].ID)
+		uuid.NewV7(), projectId, models.FS, activities[0].ActivityID, activities[2].ActivityID)
 	db.Exec("INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) VALUES (?, ?, ?, ?, ?)",
-		uuid.NewV7(), projectId, models.FS, activities[1].ID, activities[2].ID)
+		uuid.NewV7(), projectId, models.FS, activities[1].ActivityID, activities[2].ActivityID)
 	return db
 }
 
