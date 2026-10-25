@@ -9,6 +9,57 @@ import (
 	"context"
 )
 
+const findAllPredecessorNamesByProjectId = `-- name: FindAllPredecessorNamesByProjectId :many
+SELECT
+    d.id AS dependency_id,
+    d.relationship,
+    d.successor_activity_id AS successor_activity_id,
+    predecessor.id AS predecessor_activity_id,
+    predecessor.disp_name AS predecessor_activity_name
+FROM dependencies d
+JOIN activities predecessor
+    ON predecessor.id = d.predecessor_activity_id
+   AND predecessor.project_id = d.project_id
+WHERE d.project_id = ?
+`
+
+type FindAllPredecessorNamesByProjectIdRow struct {
+	DependencyID            string
+	Relationship            string
+	SuccessorActivityID     string
+	PredecessorActivityID   string
+	PredecessorActivityName string
+}
+
+func (q *Queries) FindAllPredecessorNamesByProjectId(ctx context.Context, projectID string) ([]FindAllPredecessorNamesByProjectIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAllPredecessorNamesByProjectId, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindAllPredecessorNamesByProjectIdRow
+	for rows.Next() {
+		var i FindAllPredecessorNamesByProjectIdRow
+		if err := rows.Scan(
+			&i.DependencyID,
+			&i.Relationship,
+			&i.SuccessorActivityID,
+			&i.PredecessorActivityID,
+			&i.PredecessorActivityName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertDependency = `-- name: InsertDependency :one
 INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) 
 VALUES (?, ?, ?, ?, ?)
