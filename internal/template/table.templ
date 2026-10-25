@@ -1,0 +1,80 @@
+package template
+
+import (
+    "github.com/gtantech/p2/internal/models"
+)
+
+templ DependencyTable(params models.Table){
+    <table>
+        <thead>
+            <tr>
+                <th class="activity-column">
+                    Activity
+                </th>
+                <th class="dependency-column">
+                    Dependencies
+                </th>
+                <th class="duration-column">
+                    Duration
+                </th>
+                <th class="action-column">
+                </th>
+            </tr>
+        </thead>
+        @DependencyTableBody(params)
+    </table>
+}
+
+templ DependencyTableBody(params models.Table){
+    <tbody>
+        for _, row := range params.Rows{
+            @DependencyTableRow(ToTableRow(row))
+        }
+    </tbody>
+}
+
+
+templ DependencyTableRow(params *tableRow){
+    <tr class="activity-row">
+           <!-- activity name -->
+        <td>
+            <input
+                class="activity-name"
+                value={params.ActivityName}
+            >
+        </td>
+        
+        <!-- Dependencies -->
+        <td>
+            <div
+                class="dependency-wrapper"
+            >
+                <input
+                    class="dependency-name"
+			        placeholder="Activity A, Activity B..."
+                    value={params.Dependencies}
+                >
+            </div>
+        </td>
+        
+        <!-- Duration -->
+        <td>
+            <input
+                value={params.Duration}
+            >
+        </td>
+        
+        <!-- Add row -->
+        <td>
+            <div class="actions">
+                <button
+                    type="button"
+                    class="add-button"
+                    title="Add activity"
+                >
+                    +
+                </button>
+            </div>
+        </td>
+    </tr>
+}
