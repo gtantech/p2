@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"uuid"
 
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/template"
@@ -19,8 +18,8 @@ func New(store models.Store) *Routes {
 }
 
 func (rt *Routes) GetHome(w http.ResponseWriter, r *http.Request) {
-	mockProjectId := uuid.Max()
-	props := rt.store.GetTable(mockProjectId)
+	homeProject := rt.store.GetHomeProject()
+	props := rt.store.GetTable(homeProject.ProjecId)
 	rt.ViewHome(w, r, props)
 }
 

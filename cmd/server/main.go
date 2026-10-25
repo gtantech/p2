@@ -47,7 +47,7 @@ func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
-	store := &mock.Store{}
+	store := mock.NewStore()
 	server := server.NewServer(serverConfig, store)
 
 	// Create a done channel to signal when the shutdown is complete
