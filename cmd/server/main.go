@@ -11,9 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gtantech/p2/internal/mock"
+	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/routes"
 	"github.com/gtantech/p2/internal/server"
+	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -47,8 +49,13 @@ func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
-	store := mock.NewStore()
-	server := server.NewServer(serverConfig, store)
+	var routeStore routes.Store
+	if os.Getenv("ENV") == "mock" {
+		routeStore = store.NewSqlite(sqlite.New(sqlite.NewSQLiteWithMockValues(":memory:")))
+	} else {
+		routeStore = store.NewSqlite(sqlite.New(sqlite.NewSQLite("./data.db")))
+	}
+	server := server.NewServer(serverConfig, routeStore)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
