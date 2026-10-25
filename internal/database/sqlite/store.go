@@ -1,28 +1,29 @@
-package store
+package sqlite
 
 import (
 	"context"
+	"database/sql"
 	"time"
 	"uuid"
 
-	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/routes"
 )
 
-var _ routes.Store = (*Sqlite)(nil) //ensures SqliteStore implements routes.Store at compile time
+var _ routes.Store = (*Store)(nil) //ensures SqliteStore implements routes.Store at compile time
 
-func NewSqlite(queries *sqlite.Queries) *Sqlite {
-	return &Sqlite{queries: queries}
+func NewStore(dbq *DBQueries) *Store {
+	return &Store{queries: dbq.queries, db: dbq.db}
 }
 
-type Sqlite struct {
-	queries *sqlite.Queries
+type Store struct {
+	queries *Queries
+	db      *sql.DB
 }
 
 // CreateProject implements [routes.Store].
-func (s *Sqlite) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
-	resp, err := s.queries.InsertProject(ctx, sqlite.InsertProjectParams{
+func (s *Store) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
+	resp, err := s.queries.InsertProject(ctx, InsertProjectParams{
 		ID:       uuid.NewV7().String(),
 		DispName: projectName,
 	})
@@ -33,7 +34,7 @@ func (s *Sqlite) CreateProject(ctx context.Context, projectName string) (models.
 }
 
 // GetHomeProject implements [routes.Store].
-func (s *Sqlite) GetHomeProject(ctx context.Context) (models.Project, error) {
+func (s *Store) GetHomeProject(ctx context.Context) (models.Project, error) {
 	homeProjectId := uuid.Max() //TODO remove hard coded value
 	resp, err := s.queries.FindProjectById(ctx, homeProjectId.String())
 	if err != nil {
@@ -46,7 +47,7 @@ func (s *Sqlite) GetHomeProject(ctx context.Context) (models.Project, error) {
 }
 
 // GetTable implements [routes.Store].
-func (s *Sqlite) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error) {
+func (s *Store) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error) {
 	resp, err := s.queries.FindAllActivitiesByProjectSorted(ctx, projectId.String())
 	if err != nil {
 		return models.Table{}, err
