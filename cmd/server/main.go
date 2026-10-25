@@ -13,6 +13,7 @@ import (
 
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
+	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -45,7 +46,9 @@ func gracefulShutdown(server *server.Server, done chan bool) {
 func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
-	server := server.NewServer(serverConfig)
+
+	store := &store.MockStore{}
+	server := server.NewServer(serverConfig, store)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)

@@ -6,23 +6,23 @@ import (
 	"time"
 
 	"github.com/gtantech/p2/internal/models"
-	"github.com/gtantech/p2/internal/store"
 )
 
 type Server struct {
 	*http.Server
-	port int
+	port  int
+	store models.Store
 }
 
-func NewServer(config models.ServerConfig) *Server {
+func NewServer(config models.ServerConfig, store models.Store) *Server {
 	newServer := &Server{
-		port: config.Port,
+		port:  config.Port,
+		store: store,
 	}
-	store := &store.MockStore{}
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", newServer.port),
-		Handler:      newServer.RegisterRoutes(store),
+		Handler:      newServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,

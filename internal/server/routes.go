@@ -6,12 +6,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/routes"
 )
 
-func (s *Server) RegisterRoutes(store models.Store) http.Handler {
-	rts := routes.New(store)
+func (s *Server) RegisterRoutes() http.Handler {
+	rts := routes.New(s.store)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
