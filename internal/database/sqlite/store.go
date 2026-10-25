@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"database/sql"
 	"time"
 	"uuid"
 
@@ -11,12 +12,13 @@ import (
 
 var _ routes.Store = (*Store)(nil) //ensures SqliteStore implements routes.Store at compile time
 
-func NewStore(queries *Queries) *Store {
-	return &Store{queries: queries}
+func NewStore(dbq *DBQueries) *Store {
+	return &Store{queries: dbq.queries, db: dbq.db}
 }
 
 type Store struct {
 	queries *Queries
+	db      *sql.DB
 }
 
 // CreateProject implements [routes.Store].
