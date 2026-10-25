@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,13 +14,12 @@ import (
 
 	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
-	"github.com/gtantech/p2/internal/routes"
 	"github.com/gtantech/p2/internal/server"
 	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func gracefulShutdown(server *http.Server, done chan bool) {
+func gracefulShutdown(server *http.Server, db *sql.DB, done chan bool) {
 	apiServer := server
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -28,18 +28,28 @@ func gracefulShutdown(server *http.Server, done chan bool) {
 	// Listen for the interrupt signal.
 	<-ctx.Done()
 
-	log.Println("shutting down gracefully, press Ctrl+C again to force")
+	log.Println("Shutting down gracefully, press Ctrl+C again to force")
 	stop() // Allow Ctrl+C to force shutdown
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	log.Println("Server exiting...")
+
 	if err := apiServer.Shutdown(ctx); err != nil {
 		log.Printf("Server forced to shutdown with error: %v", err)
+	} else {
+		log.Println("Server exited successfully")
 	}
 
-	log.Println("Server exiting")
+	log.Println("Closing database connection...")
+	if err := db.Close(); err != nil {
+		log.Printf("Databse forced to close with error: %v", err)
+	} else {
+		log.Println("Database connection closed successfully")
+	}
 
 	// Notify the main goroutine that the shutdown is complete
 	done <- true
@@ -49,19 +59,19 @@ func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
-	var routeStore routes.Store
+	var db *sql.DB
 	if os.Getenv("ENV") == "mock" {
-		routeStore = store.NewSqlite(sqlite.New(sqlite.NewSQLiteWithMockValues(":memory:")))
+		db = sqlite.NewSQLiteWithMockValues(":memory:")
 	} else {
-		routeStore = store.NewSqlite(sqlite.New(sqlite.NewSQLite("./data.db")))
+		db = sqlite.NewSQLite("./data.db")
 	}
-	server := server.NewServer(serverConfig, routeStore)
+	server := server.NewServer(serverConfig, store.NewSqlite(sqlite.New(db)))
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
 
 	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, done)
+	go gracefulShutdown(server, db, done)
 	log.Printf("Listening on http://localhost:%d", serverConfig.Port)
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
