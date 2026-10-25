@@ -8,14 +8,14 @@ import (
 	"github.com/gtantech/p2/internal/models"
 )
 
-type Server struct {
+type server struct {
 	*http.Server
 	port  int
 	store models.Store
 }
 
-func NewServer(config models.ServerConfig, store models.Store) *Server {
-	newServer := &Server{
+func NewServer(config models.ServerConfig, store models.Store) *http.Server {
+	newServer := &server{
 		port:  config.Port,
 		store: store,
 	}
@@ -30,5 +30,5 @@ func NewServer(config models.ServerConfig, store models.Store) *Server {
 
 	newServer.Server = server
 
-	return newServer
+	return server
 }

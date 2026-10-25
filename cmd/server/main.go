@@ -17,8 +17,8 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func gracefulShutdown(server *server.Server, done chan bool) {
-	apiServer := server.Server
+func gracefulShutdown(server *http.Server, done chan bool) {
+	apiServer := server
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
