@@ -9,18 +9,16 @@ import (
 )
 
 type server struct {
-	port  int
 	store models.Store
 }
 
 func NewServer(config models.ServerConfig, store models.Store) *http.Server {
 	newServer := &server{
-		port:  config.Port,
 		store: store,
 	}
 	// Declare Server config
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", newServer.port),
+		Addr:         fmt.Sprintf(":%d", config.Port),
 		Handler:      newServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
