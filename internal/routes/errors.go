@@ -4,8 +4,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
+)
 
-	"github.com/gtantech/p2/internal/store"
+var (
+	ErrProjectNotFound = errors.New("project not found")
 )
 
 // Returns true if the caller should return early
@@ -13,7 +15,7 @@ func storeErrorHandler(err error, w http.ResponseWriter, internalServerErrorLogM
 	if err == nil {
 		return false
 	}
-	if errors.Is(err, store.ErrProjectNotFound) {
+	if errors.Is(err, ErrProjectNotFound) {
 		http.Error(w, "project not found", http.StatusBadRequest)
 		return true
 	}
