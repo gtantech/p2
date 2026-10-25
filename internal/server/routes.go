@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) RegisterRoutes(store models.Store) http.Handler {
-	rts := routes.NewRoutes(store)
+	rts := routes.New(store)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

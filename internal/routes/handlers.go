@@ -11,7 +11,7 @@ type Routes struct {
 	store models.Store
 }
 
-func NewRoutes(store models.Store) *Routes {
+func New(store models.Store) *Routes {
 	r := &Routes{store: store}
 	return r
 }
