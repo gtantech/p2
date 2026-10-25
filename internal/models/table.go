@@ -10,8 +10,8 @@ type Table struct {
 }
 
 type TableRow struct {
-	RowId        uuid.UUID
-	Activity     string
-	Dependencies []string
-	Duration     time.Duration
+	RowId           uuid.UUID
+	ActivityName    string
+	DependencyNames []string
+	Duration        time.Duration
 }
