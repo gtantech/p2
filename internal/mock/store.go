@@ -27,6 +27,11 @@ type Store struct {
 	project map[uuid.UUID]home
 }
 
+// GetHomeProject implements [models.Store].
+func (ms *Store) GetHomeProject() models.Project {
+	return ms.project[uuid.Max()].Project
+}
+
 // CreateProject implements [models.Store].
 func (ms *Store) CreateProject(projectName string) models.Project {
 	project := models.Project{ProjecId: uuid.New(), ProjectName: projectName}
