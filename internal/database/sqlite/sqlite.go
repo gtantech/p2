@@ -3,15 +3,12 @@ package sqlite
 import (
 	"database/sql"
 	"embed"
-	"errors"
 	"log"
 	"time"
 	"uuid"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
-	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/gtantech/p2/internal/database"
 	"github.com/gtantech/p2/internal/models"
 	_ "modernc.org/sqlite"
 )
@@ -38,7 +35,7 @@ func NewSQLite(dataSourceName string) *dbQueries {
 	if err != nil {
 		log.Fatalf("Failed to create driver for sqlite database: %v", err)
 	}
-	if err := migrateDB(driver); err != nil {
+	if err := database.MigrateDB(driver, migrationsFS); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 	return &dbQueries{db: db, queries: New(db)}
@@ -71,27 +68,4 @@ func InjectMockValues(db *sql.DB) *sql.DB {
 	db.Exec("INSERT INTO dependencies (id, project_id, relationship, predecessor_activity_id, successor_activity_id) VALUES (?, ?, ?, ?, ?)",
 		uuid.NewV7(), projectId, models.FS, activities[1].ActivityID, activities[2].ActivityID)
 	return db
-}
-
-func migrateDB(driver database.Driver) error {
-	source, err := iofs.New(migrationsFS, "migrations")
-	if err != nil {
-		return err
-	}
-
-	m, err := migrate.NewWithInstance(
-		"iofs",
-		source,
-		"main",
-		driver,
-	)
-	if err != nil {
-		return err
-	}
-
-	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return err
-	}
-
-	return nil
 }
