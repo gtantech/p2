@@ -5,6 +5,10 @@ import (
 	"uuid"
 )
 
+const (
+	TableRowSortRankStep = int64(1000)
+)
+
 type Table struct {
 	Rows []TableRow
 }
