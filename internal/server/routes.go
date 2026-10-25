@@ -24,6 +24,7 @@ func (s *server) RegisterRoutes() http.Handler {
 	}))
 
 	r.Get("/", rts.GetHome)
+	r.Get("/static/home_style.css", rts.GetHomeStyle)
 
 	return r
 }
