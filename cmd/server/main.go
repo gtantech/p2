@@ -11,13 +11,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gtantech/p2/internal/mock"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func gracefulShutdown(server *server.Server, done chan bool) {
-	apiServer := server.Server
+func gracefulShutdown(server *http.Server, done chan bool) {
+	apiServer := server
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -45,7 +46,9 @@ func gracefulShutdown(server *server.Server, done chan bool) {
 func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
-	server := server.NewServer(serverConfig)
+
+	store := &mock.Store{}
+	server := server.NewServer(serverConfig, store)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
