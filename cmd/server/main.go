@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,13 +11,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gtantech/p2/internal/database"
 	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func gracefulShutdown(server *http.Server, db *sql.DB, done chan bool) {
+func gracefulShutdown(server *http.Server, dbq database.DBQueries, done chan bool) {
 	apiServer := server
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -44,7 +44,7 @@ func gracefulShutdown(server *http.Server, db *sql.DB, done chan bool) {
 	}
 
 	log.Println("Closing database connection...")
-	if err := db.Close(); err != nil {
+	if err := dbq.Close(); err != nil {
 		log.Printf("Databse forced to close with error: %v", err)
 	} else {
 		log.Println("Database connection closed successfully")
@@ -58,19 +58,19 @@ func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
-	var db *sql.DB
+	var dbq *sqlite.DBQueries
 	if os.Getenv("ENV") == "mock" {
-		db = sqlite.NewSQLiteWithMockValues(":memory:")
+		dbq = sqlite.NewSQLiteWithMockValues(":memory:")
 	} else {
-		db = sqlite.NewSQLite("./data.db")
+		dbq = sqlite.NewSQLite("./data.db")
 	}
-	server := server.NewServer(serverConfig, sqlite.NewStore(sqlite.New(db)))
+	server := server.NewServer(serverConfig, sqlite.NewStore(dbq))
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
 
 	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, db, done)
+	go gracefulShutdown(server, dbq, done)
 	log.Printf("Listening on http://localhost:%d", serverConfig.Port)
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
