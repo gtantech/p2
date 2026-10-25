@@ -15,7 +15,6 @@ import (
 	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
-	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -65,7 +64,7 @@ func main() {
 	} else {
 		db = sqlite.NewSQLite("./data.db")
 	}
-	server := server.NewServer(serverConfig, store.NewSqlite(sqlite.New(db)))
+	server := server.NewServer(serverConfig, sqlite.NewSqlite(sqlite.New(db)))
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)

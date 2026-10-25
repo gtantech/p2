@@ -1,28 +1,27 @@
-package store
+package sqlite
 
 import (
 	"context"
 	"time"
 	"uuid"
 
-	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/routes"
 )
 
 var _ routes.Store = (*Sqlite)(nil) //ensures SqliteStore implements routes.Store at compile time
 
-func NewSqlite(queries *sqlite.Queries) *Sqlite {
+func NewSqlite(queries *Queries) *Sqlite {
 	return &Sqlite{queries: queries}
 }
 
 type Sqlite struct {
-	queries *sqlite.Queries
+	queries *Queries
 }
 
 // CreateProject implements [routes.Store].
 func (s *Sqlite) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
-	resp, err := s.queries.InsertProject(ctx, sqlite.InsertProjectParams{
+	resp, err := s.queries.InsertProject(ctx, InsertProjectParams{
 		ID:       uuid.NewV7().String(),
 		DispName: projectName,
 	})
