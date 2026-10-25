@@ -9,6 +9,17 @@ import (
 	"context"
 )
 
+const findProjectById = `-- name: FindProjectById :one
+SELECT id, disp_name FROM projects WHERE id = ?
+`
+
+func (q *Queries) FindProjectById(ctx context.Context, id string) (Project, error) {
+	row := q.db.QueryRowContext(ctx, findProjectById, id)
+	var i Project
+	err := row.Scan(&i.ID, &i.DispName)
+	return i, err
+}
+
 const insertProject = `-- name: InsertProject :one
 INSERT INTO projects (id, disp_name) VALUES (?, ?)
 RETURNING id, disp_name
