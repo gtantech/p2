@@ -4,7 +4,7 @@ VALUES (?, ?, ?, ?)
 RETURNING *;
 
 -- name: FindAllActivitiesByProjectSorted :many
-SELECT a.* , ao.sort_rank
+SELECT a.* , ao.sort_rank, ao.id AS row_id
 FROM activities a
 JOIN activities_ordering ao
     ON a.id = ao.successor_activity_id

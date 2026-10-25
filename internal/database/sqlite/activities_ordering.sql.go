@@ -10,7 +10,7 @@ import (
 )
 
 const findAllActivitiesByProjectSorted = `-- name: FindAllActivitiesByProjectSorted :many
-SELECT a.id, a.project_id, a.disp_name, a.duration , ao.sort_rank
+SELECT a.id, a.project_id, a.disp_name, a.duration , ao.sort_rank, ao.id AS row_id
 FROM activities a
 JOIN activities_ordering ao
     ON a.id = ao.successor_activity_id
@@ -25,6 +25,7 @@ type FindAllActivitiesByProjectSortedRow struct {
 	DispName  string
 	Duration  int64
 	SortRank  int64
+	RowID     string
 }
 
 func (q *Queries) FindAllActivitiesByProjectSorted(ctx context.Context, projectID string) ([]FindAllActivitiesByProjectSortedRow, error) {
@@ -42,6 +43,7 @@ func (q *Queries) FindAllActivitiesByProjectSorted(ctx context.Context, projectI
 			&i.DispName,
 			&i.Duration,
 			&i.SortRank,
+			&i.RowID,
 		); err != nil {
 			return nil, err
 		}
