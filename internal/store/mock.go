@@ -10,4 +10,4 @@ func (ms *MockStore) GetHome() models.Home {
 	return models.Home{Name: "World"}
 }
 
-var _ models.Store = (*MockStore)(nil) //ensures MockStore implements models.Model at compile time
+var _ models.Store = (*MockStore)(nil) //ensures MockStore implements models.Store at compile time
