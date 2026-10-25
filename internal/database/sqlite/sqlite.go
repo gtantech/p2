@@ -19,12 +19,12 @@ import (
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 
-type DBQueries struct {
+type dbQueries struct {
 	db      *sql.DB
 	queries *Queries
 }
 
-func NewSQLite(dataSourceName string) *DBQueries {
+func NewSQLite(dataSourceName string) *dbQueries {
 	db, err := sql.Open("sqlite", dataSourceName)
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
@@ -41,10 +41,10 @@ func NewSQLite(dataSourceName string) *DBQueries {
 	if err := migrateDB(driver); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
-	return &DBQueries{db: db, queries: New(db)}
+	return &dbQueries{db: db, queries: New(db)}
 }
 
-func NewSQLiteWithMockValues(dataSourceName string) *DBQueries {
+func NewSQLiteWithMockValues(dataSourceName string) *dbQueries {
 	dbq := NewSQLite(dataSourceName)
 	InjectMockValues(dbq.db)
 	return dbq

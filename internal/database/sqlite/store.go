@@ -12,7 +12,7 @@ import (
 
 var _ routes.Store = (*Store)(nil) //ensures SqliteStore implements routes.Store at compile time
 
-func NewStore(dbq *DBQueries) *Store {
+func NewStore(dbq *dbQueries) *Store {
 	return &Store{queries: dbq.queries, db: dbq.db}
 }
 
