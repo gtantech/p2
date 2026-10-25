@@ -22,8 +22,3 @@ func (ms *Store) GetTable(projectId uuid.UUID) models.Table {
 		},
 	}
 }
-
-// GetHome implements [models.Store].
-func (ms *Store) GetHome() models.Home {
-	return models.Home{Name: "World"}
-}
