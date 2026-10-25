@@ -6,13 +6,14 @@ import (
 	"time"
 
 	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/routes"
 )
 
 type server struct {
-	store models.Store
+	store routes.Store
 }
 
-func NewServer(config models.ServerConfig, store models.Store) *http.Server {
+func NewServer(config models.ServerConfig, store routes.Store) *http.Server {
 	newServer := &server{
 		store: store,
 	}

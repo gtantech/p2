@@ -7,9 +7,10 @@ import (
 
 	"github.com/gtantech/p2/internal/database/sqlite"
 	"github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/routes"
 )
 
-var _ models.Store = (*Sqlite)(nil) //ensures SqliteStore implements models.Store at compile time
+var _ routes.Store = (*Sqlite)(nil) //ensures SqliteStore implements routes.Store at compile time
 
 func NewSqlite(queries *sqlite.Queries) *Sqlite {
 	return &Sqlite{queries: queries}
@@ -19,7 +20,7 @@ type Sqlite struct {
 	queries *sqlite.Queries
 }
 
-// CreateProject implements [models.Store].
+// CreateProject implements [routes.Store].
 func (s *Sqlite) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
 	resp, err := s.queries.InsertProject(ctx, sqlite.InsertProjectParams{
 		ID:       uuid.NewV7().String(),
@@ -31,12 +32,12 @@ func (s *Sqlite) CreateProject(ctx context.Context, projectName string) (models.
 	return models.Project{ProjecId: uuid.MustParse(resp.ID), ProjectName: resp.DispName}, nil
 }
 
-// GetHomeProject implements [models.Store].
+// GetHomeProject implements [routes.Store].
 func (s *Sqlite) GetHomeProject(ctx context.Context) (models.Project, error) {
 	homeProjectId := uuid.Max() //TODO remove hard coded value
 	resp, err := s.queries.FindProjectById(ctx, homeProjectId.String())
 	if err != nil {
-		return models.Project{}, ErrProjectNotFound
+		return models.Project{}, routes.ErrProjectNotFound
 	}
 	return models.Project{
 		ProjecId:    uuid.MustParse(resp.ID),
@@ -44,7 +45,7 @@ func (s *Sqlite) GetHomeProject(ctx context.Context) (models.Project, error) {
 	}, nil
 }
 
-// GetTable implements [models.Store].
+// GetTable implements [routes.Store].
 func (s *Sqlite) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error) {
 	resp, err := s.queries.FindAllActivitiesByProjectSorted(ctx, projectId.String())
 	if err != nil {
@@ -52,7 +53,7 @@ func (s *Sqlite) GetTable(ctx context.Context, projectId uuid.UUID) (models.Tabl
 	}
 	if len(resp) == 0 {
 		if _, err := s.queries.FindProjectById(ctx, projectId.String()); err != nil {
-			return models.Table{}, ErrProjectNotFound
+			return models.Table{}, routes.ErrProjectNotFound
 		}
 	}
 
@@ -75,7 +76,7 @@ func (s *Sqlite) GetTable(ctx context.Context, projectId uuid.UUID) (models.Tabl
 				tableRows[i] = models.TableRow{
 					RowId:           uuid.MustParse(row.RowID),
 					ActivityName:    row.DispName,
-					DependencyNames: activityDependencies[uuid.MustParse(row.ID)],
+					DependencyNames: activityDependencies[uuid.MustParse(row.ActivityID)],
 					Duration:        time.Duration(row.Duration),
 				}
 			}

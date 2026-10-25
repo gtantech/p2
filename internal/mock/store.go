@@ -6,10 +6,10 @@ import (
 	"uuid"
 
 	"github.com/gtantech/p2/internal/models"
-	"github.com/gtantech/p2/internal/store"
+	"github.com/gtantech/p2/internal/routes"
 )
 
-var _ models.Store = (*Store)(nil) //ensures MockStore implements models.Store at compile time
+var _ routes.Store = (*Store)(nil) //ensures MockStore implements routes.Store at compile time
 
 func NewStore() *Store {
 	s := &Store{project: make(map[uuid.UUID]home)}
@@ -29,25 +29,25 @@ type Store struct {
 	project map[uuid.UUID]home
 }
 
-// GetHomeProject implements [models.Store].
+// GetHomeProject implements [routes.Store].
 func (ms *Store) GetHomeProject(ctx context.Context) (models.Project, error) {
 	if _, ok := ms.project[uuid.Max()]; !ok {
-		return models.Project{}, store.ErrProjectNotFound
+		return models.Project{}, routes.ErrProjectNotFound
 	}
 	return ms.project[uuid.Max()].Project, nil
 }
 
-// CreateProject implements [models.Store].
+// CreateProject implements [routes.Store].
 func (ms *Store) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
 	project := models.Project{ProjecId: uuid.New(), ProjectName: projectName}
 	ms.project[project.ProjecId] = home{Project: project, Table: models.Table{Rows: make([]models.TableRow, 0)}}
 	return project, nil
 }
 
-// GetTable implements [models.Store].
+// GetTable implements [routes.Store].
 func (ms *Store) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error) {
 	if _, ok := ms.project[projectId]; !ok {
-		return models.Table{}, store.ErrProjectNotFound
+		return models.Table{}, routes.ErrProjectNotFound
 	}
 	return ms.project[projectId].Table, nil
 }
