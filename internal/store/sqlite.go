@@ -9,18 +9,18 @@ import (
 	"github.com/gtantech/p2/internal/models"
 )
 
-var _ models.Store = (*SqliteStore)(nil) //ensures SqliteStore implements models.Store at compile time
+var _ models.Store = (*Sqlite)(nil) //ensures SqliteStore implements models.Store at compile time
 
-func NewSqliteStore(queries *sqlite.Queries) *SqliteStore {
-	return &SqliteStore{queries: queries}
+func NewSqlite(queries *sqlite.Queries) *Sqlite {
+	return &Sqlite{queries: queries}
 }
 
-type SqliteStore struct {
+type Sqlite struct {
 	queries *sqlite.Queries
 }
 
 // CreateProject implements [models.Store].
-func (s *SqliteStore) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
+func (s *Sqlite) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
 	resp, err := s.queries.InsertProject(ctx, sqlite.InsertProjectParams{
 		ID:       uuid.NewV7().String(),
 		DispName: projectName,
@@ -32,7 +32,7 @@ func (s *SqliteStore) CreateProject(ctx context.Context, projectName string) (mo
 }
 
 // GetHomeProject implements [models.Store].
-func (s *SqliteStore) GetHomeProject(ctx context.Context) (models.Project, error) {
+func (s *Sqlite) GetHomeProject(ctx context.Context) (models.Project, error) {
 	homeProjectId := uuid.Max() //TODO remove hard coded value
 	resp, err := s.queries.FindProjectById(ctx, homeProjectId.String())
 	if err != nil {
@@ -45,7 +45,7 @@ func (s *SqliteStore) GetHomeProject(ctx context.Context) (models.Project, error
 }
 
 // GetTable implements [models.Store].
-func (s *SqliteStore) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error) {
+func (s *Sqlite) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error) {
 	resp, err := s.queries.FindAllActivitiesByProjectSorted(ctx, projectId.String())
 	if err != nil {
 		return models.Table{}, err
