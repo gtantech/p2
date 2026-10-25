@@ -18,8 +18,18 @@ func New(store models.Store) *Routes {
 }
 
 func (rt *Routes) GetHome(w http.ResponseWriter, r *http.Request) {
-	homeProject := rt.store.GetHomeProject()
-	props := rt.store.GetTable(homeProject.ProjecId)
+	homeProject, err := rt.store.GetHomeProject(r.Context())
+	if err != nil {
+		if storeErrorHandler(err, w, "failed to get home project in GetHome handler") {
+			return
+		}
+	}
+	props, err := rt.store.GetTable(r.Context(), homeProject.ProjecId)
+	if err != nil {
+		if storeErrorHandler(err, w, "failed to get home table in GetHome handler") {
+			return
+		}
+	}
 	rt.ViewHome(w, r, props)
 }
 
