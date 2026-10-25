@@ -9,10 +9,10 @@ import (
 )
 
 type Routes struct {
-	store models.Store
+	store Store
 }
 
-func New(store models.Store) *Routes {
+func New(store Store) *Routes {
 	r := &Routes{store: store}
 	return r
 }
