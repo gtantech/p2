@@ -9,7 +9,6 @@ import (
 )
 
 type server struct {
-	*http.Server
 	port  int
 	store models.Store
 }
@@ -27,8 +26,6 @@ func NewServer(config models.ServerConfig, store models.Store) *http.Server {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
-
-	newServer.Server = server
 
 	return server
 }
