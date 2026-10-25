@@ -16,7 +16,7 @@ func ToTableRow(params models.TableRow) *tableRow {
 	return &tableRow{
 		ActivityName: params.ActivityName,
 		Dependencies: func() string {
-			return strings.Join(params.DependencyNames, ",")
+			return strings.Join(params.DependencyNames, ", ")
 		}(),
 		Duration: params.Duration.String(),
 	}
