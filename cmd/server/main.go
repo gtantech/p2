@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gtantech/p2/internal/mock"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
-	"github.com/gtantech/p2/internal/store"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -47,7 +47,7 @@ func main() {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
-	store := &store.MockStore{}
+	store := &mock.Store{}
 	server := server.NewServer(serverConfig, store)
 
 	// Create a done channel to signal when the shutdown is complete
