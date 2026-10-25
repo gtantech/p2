@@ -16,9 +16,16 @@ import (
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 
+var _ database.DBQueries = (*dbQueries)(nil) //ensures dbQueries implements DBQueries at compile time
+
 type dbQueries struct {
 	db      *sql.DB
 	queries *Queries
+}
+
+// Close implements [database.DBQueries].
+func (d *dbQueries) Close() error {
+	return d.db.Close()
 }
 
 func NewSQLite(dataSourceName string) *dbQueries {
