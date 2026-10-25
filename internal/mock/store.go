@@ -9,7 +9,22 @@ import (
 
 var _ models.Store = (*Store)(nil) //ensures MockStore implements models.Store at compile time
 
+func NewStore() *Store {
+	s := &Store{project: make(map[uuid.UUID]models.Project)}
+	mockProjectId := uuid.Max()
+	s.project[mockProjectId] = models.Project{ProjecId: mockProjectId, ProjectName: "mock project"}
+	return s
+}
+
 type Store struct {
+	project map[uuid.UUID]models.Project
+}
+
+// CreateProject implements [models.Store].
+func (ms *Store) CreateProject(projectName string) models.Project {
+	project := models.Project{ProjecId: uuid.New(), ProjectName: projectName}
+	ms.project[project.ProjecId] = project
+	return project
 }
 
 // GetTable implements [models.Store].
