@@ -12,10 +12,10 @@ type ActivitiesOrdering struct {
 }
 
 type Activity struct {
-	ID        string
-	ProjectID string
-	DispName  string
-	Duration  int64
+	ActivityID string
+	ProjectID  string
+	DispName   string
+	Duration   int64
 }
 
 type Dependency struct {

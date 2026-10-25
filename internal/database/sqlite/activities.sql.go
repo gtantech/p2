@@ -10,28 +10,28 @@ import (
 )
 
 const insertActivity = `-- name: InsertActivity :one
-INSERT INTO activities (id, project_id, disp_name, duration)
+INSERT INTO activities (activity_id, project_id, disp_name, duration)
 VALUES (?, ?, ?, ?)
-RETURNING id, project_id, disp_name, duration
+RETURNING activity_id, project_id, disp_name, duration
 `
 
 type InsertActivityParams struct {
-	ID        string
-	ProjectID string
-	DispName  string
-	Duration  int64
+	ActivityID string
+	ProjectID  string
+	DispName   string
+	Duration   int64
 }
 
 func (q *Queries) InsertActivity(ctx context.Context, arg InsertActivityParams) (Activity, error) {
 	row := q.db.QueryRowContext(ctx, insertActivity,
-		arg.ID,
+		arg.ActivityID,
 		arg.ProjectID,
 		arg.DispName,
 		arg.Duration,
 	)
 	var i Activity
 	err := row.Scan(
-		&i.ID,
+		&i.ActivityID,
 		&i.ProjectID,
 		&i.DispName,
 		&i.Duration,
