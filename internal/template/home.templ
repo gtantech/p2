@@ -1,0 +1,27 @@
+package template
+
+import (
+    "github.com/gtantech/p2/internal/models"
+)
+
+templ Home(table models.Table, pageTitle string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>{pageTitle}</title>
+			<link rel="stylesheet" href="/static/home_style.css"/>
+		</head>
+		<body>
+			<div class=container>
+				<h1>{pageTitle}</h1>
+				<div 
+					class=table-wrapper
+				>
+					@DependencyTable(table)
+				</div>
+			</div>
+		</body>
+	</html>
+}
