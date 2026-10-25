@@ -23,7 +23,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Get("/", rts.HomeHandler)
+	r.Get("/", rts.GetHome)
 
 	return r
 }

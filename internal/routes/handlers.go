@@ -16,7 +16,7 @@ func New(store models.Store) *Routes {
 	return r
 }
 
-func (rt *Routes) HomeHandler(w http.ResponseWriter, r *http.Request) {
+func (rt *Routes) GetHome(w http.ResponseWriter, r *http.Request) {
 	props := rt.store.GetHome()
 	rt.ViewHome(w, r, props)
 }
