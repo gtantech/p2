@@ -6,10 +6,10 @@ import (
 )
 
 type Table struct {
-	Rows []TableRows
+	Rows []TableRow
 }
 
-type TableRows struct {
+type TableRow struct {
 	RowId        uuid.UUID
 	Activity     string
 	Dependencies []string
