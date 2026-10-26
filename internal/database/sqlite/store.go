@@ -69,12 +69,16 @@ func (s *Store) CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.Tab
 		return models.TableRow{}, err
 	}
 
+	if err := tx.Commit(); err != nil {
+		return models.TableRow{}, err
+	}
+
 	return models.TableRow{
 		RowId:           uuid.MustParse(insertRowOrderResp.ID),
 		ActivityName:    insertActivityResp.DispName,
 		DependencyNames: []string{},
 		Duration:        time.Duration(insertActivityResp.Duration),
-	}, tx.Commit()
+	}, nil
 }
 
 // CreateProject implements [routes.Store].
