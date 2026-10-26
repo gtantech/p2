@@ -8,6 +8,7 @@ import (
 
 var (
 	ErrProjectNotFound = errors.New("project not found")
+	ErrRowNotFound     = errors.New("row not found")
 )
 
 // Returns true if the caller should return early
@@ -17,6 +18,10 @@ func storeErrorHandler(err error, w http.ResponseWriter, internalServerErrorLogM
 	}
 	if errors.Is(err, ErrProjectNotFound) {
 		http.Error(w, "project not found", http.StatusBadRequest)
+		return true
+	}
+	if errors.Is(err, ErrRowNotFound) {
+		http.Error(w, "row not found", http.StatusBadRequest)
 		return true
 	}
 	http.Error(w, "internal server error", http.StatusInternalServerError)
