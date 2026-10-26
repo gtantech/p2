@@ -58,6 +58,59 @@ func (q *Queries) FindAllActivitiesByProjectSorted(ctx context.Context, projectI
 	return items, nil
 }
 
+const findCurrentAndNextActivityByRowId = `-- name: FindCurrentAndNextActivityByRowId :many
+WITH current_activity AS (
+    SELECT id, project_id, successor_activity_id, sort_rank
+    FROM activities_ordering
+    WHERE activities_ordering.id = ?
+), project_activities AS (
+    SELECT id, project_id, successor_activity_id, sort_rank
+    FROM activities_ordering
+    WHERE project_id =  (SELECT project_id FROM current_activity)
+)
+SELECT id, project_id, successor_activity_id, sort_rank
+FROM project_activities
+WHERE sort_rank > (SELECT sort_rank FROM current_activity)
+   OR id = (SELECT id FROM current_activity)
+ORDER BY sort_rank
+LIMIT 2
+`
+
+type FindCurrentAndNextActivityByRowIdRow struct {
+	ID                  string
+	ProjectID           string
+	SuccessorActivityID string
+	SortRank            int64
+}
+
+func (q *Queries) FindCurrentAndNextActivityByRowId(ctx context.Context, id string) ([]FindCurrentAndNextActivityByRowIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, findCurrentAndNextActivityByRowId, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindCurrentAndNextActivityByRowIdRow
+	for rows.Next() {
+		var i FindCurrentAndNextActivityByRowIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.SuccessorActivityID,
+			&i.SortRank,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertActivityOrdering = `-- name: InsertActivityOrdering :one
 INSERT INTO activities_ordering (id, project_id, successor_activity_id, sort_rank)
 VALUES (?, ?, ?, ?)

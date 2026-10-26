@@ -18,4 +18,8 @@ type Store interface {
 	// Gets the table with rows associated with the projectId sorted by sort rank.
 	// GetTable returns ErrProjectNotFound if projectId does not exist.
 	GetTable(ctx context.Context, projectId uuid.UUID) (models.Table, error)
+
+	// CreateRowBelow adds a new empty row below the specified rowId.
+	// CreateRowBelow returns ErrRowNotFound if no row with the rowId exists.
+	CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.TableRow, error)
 }

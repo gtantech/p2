@@ -2,6 +2,7 @@ package template
 
 import (
     "github.com/gtantech/p2/internal/models"
+	"github.com/gtantech/p2/internal/models/jsonmodels"
 )
 
 templ DependencyTable(params models.Table){
@@ -71,6 +72,10 @@ templ DependencyTableRow(params *tableRow){
                     type="button"
                     class="add-button"
                     title="Add activity"
+                    hx-post="/form/json/table/row/empty/below"
+                    hx-vals={jsonmodels.MarshalParamsToJsonField(jsonmodels.PostFromRowPlusBtn{RelativeToRowId: params.RowId})}
+                    hx-target="closest tr"
+                    hx-swap="afterend"
                 >
                     +
                 </button>

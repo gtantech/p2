@@ -21,6 +21,66 @@ type Store struct {
 	db      *sql.DB
 }
 
+// CreateRowBelow implements [routes.Store].
+func (s *Store) CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.TableRow, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return models.TableRow{}, err
+	}
+	defer tx.Rollback()
+	qtx := s.queries.WithTx(tx)
+
+	rowResp, err := qtx.FindCurrentAndNextActivityByRowId(ctx, rowId.String())
+	if err != nil {
+		return models.TableRow{}, err
+	}
+
+	if len(rowResp) == 0 {
+		return models.TableRow{}, routes.ErrRowNotFound
+	}
+
+	projectId := rowResp[0].ProjectID
+
+	insertActivityResp, err := qtx.InsertActivity(ctx, InsertActivityParams{
+		ActivityID: uuid.NewV7().String(),
+		ProjectID:  projectId,
+		DispName:   "",
+		Duration:   0,
+	})
+	if err != nil {
+		return models.TableRow{}, err
+	}
+
+	var sortRank int64
+	if len(rowResp) == 1 {
+		//last row, end of table
+		sortRank = rowResp[0].SortRank + models.TableRowSortRankStep
+	} else {
+		sortRank = rowResp[0].SortRank/2 + rowResp[1].SortRank/2
+	}
+
+	insertRowOrderResp, err := qtx.InsertActivityOrdering(ctx, InsertActivityOrderingParams{
+		ID:                  uuid.NewV7().String(),
+		ProjectID:           projectId,
+		SuccessorActivityID: insertActivityResp.ActivityID,
+		SortRank:            sortRank,
+	})
+	if err != nil {
+		return models.TableRow{}, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return models.TableRow{}, err
+	}
+
+	return models.TableRow{
+		RowId:           uuid.MustParse(insertRowOrderResp.ID),
+		ActivityName:    insertActivityResp.DispName,
+		DependencyNames: []string{},
+		Duration:        time.Duration(insertActivityResp.Duration),
+	}, nil
+}
+
 // CreateProject implements [routes.Store].
 func (s *Store) CreateProject(ctx context.Context, projectName string) (models.Project, error) {
 	resp, err := s.queries.InsertProject(ctx, InsertProjectParams{
