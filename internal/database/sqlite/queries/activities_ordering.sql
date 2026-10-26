@@ -11,3 +11,20 @@ JOIN activities_ordering ao
     AND a.project_id = ao.project_id
 WHERE a.project_id = ?
 ORDER BY ao.sort_rank;
+
+-- name: FindCurrentAndNextActivityByRowId :many
+WITH current_activity AS (
+    SELECT *
+    FROM activities_ordering
+    WHERE activities_ordering.id = ?
+), project_activities AS (
+    SELECT *
+    FROM activities_ordering
+    WHERE project_id =  (SELECT project_id FROM current_activity)
+)
+SELECT *
+FROM project_activities
+WHERE sort_rank > (SELECT sort_rank FROM current_activity)
+   OR successor_activity_id = (SELECT successor_activity_id FROM current_activity)
+ORDER BY sort_rank
+LIMIT 2;
