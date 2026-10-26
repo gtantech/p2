@@ -26,5 +26,15 @@ func (s *server) RegisterRoutes() http.Handler {
 	r.Get("/", rts.GetHome)
 	r.Get("/static/home_style.css", rts.GetHomeStyle)
 
+	r.Route("/form", func(r chi.Router) {
+		r.Route("/json", func(r chi.Router) {
+			r.Route("/table", func(r chi.Router) {
+				r.Route("/row", func(r chi.Router) {
+					r.Post("/empty/below", rts.PostFromRowPlusBtnReturnsEmptyTableRow)
+				})
+			})
+		})
+	})
+
 	return r
 }
