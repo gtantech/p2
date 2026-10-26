@@ -39,7 +39,7 @@ func (s *Store) CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.Tab
 		return models.TableRow{}, routes.ErrRowNotFound
 	}
 
-	projectId := rowResp[0].ID
+	projectId := rowResp[0].ProjectID
 
 	insertActivityResp, err := qtx.InsertActivity(ctx, InsertActivityParams{
 		ActivityID: uuid.NewV7().String(),
