@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/gtantech/p2/internal/models"
@@ -13,10 +14,11 @@ import (
 
 type Routes struct {
 	store Store
+	log   *slog.Logger
 }
 
-func New(store Store) *Routes {
-	r := &Routes{store: store}
+func New(store Store, log *slog.Logger) *Routes {
+	r := &Routes{store: store, log: log}
 	return r
 }
 
