@@ -70,7 +70,7 @@ func main() {
 	} else {
 		dbq = sqlite.NewSQLite("./data.db")
 	}
-	server := server.NewServer(serverConfig, sqlite.NewStore(dbq))
+	server := server.NewServer(serverConfig, sqlite.NewStore(dbq), logging)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
