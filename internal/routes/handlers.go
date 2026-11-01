@@ -30,7 +30,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 		return
 	}
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
-	if storeErrorHandler(err, w, fmt.Sprintf("failed to create new row below row id %v in PostFromRowPlusBtnReturnsEmptyTableRow handler", dto.RelativeToRowId)) {
+	if storeErrorHttpHandler(err, w, fmt.Sprintf("failed to create new row below row id %v in PostFromRowPlusBtnReturnsEmptyTableRow handler", dto.RelativeToRowId)) {
 		return
 	}
 	rt.ViewTableRow(w, r, tr)
@@ -43,13 +43,13 @@ func (rt *Routes) ViewTableRow(w http.ResponseWriter, r *http.Request, props mod
 func (rt *Routes) GetHome(w http.ResponseWriter, r *http.Request) {
 	homeProject, err := rt.store.GetHomeProject(r.Context())
 	if err != nil {
-		if storeErrorHandler(err, w, "failed to get home project in GetHome handler") {
+		if storeErrorHttpHandler(err, w, "failed to get home project in GetHome handler") {
 			return
 		}
 	}
 	props, err := rt.store.GetTable(r.Context(), homeProject.ProjecId)
 	if err != nil {
-		if storeErrorHandler(err, w, "failed to get home table in GetHome handler") {
+		if storeErrorHttpHandler(err, w, "failed to get home table in GetHome handler") {
 			return
 		}
 	}

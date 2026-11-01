@@ -57,8 +57,8 @@ func (e *RowNotFoundError) Slog() slog.Attr {
 	return slog.Group("http", "status", e.httpStatusCode(), "err", e.httpErrMsg(), "rowId", e.RowId)
 }
 
-// storeErrorHandler handles store errors and writes to http response. err is assumed to be non-nil. Returns true if the caller should return early
-func storeErrorHandler(err error, w http.ResponseWriter, internalServerErrorLogMessage string) bool {
+// storeErrorHttpHandler handles store errors and writes to http response. err is assumed to be non-nil. Returns true if the caller should return early
+func storeErrorHttpHandler(err error, w http.ResponseWriter, internalServerErrorLogMessage string) bool {
 	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
 		err.WriteToHttpResponse(w)
 		return true
