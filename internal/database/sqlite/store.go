@@ -36,7 +36,7 @@ func (s *Store) CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.Tab
 	}
 
 	if len(rowResp) == 0 {
-		return models.TableRow{}, routes.ErrRowNotFound
+		return models.TableRow{}, &routes.RowNotFoundError{RowId: rowId}
 	}
 
 	projectId := rowResp[0].ProjectID
@@ -98,7 +98,7 @@ func (s *Store) GetHomeProject(ctx context.Context) (models.Project, error) {
 	homeProjectId := uuid.Max() //TODO remove hard coded value
 	resp, err := s.queries.FindProjectById(ctx, homeProjectId.String())
 	if err != nil {
-		return models.Project{}, routes.ErrProjectNotFound
+		return models.Project{}, &routes.ProjectNotFoundError{ProjectId: homeProjectId}
 	}
 	return models.Project{
 		ProjecId:    uuid.MustParse(resp.ID),
@@ -114,7 +114,7 @@ func (s *Store) GetTable(ctx context.Context, projectId uuid.UUID) (models.Table
 	}
 	if len(resp) == 0 {
 		if _, err := s.queries.FindProjectById(ctx, projectId.String()); err != nil {
-			return models.Table{}, routes.ErrProjectNotFound
+			return models.Table{}, &routes.ProjectNotFoundError{ProjectId: projectId}
 		}
 	}
 
