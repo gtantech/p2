@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/gtantech/p2/internal/database"
 	"github.com/gtantech/p2/internal/database/sqlite"
+	"github.com/gtantech/p2/internal/env"
+	"github.com/gtantech/p2/internal/logger"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
 	_ "github.com/joho/godotenv/autoload"
@@ -55,6 +58,9 @@ func gracefulShutdown(server *http.Server, dbq database.DBQueries, done chan boo
 }
 
 func main() {
+	logging := logger.New("p2", env.DeploymentType(os.Getenv("ENV")))
+	slog.SetDefault(logging)
+
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
