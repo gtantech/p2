@@ -8,11 +8,6 @@ import (
 	"uuid"
 )
 
-var (
-	ErrProjectNotFound = errors.New("project not found")
-	ErrRowNotFound     = errors.New("row not found")
-)
-
 type ProjectNotFoundError struct {
 	ID uuid.UUID
 }
@@ -42,12 +37,12 @@ func storeErrorHandler(err error, w http.ResponseWriter, internalServerErrorLogM
 	if err == nil {
 		return false
 	}
-	if errors.Is(err, ErrProjectNotFound) {
-		http.Error(w, "project not found", http.StatusBadRequest)
+	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
+		err.WriteToHttpResponse(w)
 		return true
 	}
-	if errors.Is(err, ErrRowNotFound) {
-		http.Error(w, "row not found", http.StatusBadRequest)
+	if err, is := errors.AsType[*RowNotFoundError](err); is {
+		err.WriteToHttpResponse(w)
 		return true
 	}
 	http.Error(w, "internal server error", http.StatusInternalServerError)
