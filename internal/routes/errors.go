@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"uuid"
 )
@@ -28,6 +29,10 @@ func (e *ProjectNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
 	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
 }
 
+func (e *ProjectNotFoundError) Slog() slog.Attr {
+	return slog.Group("http", "status", e.httpStatusCode(), "err", e.httpErrMsg(), "projectId", e.ProjectId)
+}
+
 type RowNotFoundError struct {
 	RowId uuid.UUID
 }
@@ -46,6 +51,10 @@ func (e *RowNotFoundError) httpStatusCode() int {
 
 func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
 	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
+}
+
+func (e *RowNotFoundError) Slog() slog.Attr {
+	return slog.Group("http", "status", e.httpStatusCode(), "err", e.httpErrMsg(), "rowId", e.RowId)
 }
 
 // Returns true if the caller should return early
