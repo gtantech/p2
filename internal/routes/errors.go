@@ -16,8 +16,16 @@ func (e *ProjectNotFoundError) Error() string {
 	return fmt.Sprintf("project not found with project id %v", e.ProjectId)
 }
 
+func (e *ProjectNotFoundError) httpErrMsg() string {
+	return "project not found"
+}
+
+func (e *ProjectNotFoundError) httpStatusCode() int {
+	return http.StatusBadRequest
+}
+
 func (e *ProjectNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
-	http.Error(w, "project not found", http.StatusBadRequest)
+	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
 }
 
 type RowNotFoundError struct {
@@ -28,8 +36,16 @@ func (e *RowNotFoundError) Error() string {
 	return fmt.Sprintf("row not found with row id %v", e.RowId)
 }
 
+func (e *RowNotFoundError) httpErrMsg() string {
+	return "row not found"
+}
+
+func (e *RowNotFoundError) httpStatusCode() int {
+	return http.StatusBadRequest
+}
+
 func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
-	http.Error(w, "row not found", http.StatusBadRequest)
+	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
 }
 
 // Returns true if the caller should return early
