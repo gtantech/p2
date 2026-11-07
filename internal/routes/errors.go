@@ -3,7 +3,6 @@ package routes
 import (
 	"errors"
 	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
 	"uuid"
@@ -74,16 +73,6 @@ func errorToSlogAttr(err error) slog.Attr {
 		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "rowId", err.RowId)
 	}
 	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
-}
-
-// Returns true if the caller should return early
-func jsonUnmarshalErrorHandler(err error, w http.ResponseWriter, jsonStr string) bool {
-	if err == nil {
-		return false
-	}
-	http.Error(w, "failed to parse json", http.StatusBadRequest)
-	log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
-	return true
 }
 
 func jsonUnmarshalHttpErrorHandler(w http.ResponseWriter) {
