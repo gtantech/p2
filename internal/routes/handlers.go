@@ -30,8 +30,10 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 		return
 	}
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
-	if storeErrorHttpHandler(err, w, fmt.Sprintf("failed to create new row below row id %v in PostFromRowPlusBtnReturnsEmptyTableRow handler", dto.RelativeToRowId)) {
-		return
+	if err != nil {
+		if storeErrorHttpHandler(err, w, fmt.Sprintf("failed to create new row below row id %v in PostFromRowPlusBtnReturnsEmptyTableRow handler", dto.RelativeToRowId)) {
+			return
+		}
 	}
 	rt.ViewTableRow(w, r, tr)
 }
