@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -71,6 +72,18 @@ func errorToSlogAttr(err error) slog.Attr {
 	}
 	if err, is := errors.AsType[*RowNotFoundError](err); is {
 		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "rowId", err.RowId)
+	}
+	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
+}
+
+// jsonErrorToSlogAttr returns the slog.Attr with data from err.
+// if the error type is unknown, internal server error with err value will be used for the return value.
+func jsonErrorToSlogAttr(err error) slog.Attr {
+	if err, is := errors.AsType[*json.SyntaxError](err); is {
+		return logger.HttpErrorGroup(http.StatusBadRequest, "SyntaxError", &err)
+	}
+	if err, is := errors.AsType[*json.UnmarshalTypeError](err); is {
+		return logger.HttpErrorGroup(http.StatusInternalServerError, "unmarshal type mismatched", "UnmarshalTypeError", &err)
 	}
 	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
 }
