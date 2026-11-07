@@ -3,9 +3,11 @@ package routes
 import (
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"uuid"
+
+	"github.com/gtantech/p2/internal/logger"
 )
 
 type ProjectNotFoundError struct {
@@ -16,8 +18,16 @@ func (e *ProjectNotFoundError) Error() string {
 	return fmt.Sprintf("project not found with project id %v", e.ProjectId)
 }
 
+func (e *ProjectNotFoundError) httpErrMsg() string {
+	return "project not found"
+}
+
+func (e *ProjectNotFoundError) httpStatusCode() int {
+	return http.StatusBadRequest
+}
+
 func (e *ProjectNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
-	http.Error(w, "project not found", http.StatusBadRequest)
+	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
 }
 
 type RowNotFoundError struct {
@@ -28,34 +38,43 @@ func (e *RowNotFoundError) Error() string {
 	return fmt.Sprintf("row not found with row id %v", e.RowId)
 }
 
-func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
-	http.Error(w, "row not found", http.StatusBadRequest)
+func (e *RowNotFoundError) httpErrMsg() string {
+	return "row not found"
 }
 
-// Returns true if the caller should return early
-func storeErrorHandler(err error, w http.ResponseWriter, internalServerErrorLogMessage string) bool {
-	if err == nil {
-		return false
-	}
+func (e *RowNotFoundError) httpStatusCode() int {
+	return http.StatusBadRequest
+}
+
+func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
+	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
+}
+
+// storeErrorHttpHandler handles store errors and writes to http response. err is assumed to be non-nil
+func storeErrorHttpHandler(err error, w http.ResponseWriter) {
 	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
 		err.WriteToHttpResponse(w)
-		return true
+		return
 	}
 	if err, is := errors.AsType[*RowNotFoundError](err); is {
 		err.WriteToHttpResponse(w)
-		return true
+		return
 	}
 	http.Error(w, "internal server error", http.StatusInternalServerError)
-	log.Printf("returned http internal server error. %s", internalServerErrorLogMessage)
-	return true
 }
 
-// Returns true if the caller should return early
-func jsonUnmarshalErrorHandler(err error, w http.ResponseWriter, jsonStr string) bool {
-	if err == nil {
-		return false
+// errorToSlogAttr returns the slog.Attr with data from err.
+// if the error type is unknown, internal server error with err value will be used for the return value.
+func errorToSlogAttr(err error) slog.Attr {
+	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
+		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "projectId", err.ProjectId)
 	}
+	if err, is := errors.AsType[*RowNotFoundError](err); is {
+		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "rowId", err.RowId)
+	}
+	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
+}
+
+func jsonUnmarshalHttpErrorHandler(w http.ResponseWriter) {
 	http.Error(w, "failed to parse json", http.StatusBadRequest)
-	log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
-	return true
 }

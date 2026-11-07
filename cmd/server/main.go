@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/gtantech/p2/internal/database"
 	"github.com/gtantech/p2/internal/database/sqlite"
+	"github.com/gtantech/p2/internal/env"
+	"github.com/gtantech/p2/internal/logger"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/server"
 	_ "github.com/joho/godotenv/autoload"
@@ -55,6 +58,15 @@ func gracefulShutdown(server *http.Server, dbq database.DBQueries, done chan boo
 }
 
 func main() {
+	LOG_FILE := os.Getenv("LOG_FILE")
+	file, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	logging := logger.New("p2", env.DeploymentType(os.Getenv("ENV")), file)
+	slog.SetDefault(logging)
+
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	serverConfig := models.ServerConfig{Port: port}
 
@@ -64,7 +76,7 @@ func main() {
 	} else {
 		dbq = sqlite.NewSQLite("./data.db")
 	}
-	server := server.NewServer(serverConfig, sqlite.NewStore(dbq))
+	server := server.NewServer(serverConfig, sqlite.NewStore(dbq), logging)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
@@ -72,7 +84,7 @@ func main() {
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(server, dbq, done)
 	log.Printf("Listening on http://localhost:%d", serverConfig.Port)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))
 	}

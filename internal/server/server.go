@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -10,12 +11,14 @@ import (
 )
 
 type server struct {
-	store routes.Store
+	store  routes.Store
+	logger *slog.Logger
 }
 
-func NewServer(config models.ServerConfig, store routes.Store) *http.Server {
+func NewServer(config models.ServerConfig, store routes.Store, logger *slog.Logger) *http.Server {
 	newServer := &server{
-		store: store,
+		store:  store,
+		logger: logger,
 	}
 	// Declare Server config
 	server := &http.Server{

@@ -10,7 +10,7 @@ import (
 )
 
 func (s *server) RegisterRoutes() http.Handler {
-	rts := routes.New(s.store)
+	rts := routes.New(s.store, s.logger)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
