@@ -52,7 +52,7 @@ func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
 }
 
 // storeErrorHttpHandler handles store errors and writes to http response. err is assumed to be non-nil
-func storeErrorHttpHandler(err error, w http.ResponseWriter, internalServerErrorLogMessage string) {
+func storeErrorHttpHandler(err error, w http.ResponseWriter) {
 	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
 		err.WriteToHttpResponse(w)
 		return
@@ -62,7 +62,6 @@ func storeErrorHttpHandler(err error, w http.ResponseWriter, internalServerError
 		return
 	}
 	http.Error(w, "internal server error", http.StatusInternalServerError)
-	log.Printf("returned http internal server error. %s", internalServerErrorLogMessage)
 }
 
 // errorToSlogAttr returns the slog.Attr with data from err.
