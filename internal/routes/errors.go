@@ -85,3 +85,7 @@ func jsonUnmarshalErrorHandler(err error, w http.ResponseWriter, jsonStr string)
 	log.Printf("returned http bad request error while parsing json: <%s>", jsonStr)
 	return true
 }
+
+func jsonUnmarshalHttpErrorHandler(w http.ResponseWriter) {
+	http.Error(w, "failed to parse json", http.StatusBadRequest)
+}
