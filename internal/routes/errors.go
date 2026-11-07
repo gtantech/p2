@@ -4,8 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"uuid"
+
+	"github.com/gtantech/p2/internal/logger"
 )
 
 type ProjectNotFoundError struct {
@@ -61,6 +64,18 @@ func storeErrorHttpHandler(err error, w http.ResponseWriter, internalServerError
 	http.Error(w, "internal server error", http.StatusInternalServerError)
 	log.Printf("returned http internal server error. %s", internalServerErrorLogMessage)
 	return true
+}
+
+// errorToSlogAttr returns the slog.Attr with data from err.
+// if the error type is unknown, internal server error with internalServerErrorLogMessage will be used for the return value.
+func errorToSlogAttr(err error, internalServerErrorLogMessage string) slog.Attr {
+	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
+		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "projectId", err.ProjectId)
+	}
+	if err, is := errors.AsType[*RowNotFoundError](err); is {
+		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "rowId", err.RowId)
+	}
+	return logger.HttpErrorGroup(http.StatusInternalServerError, internalServerErrorLogMessage)
 }
 
 // Returns true if the caller should return early
