@@ -4,11 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"log/slog"
 	"net/http"
 	"uuid"
-
-	"github.com/gtantech/p2/internal/logger"
 )
 
 type ProjectNotFoundError struct {
@@ -31,10 +28,6 @@ func (e *ProjectNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
 	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
 }
 
-func (e *ProjectNotFoundError) Slog() slog.Attr {
-	return logger.HttpErrorGroup(e.httpStatusCode(), "err", e.httpErrMsg(), "projectId", e.ProjectId)
-}
-
 type RowNotFoundError struct {
 	RowId uuid.UUID
 }
@@ -53,10 +46,6 @@ func (e *RowNotFoundError) httpStatusCode() int {
 
 func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
 	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
-}
-
-func (e *RowNotFoundError) Slog() slog.Attr {
-	return logger.HttpErrorGroup(e.httpStatusCode(), "err", e.httpErrMsg(), "rowId", e.RowId)
 }
 
 // storeErrorHttpHandler handles store errors and writes to http response. err is assumed to be non-nil. Returns true if the caller should return early
