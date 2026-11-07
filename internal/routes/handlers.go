@@ -28,8 +28,9 @@ func New(store Store, log *slog.Logger) *Routes {
 func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, r *http.Request) {
 	jsonStr := getJson(r)
 	dto := jsonmodels.PostFromRowPlusBtn{}
-
-	if err := json.Unmarshal([]byte(jsonStr), &dto); jsonUnmarshalErrorHandler(err, w, jsonStr) {
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		jsonUnmarshalHttpErrorHandler(w)
 		return
 	}
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
