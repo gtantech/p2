@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -34,6 +35,10 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
 	if err != nil {
 		storeErrorHttpHandler(err, w)
+		rt.log.Error(
+			fmt.Sprintf("failed to create new row below row id %v", dto.RelativeToRowId),
+			errorToSlogAttr(err),
+		)
 		return
 	}
 	rt.ViewTableRow(w, r, tr)
@@ -47,11 +52,19 @@ func (rt *Routes) GetHome(w http.ResponseWriter, r *http.Request) {
 	homeProject, err := rt.store.GetHomeProject(r.Context())
 	if err != nil {
 		storeErrorHttpHandler(err, w)
+		rt.log.Error(
+			"failed to get home project",
+			errorToSlogAttr(err),
+		)
 		return
 	}
 	props, err := rt.store.GetTable(r.Context(), homeProject.ProjecId)
 	if err != nil {
 		storeErrorHttpHandler(err, w)
+		rt.log.Error(
+			"failed to get home table",
+			errorToSlogAttr(err),
+		)
 		return
 	}
 	rt.ViewHome(w, r, props)
