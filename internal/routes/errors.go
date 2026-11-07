@@ -65,15 +65,15 @@ func storeErrorHttpHandler(err error, w http.ResponseWriter) {
 }
 
 // errorToSlogAttr returns the slog.Attr with data from err.
-// if the error type is unknown, internal server error with internalServerErrorLogMessage will be used for the return value.
-func errorToSlogAttr(err error, internalServerErrorLogMessage string) slog.Attr {
+// if the error type is unknown, internal server error with err value will be used for the return value.
+func errorToSlogAttr(err error) slog.Attr {
 	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
 		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "projectId", err.ProjectId)
 	}
 	if err, is := errors.AsType[*RowNotFoundError](err); is {
 		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "rowId", err.RowId)
 	}
-	return logger.HttpErrorGroup(http.StatusInternalServerError, internalServerErrorLogMessage)
+	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
 }
 
 // Returns true if the caller should return early
