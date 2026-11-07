@@ -19,7 +19,7 @@ type Routes struct {
 func New(store Store, log *slog.Logger) *Routes {
 	r := &Routes{
 		store: store,
-		log:   log.WithGroup("routes"),
+		log:   log.WithGroup(packagePath),
 	}
 	return r
 }
