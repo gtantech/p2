@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/gtantech/p2/internal/logger"
 	"github.com/gtantech/p2/internal/models"
 	"github.com/gtantech/p2/internal/models/jsonmodels"
 	"github.com/gtantech/p2/internal/template"
@@ -31,6 +32,7 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
 		jsonUnmarshalHttpErrorHandler(w)
+		rt.log.Error("failed to unmarshal json", logger.JsonGroup(jsonStr))
 		return
 	}
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
