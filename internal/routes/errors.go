@@ -76,7 +76,7 @@ func errorToSlogAttr(err error) slog.Attr {
 	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
 }
 
-// jsonUnmarshalHttpErrorHandler returns the slog.Attr with data from err and writes http error to w.
+// jsonUnmarshalHttpErrorHandler returns the slog.Attr with data from err and writes http error to w. err is assumed to be non-nil.
 // if the error type is unknown, internal server error with err value will be used for the return value.
 func jsonUnmarshalHttpErrorHandler(err error, w http.ResponseWriter) slog.Attr {
 	if err, is := errors.AsType[*json.SyntaxError](err); is {
