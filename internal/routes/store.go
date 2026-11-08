@@ -25,5 +25,5 @@ type Store interface {
 
 	// UpdateRowActivityName updates the activity name associated with the specified rowId.
 	// UpdateRowActivityName returns ErrRowNotFound if no row with the rowId exists.
-	UpdateRowActivityName(ctx context.Context, rowId uuid.UUID, activityName string) (models.TableRow, error)
+	UpdateRowActivityName(ctx context.Context, rowId uuid.UUID, activityName string) (string, error)
 }
