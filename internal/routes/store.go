@@ -22,4 +22,8 @@ type Store interface {
 	// CreateRowBelow adds a new empty row below the specified rowId.
 	// CreateRowBelow returns ErrRowNotFound if no row with the rowId exists.
 	CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.TableRow, error)
+
+	// UpdateRowActivityName updates the activity name associated with the specified rowId.
+	// UpdateRowActivityName returns ErrRowNotFound if no row with the rowId exists.
+	UpdateRowActivityName(ctx context.Context, rowId uuid.UUID, activityName string) (models.TableRow, error)
 }
