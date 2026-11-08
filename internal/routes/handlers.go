@@ -32,7 +32,10 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
 		jsonUnmarshalHttpErrorHandler(w)
-		rt.log.Error("failed to unmarshal json", logger.JsonGroup(jsonStr))
+		rt.log.Error("failed to unmarshal json",
+			logger.JsonGroup(jsonStr),
+			jsonErrorToSlogAttr(err),
+		)
 		return
 	}
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
