@@ -31,16 +31,17 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 	dto := jsonmodels.PostFromRowPlusBtn{}
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
-		jsonUnmarshalHttpErrorHandler(w)
-		rt.log.Error("failed to unmarshal json", logger.JsonGroup(jsonStr))
+		rt.log.Error("failed to unmarshal json",
+			logger.JsonGroup(jsonStr),
+			jsonUnmarshalHttpErrorHandler(err, w),
+		)
 		return
 	}
 	tr, err := rt.store.CreateRowBelow(r.Context(), dto.RelativeToRowId)
 	if err != nil {
-		storeErrorHttpHandler(err, w)
 		rt.log.Error(
 			fmt.Sprintf("failed to create new row below row id %v", dto.RelativeToRowId),
-			errorToSlogAttr(err),
+			storeErrorHttpHandler(err, w),
 		)
 		return
 	}
@@ -54,19 +55,17 @@ func (rt *Routes) ViewTableRow(w http.ResponseWriter, r *http.Request, props mod
 func (rt *Routes) GetHome(w http.ResponseWriter, r *http.Request) {
 	homeProject, err := rt.store.GetHomeProject(r.Context())
 	if err != nil {
-		storeErrorHttpHandler(err, w)
 		rt.log.Error(
 			"failed to get home project",
-			errorToSlogAttr(err),
+			storeErrorHttpHandler(err, w),
 		)
 		return
 	}
 	props, err := rt.store.GetTable(r.Context(), homeProject.ProjecId)
 	if err != nil {
-		storeErrorHttpHandler(err, w)
 		rt.log.Error(
 			"failed to get home table",
-			errorToSlogAttr(err),
+			storeErrorHttpHandler(err, w),
 		)
 		return
 	}
