@@ -21,6 +21,18 @@ type Store struct {
 	db      *sql.DB
 }
 
+// UpdateRowActivityName implements [routes.Store].
+func (s *Store) UpdateRowActivityName(ctx context.Context, rowId uuid.UUID, activityName string) (string, error) {
+	actvitiyResp, err := s.queries.UpdateActivityNameByRowId(ctx, UpdateActivityNameByRowIdParams{
+		ID:       rowId.String(),
+		DispName: activityName,
+	})
+	if err != nil {
+		return "", &routes.RowNotFoundError{RowId: rowId}
+	}
+	return actvitiyResp.DispName, nil
+}
+
 // CreateRowBelow implements [routes.Store].
 func (s *Store) CreateRowBelow(ctx context.Context, rowId uuid.UUID) (models.TableRow, error) {
 	tx, err := s.db.Begin()
