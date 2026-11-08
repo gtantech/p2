@@ -31,6 +31,9 @@ func (s *server) RegisterRoutes() http.Handler {
 			r.Route("/table", func(r chi.Router) {
 				r.Route("/row", func(r chi.Router) {
 					r.Post("/empty/below", rts.PostFromRowPlusBtnReturnsEmptyTableRow)
+					r.Route("/activity", func(r chi.Router) {
+						r.Put("/name", rts.PutActivityNameHandler)
+					})
 				})
 			})
 		})

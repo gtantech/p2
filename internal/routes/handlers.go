@@ -80,3 +80,26 @@ func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/css; charset=utf-8")
 	w.Write(static.StaticHomeCss)
 }
+
+func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request) {
+	jsonStr := getJson(r)
+	var dto jsonmodels.PutFromRowActivityNameChange
+	err := json.Unmarshal([]byte(jsonStr), &dto)
+	if err != nil {
+		rt.log.Error("failed to unmarshal json",
+			logger.JsonGroup(jsonStr),
+			jsonUnmarshalHttpErrorHandler(err, w),
+		)
+		return
+	}
+	userInput := r.FormValue(dto.DomName)
+	_, err = rt.store.UpdateRowActivityName(r.Context(), dto.RowId, userInput)
+	if err != nil {
+		rt.log.Error(
+			fmt.Sprintf("failed to update activity name for row id %v", dto.RowId),
+			storeErrorHttpHandler(err, w),
+		)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
