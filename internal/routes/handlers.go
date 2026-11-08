@@ -83,7 +83,7 @@ func (rt *Routes) GetHomeStyle(w http.ResponseWriter, r *http.Request) {
 
 func (rt *Routes) PutActivityNameHandler(w http.ResponseWriter, r *http.Request) {
 	jsonStr := getJson(r)
-	var dto models.PutFromRowActivityNameChange
+	var dto jsonmodels.PutFromRowActivityNameChange
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
 		rt.log.Error("failed to unmarshal json",
