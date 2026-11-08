@@ -31,10 +31,9 @@ func (rt *Routes) PostFromRowPlusBtnReturnsEmptyTableRow(w http.ResponseWriter, 
 	dto := jsonmodels.PostFromRowPlusBtn{}
 	err := json.Unmarshal([]byte(jsonStr), &dto)
 	if err != nil {
-		jsonUnmarshalHttpErrorHandler(w)
 		rt.log.Error("failed to unmarshal json",
 			logger.JsonGroup(jsonStr),
-			jsonErrorToSlogAttr(err),
+			jsonUnmarshalHttpErrorHandler(err, w),
 		)
 		return
 	}

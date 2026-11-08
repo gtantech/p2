@@ -76,18 +76,17 @@ func errorToSlogAttr(err error) slog.Attr {
 	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
 }
 
-// jsonErrorToSlogAttr returns the slog.Attr with data from err.
+// jsonUnmarshalHttpErrorHandler returns the slog.Attr with data from err and writes to http error to w.
 // if the error type is unknown, internal server error with err value will be used for the return value.
-func jsonErrorToSlogAttr(err error) slog.Attr {
+func jsonUnmarshalHttpErrorHandler(err error, w http.ResponseWriter) slog.Attr {
 	if err, is := errors.AsType[*json.SyntaxError](err); is {
+		http.Error(w, "failed to parse json", http.StatusBadRequest)
 		return logger.HttpErrorGroup(http.StatusBadRequest, "SyntaxError", &err)
 	}
 	if err, is := errors.AsType[*json.UnmarshalTypeError](err); is {
+		http.Error(w, "failed to parse json", http.StatusInternalServerError)
 		return logger.HttpErrorGroup(http.StatusInternalServerError, "unmarshal type mismatched", "UnmarshalTypeError", &err)
 	}
+	http.Error(w, "failed to parse json", http.StatusInternalServerError)
 	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
-}
-
-func jsonUnmarshalHttpErrorHandler(w http.ResponseWriter) {
-	http.Error(w, "failed to parse json", http.StatusBadRequest)
 }
