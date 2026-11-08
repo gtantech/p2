@@ -6,12 +6,10 @@ RETURNING *;
 -- name: UpdateActivityNameByRowId :one
 UPDATE activities
 SET disp_name = ?
-WHERE id = (
-    SELECT a.id
-    FROM activities a
-    JOIN activities_ordering ao
-        ON a.activity_id = ao.successor_activity_id
-        AND a.project_id = ao.project_id
+WHERE activity_id = (
+    SELECT ao.successor_activity_id
+    FROM activities_ordering ao
     WHERE ao.id = ?
+      AND ao.project_id = activities.project_id
 )
 RETURNING *;
