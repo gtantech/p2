@@ -51,28 +51,18 @@ func (e *RowNotFoundError) WriteToHttpResponse(w http.ResponseWriter) {
 	http.Error(w, e.httpErrMsg(), e.httpStatusCode())
 }
 
-// storeErrorHttpHandler handles store errors and writes to http response. err is assumed to be non-nil
-func storeErrorHttpHandler(err error, w http.ResponseWriter) {
-	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
-		err.WriteToHttpResponse(w)
-		return
-	}
-	if err, is := errors.AsType[*RowNotFoundError](err); is {
-		err.WriteToHttpResponse(w)
-		return
-	}
-	http.Error(w, "internal server error", http.StatusInternalServerError)
-}
-
-// errorToSlogAttr returns the slog.Attr with data from err.
+// storeErrorHttpHandler returns the slog.Attr with data from err and writes http error to w. err is assumed to be non-nil.
 // if the error type is unknown, internal server error with err value will be used for the return value.
-func errorToSlogAttr(err error) slog.Attr {
+func storeErrorHttpHandler(err error, w http.ResponseWriter) slog.Attr {
 	if err, is := errors.AsType[*ProjectNotFoundError](err); is {
+		err.WriteToHttpResponse(w)
 		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "projectId", err.ProjectId)
 	}
 	if err, is := errors.AsType[*RowNotFoundError](err); is {
+		err.WriteToHttpResponse(w)
 		return logger.HttpErrorGroup(err.httpStatusCode(), err.httpErrMsg(), "rowId", err.RowId)
 	}
+	http.Error(w, "internal server error", http.StatusInternalServerError)
 	return logger.HttpErrorGroup(http.StatusInternalServerError, err.Error())
 }
 
