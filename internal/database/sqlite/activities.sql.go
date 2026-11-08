@@ -38,3 +38,34 @@ func (q *Queries) InsertActivity(ctx context.Context, arg InsertActivityParams) 
 	)
 	return i, err
 }
+
+const updateActivityNameByRowId = `-- name: UpdateActivityNameByRowId :one
+UPDATE activities
+SET disp_name = ?
+WHERE id = (
+    SELECT a.id
+    FROM activities a
+    JOIN activities_ordering ao
+        ON a.activity_id = ao.successor_activity_id
+        AND a.project_id = ao.project_id
+    WHERE ao.id = ?
+)
+RETURNING activity_id, project_id, disp_name, duration
+`
+
+type UpdateActivityNameByRowIdParams struct {
+	DispName string
+	ID       string
+}
+
+func (q *Queries) UpdateActivityNameByRowId(ctx context.Context, arg UpdateActivityNameByRowIdParams) (Activity, error) {
+	row := q.db.QueryRowContext(ctx, updateActivityNameByRowId, arg.DispName, arg.ID)
+	var i Activity
+	err := row.Scan(
+		&i.ActivityID,
+		&i.ProjectID,
+		&i.DispName,
+		&i.Duration,
+	)
+	return i, err
+}
