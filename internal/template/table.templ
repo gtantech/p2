@@ -41,7 +41,11 @@ templ DependencyTableRow(params *tableRow){
         <td>
             <input
                 class="activity-name"
+                name="activity_input"
                 value={params.ActivityName}
+                hx-put="/form/json/table/row/activity/name"
+                hx-vals={jsonmodels.MarshalParamsToJsonField(jsonmodels.PutFromRowActivityNameChange{RowId: params.RowId, DomName: "activity_input"})}
+                hx-trigger="input changed delay:200ms"
             >
         </td>
         
